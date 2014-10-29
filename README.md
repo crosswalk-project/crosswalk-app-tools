@@ -1,4 +1,4 @@
-crosswalk-app-tool
-==================
+crosswalk-app-tools
+===================
 
-Command line tool to create and package Crosswalk applications
+Command line tools to create and package Crosswalk applications.
