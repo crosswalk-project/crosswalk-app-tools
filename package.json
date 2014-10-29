@@ -1,0 +1,34 @@
+{
+  "name": "crosswalk-app-tools",
+  "version": "0.1.0",
+  "description": "An APK packager for Crosswalk -- http://crosswalk-project.org",
+  "main": "crosswalk-app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/crosswalk-project/crosswalk-app-tools.git"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-jshint": "~0.10.0",
+    "grunt-contrib-nodeunit": "~0.4.1",
+    "grunt-contrib-watch": "~0.6.1"
+  },
+  "keywords": [
+    "crosswalk",
+    "apk",
+    "packaging",
+    "android"
+  ],
+  "author": "Robert Staudinger <robert.staudinger@intel.com>",
+  "license": "Apache V2",
+  "bugs": {
+    "url": "https://github.com/crosswalk-project/crosswalk-app-tools/issues"
+  },
+  "files": [
+    "README.md",
+    "LICENSE-APACHE-V2"
+  ]
+}
