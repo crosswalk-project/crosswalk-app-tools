@@ -33,3 +33,5 @@ AndroidSDK.prototype.buildProject = function() {
 
     // TODO
 };
+
+module.exports = AndroidSDK;
