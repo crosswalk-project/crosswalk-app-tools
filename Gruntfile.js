@@ -26,11 +26,6 @@ module.exports = function(grunt) {
       }
     },
 
-    watch: {
-      files: ['<%= jshint.files %>'],
-      tasks: ['jshint', 'test']
-    },
-
     jsdoc : {
         dist : {
             src: ['src/**/*.js'],
@@ -44,7 +39,6 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
-  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-jsdoc');
 
   grunt.registerTask('default', ['jshint', 'nodeunit']);
