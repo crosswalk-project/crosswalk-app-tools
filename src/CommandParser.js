@@ -12,6 +12,7 @@ function CommandParser() {}
 
 /**
  * Get primary command.
+ * @returns {String} One of "create", "update", "refresh", "build" or null.
  * @memberOf CommandParser
  */
 CommandParser.prototype.getCommand = function() {
@@ -27,9 +28,11 @@ CommandParser.prototype.getCommand = function() {
 
 /**
  * Get package name when command is "create".
+ * @returns {String} Package name as per Android conventions or null.
  * @memberOf CommandParser
+ * @see {@link http://developer.android.com/guide/topics/manifest/manifest-element.html#package}
  */
-CommandParser.prototype.getCreatePackage = function() {
+CommandParser.prototype.createGetPackage = function() {
 
     var errormsg = "Invalid package name, see http://developer.android.com/guide/topics/manifest/manifest-element.html#package";
 
@@ -62,9 +65,11 @@ CommandParser.prototype.getCreatePackage = function() {
 
 /**
  * Get version when command is "update".
+ * @returns {String} Crosswalk version string or null.
  * @memberOf CommandParser
+ * @see {@link https://crosswalk-project.org/documentation/downloads.html}
  */
-CommandParser.prototype.getUpdateVersion = function() {
+CommandParser.prototype.updateGetVersion = function() {
 
     var errormsg = "Version must be of format ab.cd.ef.gh";
 
@@ -86,9 +91,10 @@ CommandParser.prototype.getUpdateVersion = function() {
 
 /**
  * Get build type when command is "build".
+ * @returns {String} One of "debug", "release", or null.
  * @memberOf CommandParser
  */
-CommandParser.prototype.getBuildType = function() {
+CommandParser.prototype.buildGetType = function() {
 
     // Default to "debug" when no type given.
     if (process.argv.length < 4) {
