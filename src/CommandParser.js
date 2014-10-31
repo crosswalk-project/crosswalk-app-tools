@@ -39,7 +39,7 @@ CommandParser.prototype.createGetPackage = function() {
     // Check for invalid characters as per
     // http://developer.android.com/guide/topics/manifest/manifest-element.html#package
     var pkg = process.argv[3];
-    var match = pkg.match("[A-Za-z0-9_\.]*");
+    var match = pkg.match("[A-Za-z0-9_\\.]*");
     if (match[0] != pkg) {
         Console.error(errormsg);
         return null;
@@ -74,7 +74,7 @@ CommandParser.prototype.updateGetVersion = function() {
     var errormsg = "Version must be of format ab.cd.ef.gh";
 
     var version = process.argv[3];
-    var match = pkg.match("[0-9\.]*");
+    var match = pkg.match("[0-9\\.]*");
     if (match[0] != version) {
         Console.error(errormsg);
         return null;

@@ -2,31 +2,38 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    qunit: {
-      files: ['test/**/*.html']
+
+    nodeunit: {
+      all: ['test/**/*.js'],
+      options: {
+        reporter: 'junit',
+        reporterOptions: {
+          output: 'test-results'
+        }
+      }
     },
 
     jshint: {
       files: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
       options: {
-        // options here to override JSHint defaults
+        /* options here to override JSHint defaults
         globals: {
           jQuery: true,
           console: true,
           module: true,
           document: true
-        }
+        } */
       }
     },
 
     watch: {
       files: ['<%= jshint.files %>'],
-      tasks: ['jshint', 'qunit']
+      tasks: ['jshint', 'test']
     },
 
     jsdoc : {
         dist : {
-            src: ['src/*.js'],
+            src: ['src/**/*.js'],
             options: {
                 destination: 'doc'
             }
@@ -36,16 +43,11 @@ module.exports = function(grunt) {
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  // grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-contrib-nodeunit');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-jsdoc');
 
-  grunt.registerTask('docs', ['jsdoc']);
-
-  // grunt.registerTask('test', ['jshint', 'qunit']);
-  grunt.registerTask('test', ['jshint']);
-
-  // grunt.registerTask('default', ['jshint', 'qunit']);
-  grunt.registerTask('default', ['jshint']);
-
+  grunt.registerTask('default', ['jshint', 'nodeunit']);
+  grunt.registerTask('doc', ['jshint', 'nodeunit', 'jsdoc']);
+  grunt.registerTask('test', ['jshint', 'nodeunit']);
 };

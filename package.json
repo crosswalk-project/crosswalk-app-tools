@@ -16,7 +16,8 @@
     "grunt-contrib-nodeunit": "~0.4.1",
     "grunt-contrib-watch": "~0.6.1",
     "grunt-jsdoc": "~0.4.2",
-    "jsdoc": "https://github.com/jsdoc3/jsdoc/archive/v3.2.2.tar.gz"
+    "jsdoc": "https://github.com/jsdoc3/jsdoc/archive/v3.2.2.tar.gz",
+    "nodeunit": "~0.9.0"
   },
   "keywords": [
     "crosswalk",
