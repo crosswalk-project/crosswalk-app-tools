@@ -6,9 +6,18 @@ var Console = require("./Console");
 
 /**
  * Parsing and validation of command-line arguments.
+ * @param {String[]} argv Command-line arguments.
+ * @throws {TypeError} When argv is not an array.
  * @constructor
  */
-function CommandParser() {}
+function CommandParser(argv) {
+
+    if (!(argv instanceof Array)) {
+        throw new TypeError("CommandParser(argv) must be of type Array.");
+    }
+
+    this._argv = argv;
+}
 
 /**
  * Get primary command.
@@ -17,7 +26,7 @@ function CommandParser() {}
  */
 CommandParser.prototype.getCommand = function() {
 
-    var command = process.argv[2];
+    var command = this._argv[2];
 
     if (["create", "update", "refresh", "build"].indexOf(action) > -1) {
         return command;
@@ -38,7 +47,7 @@ CommandParser.prototype.createGetPackage = function() {
 
     // Check for invalid characters as per
     // http://developer.android.com/guide/topics/manifest/manifest-element.html#package
-    var pkg = process.argv[3];
+    var pkg = this._argv[3];
     var match = pkg.match("[A-Za-z0-9_\\.]*");
     if (match[0] != pkg) {
         Console.error(errormsg);
@@ -73,7 +82,7 @@ CommandParser.prototype.updateGetVersion = function() {
 
     var errormsg = "Version must be of format ab.cd.ef.gh";
 
-    var version = process.argv[3];
+    var version = this._argv[3];
     var match = pkg.match("[0-9\\.]*");
     if (match[0] != version) {
         Console.error(errormsg);
@@ -97,12 +106,12 @@ CommandParser.prototype.updateGetVersion = function() {
 CommandParser.prototype.buildGetType = function() {
 
     // Default to "debug" when no type given.
-    if (process.argv.length < 4) {
+    if (this._argv.length < 4) {
         return "debug";
     }
 
     // Check build type is recognized.
-    var type = process.argv[3];
+    var type = this._argv[3];
     if (["debug", "release"].indexOf(type) > -1) {
         return type;
     }
