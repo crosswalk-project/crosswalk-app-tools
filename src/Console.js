@@ -2,12 +2,24 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
-module.exports.error = function(message) {
+var ConsoleIface = require("./ConsoleIface");
+
+/**
+ * Creates a logging console.
+ * @constructor
+ */
+function StdioConsole() {}
+
+StdioConsole.prototype = ConsoleIface.prototype;
+
+StdioConsole.prototype.error = function(message) {
 
     console.error("ERROR: " + message);
 };
 
-module.exports.warning = function(message) {
+StdioConsole.prototype.warning = function(message) {
 
     console.error("WARNING: " + message);
 };
+
+module.exports = new StdioConsole();
