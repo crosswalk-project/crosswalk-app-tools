@@ -7,6 +7,7 @@ module.exports = function(grunt) {
       all: ['test/**/*.js'],
       options: {
         reporter: 'junit',
+        //reporter: 'verbose',
         reporterOptions: {
           output: 'test-results'
         }
