@@ -83,7 +83,7 @@ CommandParser.prototype.updateGetVersion = function() {
     var errormsg = "Version must be of format ab.cd.ef.gh";
 
     var version = this._argv[3];
-    var match = pkg.match("[0-9\\.]*");
+    var match = version.match("[0-9\\.]*");
     if (match[0] != version) {
         Console.error(errormsg);
         return null;
