@@ -28,7 +28,7 @@ CommandParser.prototype.getCommand = function() {
 
     var command = this._argv[2];
 
-    if (["create", "update", "refresh", "build"].indexOf(action) > -1) {
+    if (["create", "update", "refresh", "build"].indexOf(command) > -1) {
         return command;
     }
 
