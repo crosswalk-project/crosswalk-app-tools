@@ -20,6 +20,31 @@ function CommandParser(argv) {
 }
 
 /**
+ * Check whether the current instance represents a valid command.
+ * @returns {Boolean} true if valid, otherwise false.
+ * @memberOf CommandParser
+ */
+CommandParser.prototype.check = function() {
+
+    var cmd = this.getCommand();
+    switch (cmd) {
+    case "create":
+        var pkg = this.createGetPackage();
+        return pkg !== null;
+    case "update":
+        var version = this.updateGetVersion();
+        return version !== null;
+    case "build":
+        var type = this.buildGetType();
+        return type !== null;
+    default:
+        // fall through
+    }
+
+    return false;
+};
+
+/**
  * Get primary command.
  * @returns {String} One of "create", "update", "refresh", "build" or null.
  * @memberOf CommandParser
@@ -88,7 +113,7 @@ CommandParser.prototype.updateGetVersion = function() {
         Console.error(errormsg);
         return null;
     }
-    
+
     var parts = version.split('.');
     if (parts.length != 4) {
         Console.error(errormsg);
@@ -115,7 +140,7 @@ CommandParser.prototype.buildGetType = function() {
     if (["debug", "release"].indexOf(type) > -1) {
         return type;
     }
-    
+
     return null;
 };
 
