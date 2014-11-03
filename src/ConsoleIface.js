@@ -29,4 +29,14 @@ ConsoleIface.prototype.warning = function(message) {
     throw new Error("ConsoleIface.warning() not implemented.");
 };
 
+/**
+ * Log message.
+ * @param {String} message
+ * @memberOf ConsoleIface
+ */
+ConsoleIface.prototype.log = function(message) {
+
+    throw new Error("ConsoleIface.log() not implemented.");
+};
+
 module.exports = ConsoleIface;

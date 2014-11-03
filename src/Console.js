@@ -23,6 +23,11 @@ StdioConsole.prototype.warning = function(message) {
     console.error("WARNING: " + message);
 };
 
+StdioConsole.prototype.log = function(message) {
+
+    console.log(message);
+};
+
 
 
 /**
@@ -37,6 +42,7 @@ SilentConsole.prototype.error = function(message) {};
 
 SilentConsole.prototype.warning = function(message) {};
 
+StdioConsole.prototype.log = function(message) {};
 
 
 if (Config.getSilentConsole()) {
