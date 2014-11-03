@@ -2,6 +2,7 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var Config = require("./Config");
 var ConsoleIface = require("./ConsoleIface");
 
 /**
@@ -22,4 +23,24 @@ StdioConsole.prototype.warning = function(message) {
     console.error("WARNING: " + message);
 };
 
-module.exports = new StdioConsole();
+
+
+/**
+ * Creates a silent console.
+ * @constructor
+ */
+function SilentConsole() {}
+
+SilentConsole.prototype = ConsoleIface.prototype;
+
+SilentConsole.prototype.error = function(message) {};
+
+SilentConsole.prototype.warning = function(message) {};
+
+
+
+if (Config.getSilentConsole()) {
+    module.exports = new SilentConsole();
+} else {
+    module.exports = new StdioConsole();
+}

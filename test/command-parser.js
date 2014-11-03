@@ -2,6 +2,7 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+require("../src/Config").setSilentConsole(true);
 var CommandParser = require("../src/CommandParser");
 
 exports.tests = {
