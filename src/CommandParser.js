@@ -51,6 +51,10 @@ CommandParser.prototype.check = function() {
  */
 CommandParser.prototype.getCommand = function() {
 
+    if (this._argv.length < 3) {
+        return null;
+    }
+
     var command = this._argv[2];
 
     if (["create", "update", "refresh", "build"].indexOf(command) > -1) {
@@ -69,6 +73,10 @@ CommandParser.prototype.getCommand = function() {
 CommandParser.prototype.createGetPackage = function() {
 
     var errormsg = "Invalid package name, see http://developer.android.com/guide/topics/manifest/manifest-element.html#package";
+
+    if (this._argv.length < 4) {
+        return null;
+    }
 
     // Check for invalid characters as per
     // http://developer.android.com/guide/topics/manifest/manifest-element.html#package
@@ -107,6 +115,10 @@ CommandParser.prototype.updateGetVersion = function() {
 
     var errormsg = "Version must be of format ab.cd.ef.gh";
 
+    if (this._argv.length < 4) {
+        return null;
+    }
+
     var version = this._argv[3];
     var match = version.match("[0-9\\.]*");
     if (match[0] != version) {
@@ -129,6 +141,10 @@ CommandParser.prototype.updateGetVersion = function() {
  * @memberOf CommandParser
  */
 CommandParser.prototype.buildGetType = function() {
+
+    if (this._argv.length < 3) {
+        return null;
+    }
 
     // Default to "debug" when no type given.
     if (this._argv.length < 4) {
