@@ -7,41 +7,47 @@
 // This is a quick and dirty script for running nodeunit
 // tests standalone.
 
+var Config = require("../src/Config");
+var Console = require("../src/Console");
+
 function Driver() {}
 
 Driver.prototype.expect = function(asserts) {
 
-    console.log("  Expect " + asserts);
+    Console.log("  Expect " + asserts);
 };
 
 Driver.prototype.equal = function(exp1, exp2) {
 
-    console.log("  Equal " + exp1 + " == " + exp2);
+    Console.log("  Equal " + exp1 + " == " + exp2);
 };
 
 Driver.prototype.done = function() {
 
-    console.log("Done.\n");
+    Console.log("Done.\n");
 };
 
 
 
 if (process.argv.length <= 2) {
 
-    console.log("Usage: run.js <script>");
+    Console.log("Usage: run.js <script>");
 
 } else {
 
     var script = process.argv[2];
-    console.log("Running " + script);
+    Console.log("Running " + script);
 
     var test = require(script);
+    // Force verbose
+    Config.setSilentConsole(false);
+
     if (test.tests) {
         var driver = new Driver();
 
         for (var key in test.tests) {
 
-            console.log("Testing " + key);
+            Console.log("Testing " + key);
             test.tests[key](new Driver());
         }
     }

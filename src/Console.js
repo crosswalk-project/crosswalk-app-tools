@@ -15,17 +15,20 @@ StdioConsole.prototype = ConsoleIface.prototype;
 
 StdioConsole.prototype.error = function(message) {
 
-    console.error("ERROR: " + message);
+    if (!Config.getSilentConsole())
+        console.error("ERROR: " + message);
 };
 
 StdioConsole.prototype.warning = function(message) {
 
-    console.error("WARNING: " + message);
+    if (!Config.getSilentConsole())
+        console.error("WARNING: " + message);
 };
 
 StdioConsole.prototype.log = function(message) {
 
-    console.log(message);
+    if (!Config.getSilentConsole())
+        console.log(message);
 };
 
 
@@ -34,6 +37,7 @@ StdioConsole.prototype.log = function(message) {
  * Creates a silent console.
  * @constructor
  */
+/*
 function SilentConsole() {}
 
 SilentConsole.prototype = ConsoleIface.prototype;
@@ -42,11 +46,8 @@ SilentConsole.prototype.error = function(message) {};
 
 SilentConsole.prototype.warning = function(message) {};
 
-StdioConsole.prototype.log = function(message) {};
+SilentConsole.prototype.log = function(message) {};
+*/
 
 
-if (Config.getSilentConsole()) {
-    module.exports = new SilentConsole();
-} else {
-    module.exports = new StdioConsole();
-}
+module.exports = new StdioConsole();

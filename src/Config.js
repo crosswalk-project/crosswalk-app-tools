@@ -26,8 +26,7 @@ Config.prototype.getSilentConsole = function() {
  */
 Config.prototype.setSilentConsole = function(silent) {
 
-    if (typeof silent == "boolean")
-        this._silentConsole = silent;
+    this._silentConsole = silent;
 };
 
 module.exports = new Config();
