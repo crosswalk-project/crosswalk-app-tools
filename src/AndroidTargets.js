@@ -30,18 +30,20 @@ AndroidTargets.prototype.parse = function() {
     lines.forEach(function(line) {
 
         var match = null;
-    
-        if (target === null) {
-            // Look for target paragraph.
-            match = "id: ";
-            if (line.substring(0, match.length) === match &&
-                line.indexOf('"') < line.lastIndexOf('"')) {
 
-                target = line.substring(line.indexOf('"') + 1,
-                                        line.lastIndexOf('"'));
-            }
-        } else {
-            // Look for ABI line.
+        // Look for target paragraph (starts with "id:")
+        // and cache target name.
+        match = "id: ";
+        if (line.substring(0, match.length) === match &&
+            line.indexOf('"') < line.lastIndexOf('"')) {
+
+            target = line.substring(line.indexOf('"') + 1,
+                                    line.lastIndexOf('"'));
+
+        }
+
+        // If we are in target paragraph, look for ABI line.
+        if (target !== null) {
             match = " Tag/ABIs : ";
             var abis = line.substring(line.indexOf(':') + 1, line.length);
             if (line.substring(0, match.length) === match &&
@@ -50,6 +52,11 @@ AndroidTargets.prototype.parse = function() {
                 targets[target] = abis;
                 target = null;
             }
+        }
+
+        // At end of target paragraph reset cached target name.
+        if (line == "----------") {
+            target = null;
         }
     });
 

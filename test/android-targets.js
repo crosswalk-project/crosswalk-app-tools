@@ -61,6 +61,18 @@ exports.tests = {
         test.equal(Object.keys(targets).length, 2);
 
         test.done();
-    }
+    },
 
+    pick: function(test) {
+
+        test.expect(1);
+
+        var at1 = new AndroidTargets(_androidTargets);
+        var target = at1.pick();
+
+        // This one has both ABIs, so it should be default.
+        test.equal(target, "android-19");
+
+        test.done();
+    }
 };
