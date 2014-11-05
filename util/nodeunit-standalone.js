@@ -43,12 +43,22 @@ if (process.argv.length <= 2) {
     Config.setSilentConsole(false);
 
     if (test.tests) {
-        var driver = new Driver();
+
+        if (test.tests.setUp) {
+            test.tests.setUp(function() {});
+        }
 
         for (var key in test.tests) {
 
+            if (key == "setUp" || key == "tearDown")
+                continue;
+
             Console.log("Testing " + key);
             test.tests[key](new Driver());
+        }
+
+        if (test.tests.tearDown) {
+            test.tests.tearDown(function() {});
         }
     }
 }
