@@ -29,9 +29,11 @@ AndroidTargets.prototype.parse = function() {
     var targets = {};
     lines.forEach(function(line) {
 
-        if (target == null) {
+        var match = null;
+    
+        if (target === null) {
             // Look for target paragraph.
-            var match = "id: ";
+            match = "id: ";
             if (line.substring(0, match.length) === match &&
                 line.indexOf('"') < line.lastIndexOf('"')) {
 
@@ -40,7 +42,7 @@ AndroidTargets.prototype.parse = function() {
             }
         } else {
             // Look for ABI line.
-            var match = " Tag/ABIs : ";
+            match = " Tag/ABIs : ";
             var abis = line.substring(line.indexOf(':') + 1, line.length);
             if (line.substring(0, match.length) === match &&
                 abis != " no ABIs.") {
@@ -67,7 +69,7 @@ AndroidTargets.prototype.pick = function() {
     var pick2 = null;
     var pick3 = null;
 
-    for (target in targets) {
+    for (var target in targets) {
         var abis = targets[target];
 
         if (abis.indexOf("armeabi-v7a") > -1 &&
@@ -75,9 +77,9 @@ AndroidTargets.prototype.pick = function() {
 
             // Both ABIs, best pick.
             // If already having a pick, update only if it's "default" (not TV) target
-            if (pick1 != null && abis.indexOf("default") > -1) {
+            if (pick1 !== null && abis.indexOf("default") > -1) {
                 pick1 = target;
-            } else if (pick1 == null) {
+            } else if (pick1 === null) {
                 pick1 = target;
             }
 
@@ -85,26 +87,26 @@ AndroidTargets.prototype.pick = function() {
 
             // Let's be honest.
             // If already having a pick, update only if it's "default" (not TV) target
-            if (pick2 != null && abis.indexOf("default") > -1) {
+            if (pick2 !== null && abis.indexOf("default") > -1) {
                 pick2 = target;
-            } else if (pick2 == null) {
+            } else if (pick2 === null) {
                 pick2 = target;
             }
 
         } else if (abis.indexOf("x86") > -1) {
 
             // If already having a pick, update only if it's "default" (not TV) target
-            if (pick3 != null && abis.indexOf("default") > -1) {
+            if (pick3 !== null && abis.indexOf("default") > -1) {
                 pick3 = target;
-            } else if (pick3 == null) {
+            } else if (pick3 === null) {
                 pick3 = target;
             }
         }
     }
 
-    return pick1 != null ? pick1 :
-           pick2 != null ? pick2 :
-           pick3 != null ? pick3 :
+    return pick1 !== null ? pick1 :
+           pick2 !== null ? pick2 :
+           pick3 !== null ? pick3 :
            null;
 };
 
