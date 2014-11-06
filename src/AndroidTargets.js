@@ -20,7 +20,7 @@ function AndroidTargets(buffer) {
 /**
  * Parse SDK targets buffer passed to the constructor.
  * @param {Boolean} [onlyABI] Optionally only return targets with ABI installed when true.
- * @returns Targets object in the form of { target : ABIs }.
+ * @returns Targets object in the form of \{ target : ABIs \}.
  * @memberOf AndroidTargets
  */
 AndroidTargets.prototype.parse = function(onlyABI) {

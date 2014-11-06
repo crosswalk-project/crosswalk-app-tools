@@ -2,30 +2,58 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
-var Console = require("../src/Console");
+var AndroidTargets = require("../src/AndroidTargets");
 var ShellJS = require("shelljs");
 
 /**
  * Create AndroidSDK object, wrapping Android cmd-line tool interactions.
+ * @throws {SDKNotFoundError} If the Android SDK was not found in the environment.
  * @constructor
  */
-function AndroidSDK() {}
+function AndroidSDK() {
+
+    this._scriptPath = this.findAndroidScriptPath();
+    if (this._scriptPath === null) {
+        // TODO think out a way to unit test this code path.
+        throw new SDKNotFoundError("Android SDK now found in environment search path.");
+    }
+}
 
 /**
- * Check whether the Android SDK is available.
- * @returns {Boolean} true if available, otherwise false.
+ * Query for lowest API target that supports apiLevel.
+ * @param {Number} apiLevel Minimum supported API level.
+ * @param {Function} callback Callback function(target, errormsg), (String, String)
+ * @returns null
  * @memberOf AndroidSDK
  */
-AndroidSDK.prototype.isAvailable = function() {
+AndroidSDK.prototype.queryTarget = function(apiLevel, callback) {
 
-    var path = ShellJS.which("android");
+    if (this.buffer === null) {
+        callback([], "Android SDK executable not found");
+    }
 
-    return typeof path == "string";
-};
+    var execFile = require('child_process').execFile;
+    var child = execFile(this._scriptPath, ["list", "target"], {}, function(error, stdout, stderr) {
 
-AndroidSDK.prototype.getTargets = function() {
+        var target = null;
+        if (stdout !== null) {
 
-    // TODO
+            try {
+                var targets = new AndroidTargets(stdout);
+                target = targets.pickLowest(apiLevel);
+            } catch (e) {
+                error = "Failed to parse SDK targets.";
+            }
+
+        } else if (error === null) {
+            error = "No SDK targets found";
+        }
+
+        callback(target, error);
+    }.bind(this));
+
+    // Shut up lint
+    return null;
 };
 
 AndroidSDK.prototype.generateProject = function() {
@@ -42,5 +70,25 @@ AndroidSDK.prototype.buildProject = function() {
 
     // TODO
 };
+
+AndroidSDK.prototype.findAndroidScriptPath = function() {
+
+    return ShellJS.which("android");
+};
+
+
+
+/**
+ * Creates a new SDKNotFoundError.
+ * @param {String} message Error message.
+ * @constructor
+ */
+function SDKNotFoundError(message) {
+    Error.call(this, message);
+}
+SDKNotFoundError.prototype = Error.prototype;
+
+AndroidSDK.SDKNotFoundError = SDKNotFoundError;
+
 
 module.exports = AndroidSDK;
