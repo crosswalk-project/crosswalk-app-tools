@@ -19,10 +19,14 @@ function AndroidTargets(buffer) {
 
 /**
  * Parse SDK targets buffer passed to the constructor.
+ * @param {Boolean} [onlyABI] Optionally only return targets with ABI installed when true.
  * @returns Targets object in the form of { target : ABIs }.
  * @memberOf AndroidTargets
  */
-AndroidTargets.prototype.parse = function() {
+AndroidTargets.prototype.parse = function(onlyABI) {
+
+    if (typeof onlyABI == "undefined")
+        onlyABI = false;
 
     var lines = this._buffer.split('\n');
     var target = null;
@@ -46,11 +50,12 @@ AndroidTargets.prototype.parse = function() {
         if (target !== null) {
             match = " Tag/ABIs : ";
             var abis = line.substring(line.indexOf(':') + 1, line.length);
-            if (line.substring(0, match.length) === match &&
-                abis != " no ABIs.") {
+            if (line.substring(0, match.length) === match) {
+                if (abis != " no ABIs." || onlyABI === false) {
 
-                targets[target] = abis;
-                target = null;
+                    targets[target] = abis;
+                    target = null;
+                }
             }
         }
 
@@ -115,6 +120,29 @@ AndroidTargets.prototype.pick = function() {
            pick2 !== null ? pick2 :
            pick3 !== null ? pick3 :
            null;
+};
+
+/**
+ * Pick lowest target above minAPILevel.
+ * @param {Number} minAPILevel lowest permitted target API level.
+ * @returns Target identifier string or null if no matching target found.
+ * @memberOf AndroidTargets
+ */
+AndroidTargets.prototype.pickLowest = function(minAPILevel) {
+
+    var targets = this.parse();
+    var lowestTarget = null;
+
+    for (var target in targets) {
+        var a = target.split('-');
+        var level = Number(a[1]);
+        if (level >= minAPILevel) {
+            lowestTarget = target;
+            break;
+        }
+    }
+
+    return lowestTarget;
 };
 
 module.exports = AndroidTargets;

@@ -45,7 +45,7 @@ exports.tests = {
 
     parse: function(test) {
 
-        test.expect(2);
+        test.expect(3);
 
         // Bad test, invalid instantiation.
         try {
@@ -56,9 +56,15 @@ exports.tests = {
 
         // Good test.
         var at2 = new AndroidTargets(_androidTargets);
-        var targets = at2.parse();
+        var trg2 = at2.parse();
 
-        test.equal(Object.keys(targets).length, 2);
+        test.equal(Object.keys(trg2).length, 4);
+
+        // Good test.
+        var at3 = new AndroidTargets(_androidTargets);
+        var trg3 = at3.parse(true);
+
+        test.equal(Object.keys(trg3).length, 2);
 
         test.done();
     },
@@ -72,6 +78,19 @@ exports.tests = {
 
         // This one has both ABIs, so it should be default.
         test.equal(target, "android-19");
+
+        test.done();
+    },
+
+    pickLowest: function(test) {
+
+        test.expect(1);
+
+        var at1 = new AndroidTargets(_androidTargets);
+        var target = at1.pickLowest(14);
+
+        // Lowest target in test data.
+        test.equal(target, "android-18");
 
         test.done();
     }
