@@ -41,6 +41,33 @@ exports.tests = {
 
             test.done();
         });
+    },
 
+    generateProjectTemplate: function(test) {
+
+        test.expect(2);
+
+        var sdk = new AndroidSDK();
+        sdk.queryTarget(14, function(target, error) {
+
+            Console.log("  " + target);
+            test.equal(typeof target, "string");
+
+            var path = null;
+            var log = null;
+            var errormsg = null;
+            sdk.generateProjectTemplate("com.example.Foo", target,
+                                        function(path, log, errormsg) {
+
+                if (errormsg) {
+                    Console.error(errormsg);
+                } else {
+                    Console.log(log);
+                    // TODO create test project in tmp and test path.
+                    test.equal(true, true);
+                    test.done();
+                }
+            });
+        });
     }
 };
