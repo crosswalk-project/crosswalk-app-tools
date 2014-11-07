@@ -29,7 +29,8 @@ function AndroidSDK() {
  * @returns null
  * @memberOf AndroidSDK
  */
-AndroidSDK.prototype.queryTarget = function(apiLevel, callback) {
+AndroidSDK.prototype.queryTarget =
+function(apiLevel, callback) {
 
     if (this.buffer === null) {
         callback([], "Android SDK executable not found");
@@ -106,17 +107,20 @@ function(packageName, apiTarget, callback) {
     return null;
 };
 
-AndroidSDK.prototype.refreshProject = function() {
+AndroidSDK.prototype.refreshProject =
+function() {
 
     // TODO
 };
 
-AndroidSDK.prototype.buildProject = function() {
+AndroidSDK.prototype.buildProject =
+function() {
 
     // TODO
 };
 
-AndroidSDK.prototype.findAndroidScriptPath = function() {
+AndroidSDK.prototype.findAndroidScriptPath =
+function() {
 
     return ShellJS.which("android");
 };
@@ -134,6 +138,7 @@ function SDKNotFoundError(message) {
 SDKNotFoundError.prototype = Error.prototype;
 
 AndroidSDK.SDKNotFoundError = SDKNotFoundError;
+
 
 
 module.exports = AndroidSDK;

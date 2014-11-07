@@ -13,19 +13,22 @@ function StdioConsole() {}
 
 StdioConsole.prototype = ConsoleIface.prototype;
 
-StdioConsole.prototype.error = function(message) {
+StdioConsole.prototype.error =
+function(message) {
 
     if (!Config.getSilentConsole())
         console.error("ERROR: " + message);
 };
 
-StdioConsole.prototype.warning = function(message) {
+StdioConsole.prototype.warning =
+function(message) {
 
     if (!Config.getSilentConsole())
         console.error("WARNING: " + message);
 };
 
-StdioConsole.prototype.log = function(message) {
+StdioConsole.prototype.log =
+function(message) {
 
     if (!Config.getSilentConsole())
         console.log(message);

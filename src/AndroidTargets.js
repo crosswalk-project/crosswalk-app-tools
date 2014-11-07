@@ -23,7 +23,8 @@ function AndroidTargets(buffer) {
  * @returns Targets object in the form of \{ target : ABIs \}.
  * @memberOf AndroidTargets
  */
-AndroidTargets.prototype.parse = function(onlyABI) {
+AndroidTargets.prototype.parse =
+function(onlyABI) {
 
     if (typeof onlyABI == "undefined")
         onlyABI = false;
@@ -73,7 +74,8 @@ AndroidTargets.prototype.parse = function(onlyABI) {
  * @returns Target identifier string or null if no ABIs are installed.
  * @memberOf AndroidTargets
  */
-AndroidTargets.prototype.pick = function() {
+AndroidTargets.prototype.pick =
+function() {
 
     var targets = this.parse();
 
@@ -128,7 +130,8 @@ AndroidTargets.prototype.pick = function() {
  * @returns Target identifier string or null if no matching target found.
  * @memberOf AndroidTargets
  */
-AndroidTargets.prototype.pickLowest = function(minAPILevel) {
+AndroidTargets.prototype.pickLowest =
+function(minAPILevel) {
 
     var targets = this.parse();
     var lowestTarget = null;

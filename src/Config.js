@@ -15,7 +15,8 @@ function Config() {
  * Whether to log or suppress output.
  * @memberOf Config
  */
-Config.prototype.getSilentConsole = function() {
+Config.prototype.getSilentConsole =
+function() {
 
     return this._silentConsole;
 };
@@ -24,7 +25,8 @@ Config.prototype.getSilentConsole = function() {
  * Whether to log or suppress output.
  * @memberOf Config
  */
-Config.prototype.setSilentConsole = function(silent) {
+Config.prototype.setSilentConsole =
+function(silent) {
 
     this._silentConsole = silent;
 };

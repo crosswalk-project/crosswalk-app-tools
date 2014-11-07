@@ -4,22 +4,26 @@
 
 function Project() {}
 
-Project.prototype.generate = function() {
+Project.prototype.generate =
+function() {
 
     throw new Error("Project.generate() not implemented.");
 };
 
-Project.prototype.update = function() {
+Project.prototype.update =
+function() {
 
     throw new Error("Project.update() not implemented.");
 };
 
-Project.prototype.refresh = function() {
+Project.prototype.refresh =
+function() {
 
     throw new Error("Project.refresh() not implemented.");
 };
 
-Project.prototype.build = function() {
+Project.prototype.build =
+function() {
 
     throw new Error("Project.build() not implemented.");
 };

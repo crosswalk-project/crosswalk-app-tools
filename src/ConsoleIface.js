@@ -14,7 +14,8 @@ function ConsoleIface() {}
  * @param {String} message
  * @memberOf ConsoleIface
  */
-ConsoleIface.prototype.error = function(message) {
+ConsoleIface.prototype.error =
+function(message) {
 
     throw new Error("ConsoleIface.error() not implemented.");
 };
@@ -24,7 +25,8 @@ ConsoleIface.prototype.error = function(message) {
  * @param {String} message
  * @memberOf ConsoleIface
  */
-ConsoleIface.prototype.warning = function(message) {
+ConsoleIface.prototype.warning =
+function(message) {
 
     throw new Error("ConsoleIface.warning() not implemented.");
 };
@@ -34,7 +36,8 @@ ConsoleIface.prototype.warning = function(message) {
  * @param {String} message
  * @memberOf ConsoleIface
  */
-ConsoleIface.prototype.log = function(message) {
+ConsoleIface.prototype.log =
+function(message) {
 
     throw new Error("ConsoleIface.log() not implemented.");
 };

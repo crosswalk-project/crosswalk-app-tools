@@ -24,7 +24,8 @@ function CommandParser(argv) {
  * @returns {Boolean} true if valid, otherwise false.
  * @memberOf CommandParser
  */
-CommandParser.prototype.check = function() {
+CommandParser.prototype.check =
+function() {
 
     var cmd = this.getCommand();
     switch (cmd) {
@@ -49,7 +50,8 @@ CommandParser.prototype.check = function() {
  * @returns {String} One of "create", "update", "refresh", "build" or null.
  * @memberOf CommandParser
  */
-CommandParser.prototype.getCommand = function() {
+CommandParser.prototype.getCommand =
+function() {
 
     if (this._argv.length < 3) {
         return null;
@@ -70,7 +72,8 @@ CommandParser.prototype.getCommand = function() {
  * @memberOf CommandParser
  * @see {@link http://developer.android.com/guide/topics/manifest/manifest-element.html#package}
  */
-CommandParser.prototype.createGetPackage = function() {
+CommandParser.prototype.createGetPackage =
+function() {
 
     var errormsg = "Invalid package name, see http://developer.android.com/guide/topics/manifest/manifest-element.html#package";
 
@@ -111,7 +114,8 @@ CommandParser.prototype.createGetPackage = function() {
  * @memberOf CommandParser
  * @see {@link https://crosswalk-project.org/documentation/downloads.html}
  */
-CommandParser.prototype.updateGetVersion = function() {
+CommandParser.prototype.updateGetVersion =
+function() {
 
     var errormsg = "Version must be of format ab.cd.ef.gh";
 
@@ -140,7 +144,8 @@ CommandParser.prototype.updateGetVersion = function() {
  * @returns {String} One of "debug", "release", or null.
  * @memberOf CommandParser
  */
-CommandParser.prototype.buildGetType = function() {
+CommandParser.prototype.buildGetType =
+function() {
 
     if (this._argv.length < 3) {
         return null;

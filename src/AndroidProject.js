@@ -10,22 +10,26 @@ function AndroidProject() {
 
 AndroidProject.prototype = Project.prototype;
 
-AndroidProject.prototype.generate = function() {
+AndroidProject.prototype.generate =
+function() {
 
     // TODO implement
 };
 
-AndroidProject.prototype.update = function() {
+AndroidProject.prototype.update =
+function() {
 
     // TODO implement
 };
 
-AndroidProject.prototype.refresh = function() {
+AndroidProject.prototype.refresh =
+function() {
 
     // TODO implement
 };
 
-AndroidProject.prototype.build = function() {
+AndroidProject.prototype.build =
+function() {
 
     // TODO implement
 };
