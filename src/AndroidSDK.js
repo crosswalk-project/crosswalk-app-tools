@@ -12,17 +12,17 @@ var ShellJS = require("shelljs");
 
 /**
  * Callback signature for {@link AndroidSDK.queryTarget}
- * @param {String} target SDK API target identifier or null.
+ * @param {String} apiTarget SDK API target identifier or null.
  * @param {String} errormsg Error message or null.
  * @memberOf AndroidSDK
  * @inner
  */
-function queryTargetCb(target, errormsg) {}
+function queryTargetCb(apiTarget, errormsg) {}
 
 /**
  * Callback signature for {@link AndroidSDK.generateProjectTemplate}
  * @param {String} path Path of project template or null.
- * @param {String} target SDK API target identifier or null.
+ * @param {String} logmsg Log message or null.
  * @param {String} errormsg Error message or null.
  * @memberOf AndroidSDK
  * @inner
@@ -47,8 +47,9 @@ function AndroidSDK() {
 
 /**
  * Query for lowest API target that supports apiLevel.
+ * @function queryTarget
  * @param {Number} apiLevel Minimum supported API level.
- * @param {Function} callback see {@link AndroidSDK.queryTargetCb}
+ * @param {Function} callback see {@link AndroidSDK~queryTargetCb}
  * @returns null
  * @memberOf AndroidSDK
  */
@@ -62,21 +63,21 @@ function(apiLevel, callback) {
     var child = ChildProcess.execFile(this._scriptPath, ["list", "target"], {},
                                       function(error, stdout, stderr) {
 
-        var target = null;
+        var apiTarget = null;
         if (stdout !== null) {
 
             try {
                 var targets = new AndroidTargets(stdout);
-                target = targets.pickLowest(apiLevel);
+                apiTarget = targets.pickLowest(apiLevel);
             } catch (e) {
-                error = "Failed to parse SDK targets.";
+                error = "Failed to parse SDK API targets.";
             }
 
         } else if (error === null) {
-            error = "No SDK targets found";
+            error = "No SDK API targets found";
         }
 
-        callback(target, error);
+        callback(apiTarget, error);
     }.bind(this));
 
     // Shut up lint
@@ -85,20 +86,21 @@ function(apiLevel, callback) {
 
 /**
  * Create project template by calling "android create project ..."
- * @param {String} packageName Package name in the com.example.Foo format.
- * @apiTarget {String} Android API target android-xy as per "android list targets".
- * @param {Function} callback see {@link AndroidSDK.generateProjectTemplateCb}
+ * @function generateProjectTemplate
+ * @param {String} packageId Package name in the com.example.Foo format.
+ * @param {String} apiTarget Android API target android-xy as per "android list targets".
+ * @param {Function} callback see {@link AndroidSDK~generateProjectTemplateCb}
  * @returns null
  * @memberOf AndroidSDK
  */
 AndroidSDK.prototype.generateProjectTemplate =
-function(packageName, apiTarget, callback) {
+function(packageId, apiTarget, callback) {
 
     var errormsg = null;
 
     // Construct path and fail if exists.
     var pwd = ShellJS.pwd();
-    var path = pwd + Path.sep + packageName;
+    var path = pwd + Path.sep + packageId;
     if (ShellJS.test("-e", path)) {
         errormsg = "Error: project dir '" + path + "' already exists";
         Console.error(errormsg);
@@ -110,7 +112,7 @@ function(packageName, apiTarget, callback) {
     var args = ["create", "project",
                 "-t", apiTarget,
                 "-p", path,
-                "-k", packageName,
+                "-k", packageId,
                 "-a", "MainActivity"];
     var stdout = null;
     var stderr = null;
