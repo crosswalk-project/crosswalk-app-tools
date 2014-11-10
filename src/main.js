@@ -71,7 +71,7 @@ if (cmd) {
 
     switch (cmd) {
     case "create":
-        var packageId = parser.createGetPackage();
+        var packageId = parser.createGetPackageId();
         create(packageId);
         break;
     case "update":

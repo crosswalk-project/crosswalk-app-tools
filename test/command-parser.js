@@ -55,7 +55,7 @@ exports.tests = {
         test.done();
     },
 
-    createGetPackage: function(test) {
+    createGetPackageId: function(test) {
 
         test.expect(5);
 
@@ -68,7 +68,7 @@ exports.tests = {
         var cmd1 = cp1.getCommand();
         test.equal(cmd1, argv1[2]);
 
-        var pkg1 = cp1.createGetPackage();
+        var pkg1 = cp1.createGetPackageId();
         test.equal(pkg1, argv1[3]);
 
         // Bad test, invalid package name
@@ -77,7 +77,7 @@ exports.tests = {
 
         test.equal(cp2.getCommand(), null);
 
-        var pkg2 = cp2.createGetPackage();
+        var pkg2 = cp2.createGetPackageId();
         test.equal(pkg2, null);
 
         test.done();

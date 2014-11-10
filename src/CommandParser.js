@@ -21,6 +21,7 @@ function CommandParser(argv) {
 
 /**
  * Get program usage information.
+ * @function help
  * @returns {String} Usage information string.
  * @memberOf CommandParser
  */
@@ -36,6 +37,7 @@ function() {
 /**
  * Check whether the current instance represents a valid command line and if so,
  * get the main command.
+ * @function getCommand
  * @returns {String} Command string if valid, otherwise null.
  * @memberOf CommandParser
  */
@@ -45,8 +47,8 @@ function() {
     var cmd = this.peekCommand();
     switch (cmd) {
     case "create":
-        var pkg = this.createGetPackage();
-        return pkg !== null ? cmd : null;
+        var packageId = this.createGetPackageId();
+        return packageId !== null ? cmd : null;
     case "update":
         var version = this.updateGetVersion();
         return version !== null ? cmd : null;
@@ -65,6 +67,7 @@ function() {
 
 /**
  * Get primary command.
+ * @function peekCommand
  * @returns {String} One of "create", "update", "refresh", "build" or null.
  * @memberOf CommandParser
  */
@@ -94,11 +97,12 @@ function() {
 
 /**
  * Get package name when command is "create".
+ * @function createGetPackageId
  * @returns {String} Package name as per Android conventions or null.
  * @memberOf CommandParser
  * @see {@link http://developer.android.com/guide/topics/manifest/manifest-element.html#package}
  */
-CommandParser.prototype.createGetPackage =
+CommandParser.prototype.createGetPackageId =
 function() {
 
     var errormsg = "Invalid package name, see http://developer.android.com/guide/topics/manifest/manifest-element.html#package";
@@ -109,33 +113,34 @@ function() {
 
     // Check for invalid characters as per
     // http://developer.android.com/guide/topics/manifest/manifest-element.html#package
-    var pkg = this._argv[3];
-    var match = pkg.match("[A-Za-z0-9_\\.]*");
-    if (match[0] != pkg) {
+    var packageId = this._argv[3];
+    var match = packageId.match("[A-Za-z0-9_\\.]*");
+    if (match[0] != packageId) {
         Console.error(errormsg);
         return null;
     }
 
     // Package name must not start or end with '.'
-    if (pkg[0] == '.' || pkg[pkg.length - 1] == '.') {
+    if (packageId[0] == '.' || packageId[packageId.length - 1] == '.') {
         Console.error(errormsg);
         Console.error("Name must not start or end with '.'");
         return null;
     }
 
     // Require 3 or more elements.
-    var parts = pkg.split('.');
+    var parts = packageId.split('.');
     if (parts.length < 3) {
         Console.error(errormsg);
         Console.error("Name needs to consist of 3+ elements");
         return null;
     }
 
-    return pkg;
+    return packageId;
 };
 
 /**
  * Get version when command is "update".
+ * @function updateGetVersion
  * @returns {String} Crosswalk version string or null.
  * @memberOf CommandParser
  * @see {@link https://crosswalk-project.org/documentation/downloads.html}
@@ -167,6 +172,7 @@ function() {
 
 /**
  * Get build type when command is "build".
+ * @function buildGetType
  * @returns {String} One of "debug", "release", or null.
  * @memberOf CommandParser
  */
