@@ -20,6 +20,20 @@ function CommandParser(argv) {
 }
 
 /**
+ * Get program usage information.
+ * @returns {String} Usage information string.
+ * @memberOf CommandParser
+ */
+CommandParser.prototype.help =
+function() {
+    return "" +
+        "Crosswalk Application Project and Packaging Tool\n" +
+        "    crosswalk-app create <package-id>\tCreate project\n" +
+        "    crosswalk-app help\t\t\tDisplay usage information\n" +
+        "    crosswalk-app version\t\tDisplay version information\n";
+}
+
+/**
  * Check whether the current instance represents a valid command.
  * @returns {Boolean} true if valid, otherwise false.
  * @memberOf CommandParser
@@ -38,6 +52,9 @@ function() {
     case "build":
         var type = this.buildGetType();
         return type !== null;
+    case "help":
+    case "version":
+        return true;
     default:
         // fall through
     }
@@ -58,6 +75,14 @@ function() {
     }
 
     var command = this._argv[2];
+
+    if (["version", "-v", "-version", "--version"].indexOf(command) > -1) {
+        return "version";
+    }
+
+    if (["help", "-h", "-help", "--help"].indexOf(command) > -1) {
+        return "help";
+    }
 
     if (["create", "update", "refresh", "build"].indexOf(command) > -1) {
         return command;
