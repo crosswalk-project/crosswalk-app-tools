@@ -28,24 +28,20 @@ exports.tests = {
 
     getCommand: function(test) {
 
-        test.expect(10);
+        test.expect(8);
 
-        var commands = ["create", "update", "refresh", "build"];
+        var commands = ["create", "update", "refresh", "build", "help", "version"];
         var argv = ["foo", "bar"];
         var cp1;
         var cmd1;
 
-        // Test getCommand() gives back correct command.
+        // Test peekCommand() gives back correct command.
         commands.forEach(function(item) {
 
             argv[2] = item;
             cp1 = new CommandParser(argv);
-            cmd1 = cp1.getCommand();
+            cmd1 = cp1.peekCommand();
             test.equal(cmd1, item);
-
-            // Check only true for "build", others need more args.
-            var check = item == "build" ? true : false;
-            test.equal(cp1.check(), check);
         });
 
         // Test invalid command "baz" not recognised.
@@ -53,21 +49,21 @@ exports.tests = {
         var cmd2 = cp2.getCommand();
         test.equal(commands.indexOf(cmd2), -1);
 
-        // Check must be false because of bogus command.
-        test.equal(cp2.check(), false);
+        // getCommand() must be false because of bogus command.
+        test.equal(cp2.getCommand(), null);
 
         test.done();
     },
 
     createGetPackage: function(test) {
 
-        test.expect(6);
+        test.expect(5);
 
         // Good test
         var argv1 = ["node", "foo", "create", "com.example.Bar"];
         var cp1 = new CommandParser(argv1);
 
-        test.equal(cp1.check(), true);
+        test.equal(cp1.getCommand(), "create");
 
         var cmd1 = cp1.getCommand();
         test.equal(cmd1, argv1[2]);
@@ -79,10 +75,7 @@ exports.tests = {
         var argv2 = ["node", "foo", "create", "com.exam ple.Bar"];
         var cp2 = new CommandParser(argv2);
 
-        test.equal(cp2.check(), false);
-
-        var cmd2 = cp2.getCommand();
-        test.equal(cmd2, argv2[2]);
+        test.equal(cp2.getCommand(), null);
 
         var pkg2 = cp2.createGetPackage();
         test.equal(pkg2, null);
@@ -92,13 +85,13 @@ exports.tests = {
 
     updateGetVersion: function(test) {
 
-        test.expect(6);
+        test.expect(5);
 
         // Good test
         var argv1 = ["node", "foo", "update", "12.34.56.78"];
         var cp1 = new CommandParser(argv1);
 
-        test.equal(cp1.check(), true);
+        test.equal(cp1.getCommand(), "update");
 
         var cmd1 = cp1.getCommand();
         test.equal(cmd1, argv1[2]);
@@ -110,10 +103,7 @@ exports.tests = {
         var argv2 = ["node", "foo", "update", "12.34.x6.78"];
         var cp2 = new CommandParser(argv2);
 
-        test.equal(cp2.check(), false);
-
-        var cmd2 = cp2.getCommand();
-        test.equal(cmd2, argv2[2]);
+        test.equal(cp2.getCommand(), null);
 
         var version2 = cp2.updateGetVersion();
         test.equal(version2, null);
@@ -123,13 +113,13 @@ exports.tests = {
 
     buildGetType: function(test) {
 
-        test.expect(12);
+        test.expect(11);
 
         // Good test, default build "debug"
         var argv1 = ["node", "foo", "build"];
         var cp1 = new CommandParser(argv1);
 
-        test.equal(cp1.check(), true);
+        test.equal(cp1.getCommand(), "build");
 
         var cmd1 = cp1.getCommand();
         test.equal(cmd1, argv1[2]);
@@ -141,7 +131,7 @@ exports.tests = {
         var argv2 = ["node", "foo", "build", "debug"];
         var cp2 = new CommandParser(argv2);
 
-        test.equal(cp2.check(), true);
+        test.equal(cp2.getCommand(), "build");
 
         var cmd2 = cp2.getCommand();
         test.equal(cmd2, argv2[2]);
@@ -153,7 +143,7 @@ exports.tests = {
         var argv3 = ["node", "foo", "build", "release"];
         var cp3 = new CommandParser(argv3);
 
-        test.equal(cp3.check(), true);
+        test.equal(cp3.getCommand(), "build");
 
         var cmd3 = cp3.getCommand();
         test.equal(cmd3, argv3[2]);
@@ -165,10 +155,7 @@ exports.tests = {
         var argv4 = ["node", "foo", "build", "foo"];
         var cp4 = new CommandParser(argv4);
 
-        test.equal(cp4.check(), false);
-
-        var cmd4 = cp4.getCommand();
-        test.equal(cmd4, argv4[2]);
+        test.equal(cp4.getCommand(), null);
 
         var type4 = cp4.buildGetType();
         test.equal(type4, null);

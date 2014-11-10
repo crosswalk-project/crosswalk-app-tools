@@ -31,35 +31,36 @@ function() {
         "    crosswalk-app create <package-id>\tCreate project\n" +
         "    crosswalk-app help\t\t\tDisplay usage information\n" +
         "    crosswalk-app version\t\tDisplay version information\n";
-}
+};
 
 /**
- * Check whether the current instance represents a valid command.
- * @returns {Boolean} true if valid, otherwise false.
+ * Check whether the current instance represents a valid command line and if so,
+ * get the main command.
+ * @returns {String} Command string if valid, otherwise null.
  * @memberOf CommandParser
  */
-CommandParser.prototype.check =
+CommandParser.prototype.getCommand =
 function() {
 
-    var cmd = this.getCommand();
+    var cmd = this.peekCommand();
     switch (cmd) {
     case "create":
         var pkg = this.createGetPackage();
-        return pkg !== null;
+        return pkg !== null ? cmd : null;
     case "update":
         var version = this.updateGetVersion();
-        return version !== null;
+        return version !== null ? cmd : null;
     case "build":
         var type = this.buildGetType();
-        return type !== null;
+        return type !== null ? cmd : null;
     case "help":
     case "version":
-        return true;
+        return cmd;
     default:
         // fall through
     }
 
-    return false;
+    return null;
 };
 
 /**
@@ -67,7 +68,7 @@ function() {
  * @returns {String} One of "create", "update", "refresh", "build" or null.
  * @memberOf CommandParser
  */
-CommandParser.prototype.getCommand =
+CommandParser.prototype.peekCommand =
 function() {
 
     if (this._argv.length < 3) {
