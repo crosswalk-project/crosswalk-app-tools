@@ -8,9 +8,32 @@ var AndroidTargets = require("../src/AndroidTargets");
 var Console = require("../src/Console");
 var ShellJS = require("shelljs");
 
+
+
+/**
+ * Callback signature for {@link AndroidSDK.queryTarget}
+ * @param {String} target SDK API target identifier or null.
+ * @param {String} errormsg Error message or null.
+ * @memberOf AndroidSDK
+ * @inner
+ */
+function queryTargetCb(target, errormsg) {}
+
+/**
+ * Callback signature for {@link AndroidSDK.generateProjectTemplate}
+ * @param {String} path Path of project template or null.
+ * @param {String} target SDK API target identifier or null.
+ * @param {String} errormsg Error message or null.
+ * @memberOf AndroidSDK
+ * @inner
+ */
+function generateProjectTemplateCb(path, logmsg, errormsg) {}
+
+
+
 /**
  * Create AndroidSDK object, wrapping Android cmd-line tool interactions.
- * @throws {SDKNotFoundError} If the Android SDK was not found in the environment.
+ * @throws {AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
  * @constructor
  */
 function AndroidSDK() {
@@ -25,7 +48,7 @@ function AndroidSDK() {
 /**
  * Query for lowest API target that supports apiLevel.
  * @param {Number} apiLevel Minimum supported API level.
- * @param {Function} callback Callback function(target, errormsg), (String, String)
+ * @param {Function} callback see {@link AndroidSDK.queryTargetCb}
  * @returns null
  * @memberOf AndroidSDK
  */
@@ -64,7 +87,7 @@ function(apiLevel, callback) {
  * Create project template by calling "android create project ..."
  * @param {String} packageName Package name in the com.example.Foo format.
  * @apiTarget {String} Android API target android-xy as per "android list targets".
- * @param {Function} callback Completion callback function(projectPath, logMsg, errorMsg)
+ * @param {Function} callback see {@link AndroidSDK.generateProjectTemplateCb}
  * @returns null
  * @memberOf AndroidSDK
  */
@@ -129,8 +152,11 @@ function() {
 
 /**
  * Creates a new SDKNotFoundError.
+ * @extends Error
  * @param {String} message Error message.
  * @constructor
+ * @memberOf AndroidSDK
+ * @inner
  */
 function SDKNotFoundError(message) {
     Error.call(this, message);
