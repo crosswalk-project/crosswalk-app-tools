@@ -6,6 +6,7 @@
 require("../src/Config").setSilentConsole(true);
 var Console = require("../src/Console");
 var AndroidSDK = require("../src/AndroidSDK");
+var ShellJS = require("shelljs");
 
 exports.tests = {
 
@@ -66,6 +67,9 @@ exports.tests = {
                     // TODO create test project in tmp and test path.
                     test.equal(true, true);
                     test.done();
+
+                    // Clean up removing project skeleton directory.
+                    ShellJS.rm('-rf', path);
                 }
             });
         });
