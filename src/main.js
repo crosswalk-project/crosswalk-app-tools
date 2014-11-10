@@ -8,8 +8,15 @@ var CommandParser = require("./CommandParser");
 var Console = require("./Console");
 
 /**
+ * Main script.
+ * @namespace main
+ */
+
+/**
  * Create skeleton project.
  * @param {String} packageId Identifier in the form of com.example.Foo
+ * @memberOf main
+ * @private
  */
 function create(packageId) {
 
@@ -50,6 +57,8 @@ function create(packageId) {
 /**
  * Display usage information.
  * @param {CommandParser} parser.
+ * @memberOf main
+ * @private
  */
 function help(parser) {
 
@@ -59,6 +68,8 @@ function help(parser) {
 
 /**
  * Display version information.
+ * @memberOf main
+ * @private
  */
 function version() {
 
