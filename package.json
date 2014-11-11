@@ -19,6 +19,7 @@
     "grunt-contrib-nodeunit": "~0.4.1",
     "grunt-jsdoc": "~0.4.2",
     "jsdoc": "https://github.com/jsdoc3/jsdoc/archive/v3.2.2.tar.gz",
+    "mktemp": "~0.3.5",
     "nodeunit": "~0.9.0"
   },
   "keywords": [
