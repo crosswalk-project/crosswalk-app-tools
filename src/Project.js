@@ -2,30 +2,37 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
-function Project() {}
+/**
+ * Interface for project implementations.
+ */
+var Project = {
 
-Project.prototype.generate =
-function() {
+    /**
+     * Generate project template.
+     * @function generate
+     * @param {String} packageId Package name in com.example.Foo format.
+     * @returns {String} null on Success, error message on failure.
+     * @abstract
+     */
+    generate: function(packageId) {
 
-    throw new Error("Project.generate() not implemented.");
-};
+        throw new Error("Project.generate() not implemented.");
+    },
 
-Project.prototype.update =
-function() {
+    update: function() {
 
-    throw new Error("Project.update() not implemented.");
-};
+        throw new Error("Project.update() not implemented.");
+    },
 
-Project.prototype.refresh =
-function() {
+    refresh: function() {
 
-    throw new Error("Project.refresh() not implemented.");
-};
+        throw new Error("Project.refresh() not implemented.");
+    },
 
-Project.prototype.build =
-function() {
+    build: function() {
 
-    throw new Error("Project.build() not implemented.");
+        throw new Error("Project.build() not implemented.");
+    }
 };
 
 module.exports = Project;
