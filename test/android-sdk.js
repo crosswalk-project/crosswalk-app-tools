@@ -70,7 +70,6 @@ exports.tests = {
                     Console.error(errormsg);
                 } else {
                     Console.log(log);
-                    // TODO create test project in tmp and test path.
                     test.equal(true, true);
                     test.done();
                 }
