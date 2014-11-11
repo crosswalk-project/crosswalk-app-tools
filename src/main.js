@@ -3,7 +3,6 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var AndroidProject = require("./AndroidProject");
-var AndroidSDK = require("./AndroidSDK");
 var CommandParser = require("./CommandParser");
 var Console = require("./Console");
 
@@ -15,43 +14,30 @@ var Console = require("./Console");
 /**
  * Create skeleton project.
  * @param {String} packageId Identifier in the form of com.example.Foo
+ * @returns {Boolean} true on success.
  * @memberOf main
  * @private
  */
 function create(packageId) {
 
-    var sdk = null;
+    var project;
     try {
-        sdk = new AndroidSDK();
+        project = new AndroidProject();
     } catch (e) {
         Console.error("Error: The Android SDK could not be found. " +
                       "Make sure the directory containing the 'android' " +
                       "executable is mentioned in the PATH environment variable.");
-        return;
+        return false;
     }
 
-    var minApiLevel = 14;
-    var apiTarget;
-    sdk.queryTarget(minApiLevel,
-                    function(apiTarget, errormsg) {
+    var errorMsg = project.generate(packageId);
+    if (errorMsg) {
+        // TODO explanatory message
+        Console.error(errorMsg);
+        return false;
+    }
 
-        if (!apiTarget || errormsg) {
-            Console.error("Error: Failed to find Android SDK target API >= " + minApiLevel + " " +
-                          "Try running 'android list targets' to check.");
-            return;
-        }
-
-        sdk.generateProjectTemplate(packageId, apiTarget,
-                                    function(path, logMsg, errormsg) {
-
-            if (!path || errormsg) {
-                Console.error("Error: Failed to create project template TODO better message");
-                return;
-            }
-
-            Console.log("Project template created at '" + path + "'");
-        });
-    });
+    return true;
 }
 
 /**
@@ -76,34 +62,48 @@ function version() {
     console.log("-0 TODO fetch this from project.json");
 }
 
-var parser = new CommandParser(process.argv);
-var cmd = parser.getCommand();
-if (cmd) {
+function main() {
 
-    switch (cmd) {
-    case "create":
-        var packageId = parser.createGetPackageId();
-        create(packageId);
-        break;
-    case "update":
-        var version = parser.updateGetVersion();
-        console.log("TODO implement");
-        break;
-    case "build":
-        var type = parser.buildGetType();
-        console.log("TODO implement");
-        break;
-    case "help":
+    var parser = new CommandParser(process.argv);
+    var cmd = parser.getCommand();
+    if (cmd) {
+
+        switch (cmd) {
+        case "create":
+            var packageId = parser.createGetPackageId();
+            create(packageId);
+            break;
+        case "update":
+            var version = parser.updateGetVersion();
+            console.log("TODO implement");
+            break;
+        case "build":
+            var type = parser.buildGetType();
+            console.log("TODO implement");
+            break;
+        case "help":
+            help(parser);
+            break;
+        case "version":
+            version();
+            break;
+        default:
+            // TODO
+        }
+
+    } else {
+
         help(parser);
-        break;
-    case "version":
-        version();
-        break;
-    default:
-        // TODO
     }
-
-} else {
-
-    help(parser);
 }
+
+module.exports = {
+
+    main: main,
+
+    test: {
+        create: create,
+        help: help,
+        version: version
+    }
+};

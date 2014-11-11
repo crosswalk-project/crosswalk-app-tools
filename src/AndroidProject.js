@@ -2,18 +2,49 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var AndroidSDK = require("./AndroidSDK");
+var Console = require("./Console");
 var Project = require("./Project");
 
+/**
+ * Android project class.
+ * @throws {AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
+ * @constructor
+ */
 function AndroidProject() {
-    Project.call(this);
+
+    this._sdk = new AndroidSDK();
 }
+AndroidProject.prototype = Project;
 
-AndroidProject.prototype = Project.prototype;
-
+/**
+ * Implements {Project.generate}
+ */
 AndroidProject.prototype.generate =
-function() {
+function(packageId) {
 
-    // TODO implement
+    var minApiLevel = 14;
+    var apiTarget;
+    this._sdk.queryTarget(minApiLevel,
+                    function(apiTarget, errormsg) {
+
+        if (!apiTarget || errormsg) {
+            Console.error("Error: Failed to find Android SDK target API >= " + minApiLevel + " " +
+                          "Try running 'android list targets' to check.");
+            return;
+        }
+
+        this._sdk.generateProjectTemplate(packageId, apiTarget,
+                                    function(path, logMsg, errormsg) {
+
+            if (!path || errormsg) {
+                Console.error("Error: Failed to create project template TODO better message");
+                return;
+            }
+
+            Console.log("Project template created at '" + path + "'");
+        }.bind(this));
+    }.bind(this));
 };
 
 AndroidProject.prototype.update =
