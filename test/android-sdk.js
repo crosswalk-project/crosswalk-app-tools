@@ -6,6 +6,7 @@
 require("../src/Config").setSilentConsole(true);
 var Console = require("../src/Console");
 var AndroidSDK = require("../src/AndroidSDK");
+var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
 
 exports.tests = {
@@ -57,6 +58,11 @@ exports.tests = {
             var path = null;
             var log = null;
             var errormsg = null;
+
+            var tmpdir = MkTemp.createDirSync("XXXXXX.crosswalk-app-tools");
+            Console.log("Tempdir: " + tmpdir);
+            ShellJS.pushd(tmpdir);
+
             sdk.generateProjectTemplate("com.example.Foo", target,
                                         function(path, log, errormsg) {
 
@@ -67,10 +73,11 @@ exports.tests = {
                     // TODO create test project in tmp and test path.
                     test.equal(true, true);
                     test.done();
-
-                    // Clean up removing project skeleton directory.
-                    ShellJS.rm('-rf', path);
                 }
+
+                // Clean up removing project skeleton directory.
+                ShellJS.popd();
+                ShellJS.rm('-rf', tmpdir);
             });
         });
     }
