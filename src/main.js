@@ -53,7 +53,7 @@ function create(packageId, callback) {
  * @memberOf main
  * @private
  */
-function help(parser) {
+function printHelp(parser) {
 
     var buf = parser.help();
     console.log(buf);
@@ -64,9 +64,11 @@ function help(parser) {
  * @memberOf main
  * @private
  */
-function version() {
+function printVersion() {
 
-    console.log("-0 TODO fetch this from project.json");
+    var Package = require("../package.json");
+
+    console.log(Package.version);
 }
 
 function main() {
@@ -89,10 +91,10 @@ function main() {
             console.log("TODO implement");
             break;
         case "help":
-            help(parser);
+            printHelp(parser);
             break;
         case "version":
-            version();
+            printVersion();
             break;
         default:
             // TODO
@@ -110,7 +112,7 @@ module.exports = {
 
     test: {
         create: create,
-        help: help,
-        version: version
+        help: printHelp,
+        version: printVersion
     }
 };
