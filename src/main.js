@@ -111,7 +111,7 @@ module.exports = {
 
     test: {
         create: create,
-        help: printHelp,
-        version: printVersion
+        printHelp: printHelp,
+        printVersion: printVersion
     }
 };
