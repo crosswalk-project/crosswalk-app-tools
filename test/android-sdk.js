@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 // Run tests silently to avoid spew from tests failing on purpose.
+var OS = require('os');
 require("../src/Config").setSilentConsole(true);
 var Console = require("../src/Console");
 var AndroidSDK = require("../src/AndroidSDK");
@@ -59,6 +60,9 @@ exports.tests = {
             var log = null;
             var errormsg = null;
 
+            // MkTemp creates temp dir in working dir, so cd tmp first.
+            ShellJS.pushd(OS.tmpdir());
+
             var tmpdir = MkTemp.createDirSync("XXXXXX.crosswalk-app-tools");
             Console.log("Tempdir: " + tmpdir);
             ShellJS.pushd(tmpdir);
@@ -75,6 +79,7 @@ exports.tests = {
                 }
 
                 // Clean up removing project skeleton directory.
+                ShellJS.popd();
                 ShellJS.popd();
                 ShellJS.rm('-rf', tmpdir);
             });

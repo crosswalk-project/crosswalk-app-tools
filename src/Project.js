@@ -3,6 +3,15 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 /**
+ * Callback signature for {@link Project.generate}
+ * @function generateCb
+ * @param {Number} result 0 on success, otherwise error number.
+ * @memberOf Project
+ * @inner
+ */
+function generateCb(result) {}
+
+/**
  * Interface for project implementations.
  */
 var Project = {
@@ -11,10 +20,11 @@ var Project = {
      * Generate project template.
      * @function generate
      * @param {String} packageId Package name in com.example.Foo format.
+     * @param {Function} callback see {@link Project~generateCb}
      * @returns {String} null on Success, error message on failure.
      * @abstract
      */
-    generate: function(packageId) {
+    generate: function(packageId, callback) {
 
         throw new Error("Project.generate() not implemented.");
     },

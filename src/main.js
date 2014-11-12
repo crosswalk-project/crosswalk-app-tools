@@ -14,11 +14,16 @@ var Console = require("./Console");
 /**
  * Create skeleton project.
  * @param {String} packageId Identifier in the form of com.example.Foo
+ * @param {Function} [callback] Callback returning true/false. 
  * @returns {Boolean} true on success.
  * @memberOf main
  * @private
  */
-function create(packageId) {
+function create(packageId, callback) {
+
+    // Handle callback not passed.
+    if (!callback)
+        callback = function() {};
 
     var project;
     try {
@@ -27,17 +32,19 @@ function create(packageId) {
         Console.error("Error: The Android SDK could not be found. " +
                       "Make sure the directory containing the 'android' " +
                       "executable is mentioned in the PATH environment variable.");
-        return false;
+        callback(false);
     }
 
-    var errorMsg = project.generate(packageId);
-    if (errorMsg) {
-        // TODO explanatory message
-        Console.error(errorMsg);
-        return false;
-    }
-
-    return true;
+    project.generate(packageId, function(errno) {
+        
+        if (errorMsg) {
+            // TODO explanatory message
+            Console.error("Error: project creation failed.");
+            callback(false);
+        } else {
+            callback(true);
+        }
+    });
 }
 
 /**

@@ -21,28 +21,30 @@ AndroidProject.prototype = Project;
  * Implements {Project.generate}
  */
 AndroidProject.prototype.generate =
-function(packageId) {
+function(packageId, callback) {
 
     var minApiLevel = 14;
     var apiTarget;
     this._sdk.queryTarget(minApiLevel,
-                    function(apiTarget, errormsg) {
+                          function(apiTarget, errormsg) {
 
         if (!apiTarget || errormsg) {
             Console.error("Error: Failed to find Android SDK target API >= " + minApiLevel + " " +
                           "Try running 'android list targets' to check.");
-            return;
+            callback(1 /* TODO errno */);
         }
 
         this._sdk.generateProjectTemplate(packageId, apiTarget,
-                                    function(path, logMsg, errormsg) {
+                                          function(path, logMsg, errormsg) {
 
             if (!path || errormsg) {
                 Console.error("Error: Failed to create project template TODO better message");
-                return;
+                callback(1 /* TODO errno */);
             }
 
             Console.log("Project template created at '" + path + "'");
+            callback(0);
+            
         }.bind(this));
     }.bind(this));
 };
