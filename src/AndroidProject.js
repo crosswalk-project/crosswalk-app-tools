@@ -44,7 +44,7 @@ function(packageId, callback) {
 
             Console.log("Project template created at '" + path + "'");
             callback(0);
-            
+
         }.bind(this));
     }.bind(this));
 };

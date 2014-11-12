@@ -14,7 +14,7 @@ var Console = require("./Console");
 /**
  * Create skeleton project.
  * @param {String} packageId Identifier in the form of com.example.Foo
- * @param {Function} [callback] Callback returning true/false. 
+ * @param {Function} [callback] Callback returning true/false.
  * @returns {Boolean} true on success.
  * @memberOf main
  * @private
@@ -36,8 +36,8 @@ function create(packageId, callback) {
     }
 
     project.generate(packageId, function(errno) {
-        
-        if (errorMsg) {
+
+        if (errno) {
             // TODO explanatory message
             Console.error("Error: project creation failed.");
             callback(false);
