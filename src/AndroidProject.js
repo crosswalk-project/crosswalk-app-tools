@@ -8,7 +8,7 @@ var Project = require("./Project");
 
 /**
  * Android project class.
- * @throws {AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
+ * @throws {@link AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
  * @constructor
  */
 function AndroidProject() {
@@ -18,7 +18,7 @@ function AndroidProject() {
 AndroidProject.prototype = Project;
 
 /**
- * Implements {Project.generate}
+ * Implements {@link Project.generate}
  */
 AndroidProject.prototype.generate =
 function(packageId, callback) {

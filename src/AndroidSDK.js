@@ -61,13 +61,13 @@ function(apiLevel, callback) {
     }
 
     var child = ChildProcess.execFile(this._scriptPath, ["list", "target"], {},
-                                      function(error, stdout, stderr) {
+                                      function(error, stdlog, errlog) {
 
         var apiTarget = null;
-        if (stdout !== null) {
+        if (stdlog !== null) {
 
             try {
-                var targets = new AndroidTargets(stdout);
+                var targets = new AndroidTargets(stdlog);
                 apiTarget = targets.pickLowest(apiLevel);
             } catch (e) {
                 error = "Failed to parse SDK API targets.";
@@ -99,8 +99,8 @@ function(packageId, apiTarget, callback) {
     var errormsg = null;
 
     // Construct path and fail if exists.
-    var pwd = ShellJS.pwd();
-    var path = pwd + Path.sep + packageId;
+    var wd = ShellJS.pwd();
+    var path = wd + Path.sep + packageId;
     if (ShellJS.test("-e", path)) {
         errormsg = "Error: project dir '" + path + "' already exists";
         Console.error(errormsg);
@@ -114,17 +114,17 @@ function(packageId, apiTarget, callback) {
                 "-p", path,
                 "-k", packageId,
                 "-a", "MainActivity"];
-    var stdout = null;
-    var stderr = null;
+    var stdlog = null;
+    var errlog = null;
     var child = ChildProcess.execFile(this._scriptPath, args, {},
-                                      function(errormsg, stdout, stderr) {
+                                      function(errormsg, stdlog, errlog) {
 
-        if (stderr && !errormsg) {
-            // Pass back stderr output as error message.
-            errormsg = stderr;
+        if (errlog && !errormsg) {
+            // Pass back errlog output as error message.
+            errormsg = errlog;
         }
 
-        callback(path, stdout, errormsg);
+        callback(path, stdlog, errormsg);
     });
 
 
