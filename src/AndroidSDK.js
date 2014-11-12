@@ -58,6 +58,7 @@ function(apiLevel, callback) {
 
     if (this.buffer === null) {
         callback([], "Android SDK executable not found");
+        return;
     }
 
     var child = ChildProcess.execFile(this._scriptPath, ["list", "target"], {},
@@ -79,9 +80,6 @@ function(apiLevel, callback) {
 
         callback(apiTarget, error);
     }.bind(this));
-
-    // Shut up lint
-    return null;
 };
 
 /**
@@ -105,6 +103,7 @@ function(packageId, apiTarget, callback) {
         errormsg = "Error: project dir '" + path + "' already exists";
         Console.error(errormsg);
         callback(null, null, errormsg);
+        return;
     }
 
     // Create project
@@ -126,10 +125,6 @@ function(packageId, apiTarget, callback) {
 
         callback(path, stdlog, errormsg);
     });
-
-
-    // Shut up lint
-    return null;
 };
 
 AndroidSDK.prototype.refreshProject =

@@ -5,7 +5,7 @@
 /**
  * Callback signature for {@link Project.generate}
  * @function generateCb
- * @param {Number} result 0 on success, otherwise error number.
+ * @param {String} errormsg null on success, otherwise error message.
  * @memberOf Project
  * @inner
  */

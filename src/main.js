@@ -35,11 +35,10 @@ function create(packageId, callback) {
         callback(false);
     }
 
-    project.generate(packageId, function(errno) {
+    project.generate(packageId, function(errormsg) {
 
-        if (errno) {
-            // TODO explanatory message
-            Console.error("Error: project creation failed.");
+        if (errormsg) {
+            Console.error(errormsg);
             callback(false);
         } else {
             callback(true);

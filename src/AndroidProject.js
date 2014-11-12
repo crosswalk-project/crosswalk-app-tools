@@ -28,22 +28,21 @@ function(packageId, callback) {
     this._sdk.queryTarget(minApiLevel,
                           function(apiTarget, errormsg) {
 
-        if (!apiTarget || errormsg) {
-            Console.error("Error: Failed to find Android SDK target API >= " + minApiLevel + " " +
-                          "Try running 'android list targets' to check.");
-            callback(1 /* TODO errno */);
+        if (errormsg) {
+            callback(errormsg);
+            return;
         }
 
         this._sdk.generateProjectTemplate(packageId, apiTarget,
-                                          function(path, logMsg, errormsg) {
+                                          function(path, logmsg, errormsg) {
 
             if (!path || errormsg) {
-                Console.error("Error: Failed to create project template TODO better message");
-                callback(1 /* TODO errno */);
+                callback(errormsg);
+                return;
             }
 
             Console.log("Project template created at '" + path + "'");
-            callback(0);
+            callback(null);
 
         }.bind(this));
     }.bind(this));
