@@ -4,9 +4,9 @@
 
 var ChildProcess = require('child_process');
 var Path = require("path");
+var ShellJS = require("shelljs");
 var AndroidTargets = require("../src/AndroidTargets");
 var Console = require("./Console");
-var ShellJS = require("shelljs");
 
 
 

@@ -3,12 +3,12 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var OS = require('os');
+var MkTemp = require('mktemp');
+var ShellJS = require("shelljs");
 // Run tests silently to avoid spew from tests failing on purpose.
 require("../src/Config").setSilentConsole(true);
 var Console = require("../src/Console");
 var AndroidSDK = require("../src/AndroidSDK");
-var MkTemp = require('mktemp');
-var ShellJS = require("shelljs");
 
 exports.tests = {
 
