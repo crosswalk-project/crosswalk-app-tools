@@ -13,10 +13,11 @@ var MainTest = require("../src/main.js").test;
 
 exports.tests = {
 
-    create: function(test) {
+    create1: function(test) {
 
         test.expect(1);
 
+        // Good test.
         // MkTemp creates temp dir in working dir, so cd tmp first.
         ShellJS.pushd(OS.tmpdir());
 
@@ -30,6 +31,32 @@ exports.tests = {
 
             ShellJS.popd();
             ShellJS.popd();
+            ShellJS.rm("-rf", tmpdir);
+
+            test.done();
+        });
+    },
+
+    create2: function(test) {
+
+        test.expect(1);
+
+        // Bad test.
+        // MkTemp creates temp dir in working dir, so cd tmp first.
+        ShellJS.pushd(OS.tmpdir());
+
+        var tmpdir = MkTemp.createDirSync("XXXXXX.crosswalk-app-tools");
+        Console.log("Tempdir: " + tmpdir);
+        ShellJS.pushd(tmpdir);
+
+        // Malformed name, fail.
+        MainTest.create("Foo", function(success) {
+
+            test.equal(success, false);
+
+            ShellJS.popd();
+            ShellJS.popd();
+            ShellJS.rm("-rf", tmpdir);
 
             test.done();
         });

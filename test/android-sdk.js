@@ -81,7 +81,7 @@ exports.tests = {
                 // Clean up removing project skeleton directory.
                 ShellJS.popd();
                 ShellJS.popd();
-                ShellJS.rm('-rf', tmpdir);
+                ShellJS.rm("-rf", tmpdir);
             });
         });
     }
