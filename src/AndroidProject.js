@@ -2,9 +2,11 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var Path = require('path');
 var AndroidSDK = require("./AndroidSDK");
 var Console = require("./Console");
 var Project = require("./Project");
+var TemplateFile = require("./TemplateFile");
 
 /**
  * Android project class.
@@ -16,6 +18,26 @@ function AndroidProject() {
     this._sdk = new AndroidSDK();
 }
 AndroidProject.prototype = Project;
+
+AndroidProject.prototype.generateTemplates =
+function(packageId, path) {
+
+    var parts = packageId.split('.');
+    var packageName = parts[parts.length - 1];
+    var data = {
+        "packageId": packageId,
+        "packageName" : packageName
+    };
+
+    // AndroidManifest.xml
+    var tpl = new TemplateFile(__dirname + Path.sep +
+                               ".."+ Path.sep +
+                               "data" + Path.sep +
+                               "AndroidManifest.xml.tpl");
+    tpl.render(data, path + Path.sep + "AndroidManifest.xml");
+
+    return true;
+};
 
 /**
  * Implements {@link Project.generate}
@@ -42,6 +64,9 @@ function(packageId, callback) {
             }
 
             Console.log("Project template created at '" + path + "'");
+
+            this.generateTemplates(packageId, path);
+
             callback(null);
 
         }.bind(this));
