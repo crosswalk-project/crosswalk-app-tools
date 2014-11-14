@@ -101,7 +101,7 @@ function main() {
 
     } else {
 
-        help(parser);
+        printHelp(parser);
     }
 }
 
