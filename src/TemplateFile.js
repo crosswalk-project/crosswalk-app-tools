@@ -13,7 +13,7 @@ var Mustache = require("mustache");
  */
 function TemplateFile(path) {
 
-    this._buffer = FS.readFileSync(path);
+    this._buffer = FS.readFileSync(path, {"encoding": "utf8"});
     if (!this._buffer || this._buffer.length === 0) {
         throw new Error("Could not read " + path);
     }
