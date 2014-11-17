@@ -51,6 +51,16 @@ function(packageId, apiTarget, path) {
                                "project.properties.tpl");
     tpl.render(data, path + Path.sep + "project.properties");
 
+    // MainActivity.java
+    var tpl = new TemplateFile(__dirname + Path.sep +
+                               ".."+ Path.sep +
+                               "data" + Path.sep +
+                               "MainActivity.java.tpl");
+    var activityPath = path + Path.sep +
+                       "src" + Path.sep +
+                       parts.join(Path.sep);
+    tpl.render(data, activityPath + Path.sep + "MainActivity.java");
+
     return true;
 };
 
