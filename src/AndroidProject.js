@@ -36,6 +36,13 @@ function(packageId, path) {
                                "AndroidManifest.xml.tpl");
     tpl.render(data, path + Path.sep + "AndroidManifest.xml");
 
+    // build.xml
+    var tpl = new TemplateFile(__dirname + Path.sep +
+                               ".."+ Path.sep +
+                               "data" + Path.sep +
+                               "build.xml.tpl");
+    tpl.render(data, path + Path.sep + "build.xml");
+
     return true;
 };
 
