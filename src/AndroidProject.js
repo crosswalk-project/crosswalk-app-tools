@@ -20,13 +20,14 @@ function AndroidProject() {
 AndroidProject.prototype = Project;
 
 AndroidProject.prototype.generateTemplates =
-function(packageId, path) {
+function(packageId, apiTarget, path) {
 
     var parts = packageId.split('.');
     var packageName = parts[parts.length - 1];
     var data = {
-        "packageId": packageId,
-        "packageName" : packageName
+        "packageId" : packageId,
+        "packageName" : packageName,
+        "apiTarget" : apiTarget
     };
 
     // AndroidManifest.xml
@@ -42,6 +43,13 @@ function(packageId, path) {
                                "data" + Path.sep +
                                "build.xml.tpl");
     tpl.render(data, path + Path.sep + "build.xml");
+
+    // project.properties
+    var tpl = new TemplateFile(__dirname + Path.sep +
+                               ".."+ Path.sep +
+                               "data" + Path.sep +
+                               "project.properties.tpl");
+    tpl.render(data, path + Path.sep + "project.properties");
 
     return true;
 };
@@ -72,7 +80,7 @@ function(packageId, callback) {
 
             Console.log("Project template created at '" + path + "'");
 
-            this.generateTemplates(packageId, path);
+            this.generateTemplates(packageId, apiTarget, path);
 
             callback(null);
 
