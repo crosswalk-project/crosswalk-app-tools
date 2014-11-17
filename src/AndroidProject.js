@@ -84,6 +84,9 @@ function(packageId, apiTarget, path) {
                appTplPath + Path.sep + "template" + Path.sep + "res",
                path);
 
+    // Make html5 app dir
+    ShellJS.mkdir("-p", path + Path.sep + "assets" + Path.sep + "www")
+
     return true;
 };
 
