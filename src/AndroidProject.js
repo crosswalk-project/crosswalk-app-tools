@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var Path = require('path');
+var ShellJS = require("shelljs");
 var AndroidSDK = require("./AndroidSDK");
 var Console = require("./Console");
 var Project = require("./Project");
@@ -61,6 +62,28 @@ function(packageId, apiTarget, path) {
                        parts.join(Path.sep);
     tpl.render(data, activityPath + Path.sep + "MainActivity.java");
 
+    // Copy
+    var dirs = ShellJS.ls('crosswalk-*.*.*.*');
+    if (dirs.length === 0) {
+        Console.error("Unpacked Crosswalk not found in current directory");
+        return false;
+    }
+    var appTplPath = dirs[0];
+
+    // Copy xwalk_core_library
+    ShellJS.cp("-r",
+               appTplPath + Path.sep + "xwalk_core_library",
+               path);
+
+    // Copy jars
+    ShellJS.cp(appTplPath + Path.sep + "template" + Path.sep + "libs" + Path.sep + "*.jar",
+               path + Path.sep + "libs");
+
+    // Copy res
+    ShellJS.cp("-r",
+               appTplPath + Path.sep + "template" + Path.sep + "res",
+               path);
+
     return true;
 };
 
@@ -70,7 +93,7 @@ function(packageId, apiTarget, path) {
 AndroidProject.prototype.generate =
 function(packageId, callback) {
 
-    var minApiLevel = 14;
+    var minApiLevel = 19;
     var apiTarget;
     this._sdk.queryTarget(minApiLevel,
                           function(apiTarget, errormsg) {
@@ -88,10 +111,13 @@ function(packageId, callback) {
                 return;
             }
 
+            var ret = this.generateTemplates(packageId, apiTarget, path);
+            if (!ret) {
+                callback("Creating project template failed.");
+                return;
+            }
+
             Console.log("Project template created at '" + path + "'");
-
-            this.generateTemplates(packageId, apiTarget, path);
-
             callback(null);
 
         }.bind(this));
