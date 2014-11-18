@@ -39,21 +39,21 @@ function(packageId, apiTarget, path) {
     tpl.render(data, path + Path.sep + "AndroidManifest.xml");
 
     // build.xml
-    var tpl = new TemplateFile(__dirname + Path.sep +
+    tpl = new TemplateFile(__dirname + Path.sep +
                                ".."+ Path.sep +
                                "data" + Path.sep +
                                "build.xml.tpl");
     tpl.render(data, path + Path.sep + "build.xml");
 
     // project.properties
-    var tpl = new TemplateFile(__dirname + Path.sep +
+    tpl = new TemplateFile(__dirname + Path.sep +
                                ".."+ Path.sep +
                                "data" + Path.sep +
                                "project.properties.tpl");
     tpl.render(data, path + Path.sep + "project.properties");
 
     // MainActivity.java
-    var tpl = new TemplateFile(__dirname + Path.sep +
+    tpl = new TemplateFile(__dirname + Path.sep +
                                ".."+ Path.sep +
                                "data" + Path.sep +
                                "MainActivity.java.tpl");
@@ -85,7 +85,7 @@ function(packageId, apiTarget, path) {
                path);
 
     // Make html5 app dir
-    ShellJS.mkdir("-p", path + Path.sep + "assets" + Path.sep + "www")
+    ShellJS.mkdir("-p", path + Path.sep + "assets" + Path.sep + "www");
 
     return true;
 };
