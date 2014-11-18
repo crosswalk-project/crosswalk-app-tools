@@ -65,8 +65,13 @@ function(packageId, apiTarget, path) {
     // Copy
     var dirs = ShellJS.ls('crosswalk-*.*.*.*');
     if (dirs.length === 0) {
-        Console.error("Unpacked Crosswalk not found in current directory");
-        return false;
+        // Also try parent dir.
+        // This is especially useful for tests that run in a temporary dir.
+        dirs = ShellJS.ls('../crosswalk-*.*.*.*');
+        if (dirs.length === 0) {
+            Console.error("Unpacked Crosswalk not found in current or parent directory " + ShellJS.pwd());
+            return false;
+        }
     }
     var appTplPath = dirs[0];
 
