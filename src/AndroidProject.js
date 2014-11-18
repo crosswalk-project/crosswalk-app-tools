@@ -85,7 +85,7 @@ function(packageId, apiTarget, path) {
                path + Path.sep + "libs");
 
     // Copy res
-    ShellJS.cp("-r",
+    ShellJS.cp("-rf",
                appTplPath + Path.sep + "template" + Path.sep + "res",
                path);
 
