@@ -9,7 +9,7 @@
  * @memberOf Project
  * @inner
  */
-function generateCb(result) {}
+function projectCb(result) {}
 
 /**
  * Interface for project implementations.
@@ -20,8 +20,7 @@ var Project = {
      * Generate project template.
      * @function generate
      * @param {String} packageId Package name in com.example.Foo format.
-     * @param {Function} callback see {@link Project~generateCb}
-     * @returns {String} null on Success, error message on failure.
+     * @param {Function} callback see {@link Project~projectCb}.
      * @abstract
      */
     generate: function(packageId, callback) {
@@ -39,7 +38,15 @@ var Project = {
         throw new Error("Project.refresh() not implemented.");
     },
 
-    build: function() {
+    /**
+     * Build application package.
+     * @function build
+     * @param {String[]} abi Array of ABIs, supported armeabi-v7a, x86.
+     * @param {Boolean} release Whether to build debug or release package.
+     * @param {Function} callback see {@link Project~projectCb}.
+     * @abstract
+     */
+    build: function(abis, release, callback) {
 
         throw new Error("Project.build() not implemented.");
     }

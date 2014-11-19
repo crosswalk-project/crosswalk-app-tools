@@ -2,6 +2,7 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var ShellJS = require("shelljs");
 var AndroidProject = require("./AndroidProject");
 var CommandParser = require("./CommandParser");
 var Console = require("./Console");
@@ -10,6 +11,17 @@ var Console = require("./Console");
  * Main script.
  * @namespace main
  */
+
+function workingDirectoryIsProject() {
+    
+    if (ShellJS.test("-f", "AndroidManifest.xml") &&
+        ShellJS.test("-d", "xwalk_core_library")) {
+
+        return true;
+    }
+
+    return false;
+}
 
 /**
  * Create skeleton project.
@@ -29,10 +41,11 @@ function create(packageId, callback) {
     try {
         project = new AndroidProject();
     } catch (e) {
-        Console.error("Error: The Android SDK could not be found. " +
+        Console.error("The Android SDK could not be found. " +
                       "Make sure the directory containing the 'android' " +
                       "executable is mentioned in the PATH environment variable.");
         callback(false);
+        return;
     }
 
     project.generate(packageId, function(errormsg) {
@@ -40,10 +53,27 @@ function create(packageId, callback) {
         if (errormsg) {
             Console.error(errormsg);
             callback(false);
+            return;
         } else {
             callback(true);
+            return;
         }
     });
+}
+
+function build(type, callback) {
+
+    // Handle callback not passed.
+    if (!callback)
+        callback = function() {};
+    
+    // Check we're inside a project
+    if (!workingDirectoryIsProject()) {
+        Console.error("This does not appear to be a Crosswalk project. " +
+                      "AndroidManifest.xml and xwalk_core_library not found.");
+        callback(false);
+        return;
+    }
 }
 
 /**
