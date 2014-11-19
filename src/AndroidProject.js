@@ -147,10 +147,30 @@ function() {
     // TODO implement
 };
 
+/**
+ * Implements {@link Project.build}
+ */
 AndroidProject.prototype.build =
-function() {
+function(abis, release, callback) {
 
-    // TODO implement
+    // TODO implement handling abis
+
+    this._sdk.buildProject(release, function(logmsg, errormsg) {
+
+        if (errormsg) {
+            Console.error(errormsg);
+            callback("Build failed");
+            return;
+        } else if (logmsg) {
+            Console.log(logmsg);
+            callback(null);
+            return;
+        }
+
+        // Unknown situation
+        callback("It appears something went wrong");
+        return;
+    });
 };
 
 module.exports = AndroidProject;

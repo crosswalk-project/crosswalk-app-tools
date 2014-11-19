@@ -13,7 +13,7 @@ var Console = require("./Console");
  */
 
 function workingDirectoryIsProject() {
-    
+
     if (ShellJS.test("-f", "AndroidManifest.xml") &&
         ShellJS.test("-d", "xwalk_core_library")) {
 
@@ -23,11 +23,25 @@ function workingDirectoryIsProject() {
     return false;
 }
 
+function instantiateProject() {
+
+    var project;
+    try {
+        project = new AndroidProject();
+    } catch (e) {
+        Console.error("The Android SDK could not be found. " +
+                      "Make sure the directory containing the 'android' " +
+                      "executable is mentioned in the PATH environment variable.");
+        return null;
+    }
+
+    return project;
+}
+
 /**
  * Create skeleton project.
  * @param {String} packageId Identifier in the form of com.example.Foo
  * @param {Function} [callback] Callback returning true/false.
- * @returns {Boolean} true on success.
  * @memberOf main
  * @private
  */
@@ -37,13 +51,8 @@ function create(packageId, callback) {
     if (!callback)
         callback = function() {};
 
-    var project;
-    try {
-        project = new AndroidProject();
-    } catch (e) {
-        Console.error("The Android SDK could not be found. " +
-                      "Make sure the directory containing the 'android' " +
-                      "executable is mentioned in the PATH environment variable.");
+    var project = instantiateProject();
+    if (!project) {
         callback(false);
         return;
     }
@@ -61,19 +70,46 @@ function create(packageId, callback) {
     });
 }
 
+/**
+ * Build application package.
+ * @param {String} type "debug" or "release".
+ * @param {Function} [callback] Callback returning true/false.
+ * @memberOf main
+ * @private
+ */
 function build(type, callback) {
 
     // Handle callback not passed.
     if (!callback)
         callback = function() {};
-    
+
     // Check we're inside a project
     if (!workingDirectoryIsProject()) {
-        Console.error("This does not appear to be a Crosswalk project. " +
-                      "AndroidManifest.xml and xwalk_core_library not found.");
+        Console.error("This does not appear to be a Crosswalk project.");
         callback(false);
         return;
     }
+
+    var project = instantiateProject();
+    if (!project) {
+        callback(false);
+        return;
+    }
+
+    // Build
+    var abis = ["armeabi-v7a", "x86"];
+    var release = type === "release" ? true : false;
+    project.build(abis, release, function(errormsg) {
+
+        if (errormsg) {
+            Console.error(errormsg);
+            callback(false);
+            return;
+        } else {
+            callback(true);
+            return;
+        }
+    });
 }
 
 /**
@@ -117,7 +153,7 @@ function main() {
             break;
         case "build":
             var type = parser.buildGetType();
-            console.log("TODO implement");
+            build(type);
             break;
         case "help":
             printHelp(parser);

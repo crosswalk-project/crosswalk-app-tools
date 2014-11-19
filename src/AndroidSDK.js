@@ -158,7 +158,7 @@ function(release, callback) {
         return;
     }
 
-    var exitStatus = { "status" : 0 };
+    var exitStatus = { "code" : 0 };
     var args = [ release ? "release" : "debug" ];
     var child = ChildProcess.execFile(ant, args, {},
                                       function(errmsg, stdlog, errlog) {
@@ -168,14 +168,14 @@ function(release, callback) {
             errmsg = errlog;
         }
 
-        Console.log("Ant build finished, exit status " + exitStatus.status);
+        Console.log("Ant build finished, exit status " + exitStatus.code);
         callback(stdlog, errmsg);
         return;
     });
 
     child.on("exit", function(code, signal) {
         Console.log("Exit status " + code);
-        exitStatus.status = code;
+        exitStatus.code = code;
     });
 };
 
