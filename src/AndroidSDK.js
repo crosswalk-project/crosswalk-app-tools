@@ -13,23 +13,30 @@ var Console = require("./Console");
 /**
  * Callback signature for {@link AndroidSDK.queryTarget}
  * @param {String} apiTarget SDK API target identifier or null.
- * @param {String} errormsg Error message or null.
+ * @param {String} errmsg Error message or null.
  * @memberOf AndroidSDK
  * @inner
  */
-function queryTargetCb(apiTarget, errormsg) {}
+function queryTargetCb(apiTarget, errmsg) {}
 
 /**
  * Callback signature for {@link AndroidSDK.generateProjectTemplate}
  * @param {String} path Path of project template or null.
  * @param {String} logmsg Log message or null.
- * @param {String} errormsg Error message or null.
+ * @param {String} errmsg Error message or null.
  * @memberOf AndroidSDK
  * @inner
  */
-function generateProjectTemplateCb(path, logmsg, errormsg) {}
+function generateProjectTemplateCb(path, logmsg, errmsg) {}
 
-
+/**
+ * Callback signature for {@link AndroidSDK.buildProject}
+ * @param {String} logmsg Log message or null.
+ * @param {String} errmsg Error message or null.
+ * @memberOf AndroidSDK
+ * @inner
+ */
+function buildProjectCb(logmsg, errmsg) {}
 
 /**
  * Create AndroidSDK object, wrapping Android cmd-line tool interactions.
@@ -62,7 +69,7 @@ function(apiLevel, callback) {
     }
 
     var child = ChildProcess.execFile(this._scriptPath, ["list", "target"], {},
-                                      function(error, stdlog, errlog) {
+                                      function(errmsg, stdlog, errlog) {
 
         var apiTarget = null;
         if (stdlog !== null) {
@@ -71,19 +78,19 @@ function(apiLevel, callback) {
                 var targets = new AndroidTargets(stdlog);
                 apiTarget = targets.pickLowest(apiLevel);
             } catch (e) {
-                error = "Failed to parse SDK API targets.";
+                errmsg = "Failed to parse SDK API targets.";
             }
 
-        } else if (error === null) {
-            error = "No SDK API targets found";
+        } else if (errmsg === null) {
+            errmsg = "No SDK API targets found";
         }
 
-        callback(apiTarget, error);
+        callback(apiTarget, errmsg);
     }.bind(this));
 };
 
 /**
- * Create project template by calling "android create project ..."
+ * Create project template by running "android create project ..."
  * @function generateProjectTemplate
  * @param {String} packageId Package name in the com.example.Foo format.
  * @param {String} apiTarget Android API target android-xy as per "android list targets".
@@ -94,15 +101,15 @@ function(apiLevel, callback) {
 AndroidSDK.prototype.generateProjectTemplate =
 function(packageId, apiTarget, callback) {
 
-    var errormsg = null;
+    var errmsg = null;
 
     // Construct path and fail if exists.
     var wd = ShellJS.pwd();
     var path = wd + Path.sep + packageId;
     if (ShellJS.test("-e", path)) {
-        errormsg = "Error: project dir '" + path + "' already exists";
-        Console.error(errormsg);
-        callback(null, null, errormsg);
+        errmsg = "Error: project dir '" + path + "' already exists";
+        Console.error(errmsg);
+        callback(null, null, errmsg);
         return;
     }
 
@@ -116,14 +123,15 @@ function(packageId, apiTarget, callback) {
     var stdlog = null;
     var errlog = null;
     var child = ChildProcess.execFile(this._scriptPath, args, {},
-                                      function(errormsg, stdlog, errlog) {
+                                      function(errmsg, stdlog, errlog) {
 
-        if (errlog && !errormsg) {
+        if (errlog && !errmsg) {
             // Pass back errlog output as error message.
-            errormsg = errlog;
+            errmsg = errlog;
         }
 
-        callback(path, stdlog, errormsg);
+        callback(path, stdlog, errmsg);
+        return;
     });
 };
 
@@ -133,10 +141,42 @@ function() {
     // TODO
 };
 
+/**
+ * Build project by running "ant debug" or "ant release"
+ * @function buildProject
+ * @param {Boolean} release Whether to build a release or debug package.
+ * @param {Function} callback see {@link AndroidSDK~buildProjectCb}
+ * @returns null
+ * @memberOf AndroidSDK
+ */
 AndroidSDK.prototype.buildProject =
-function() {
+function(release, callback) {
 
-    // TODO
+    var ant = ShellJS.which("ant");
+    if (!ant) {
+        callback(null, "Executable 'ant' not found in path");
+        return;
+    }
+
+    var exitStatus = { "status" : 0 };
+    var args = [ release ? "release" : "debug" ];
+    var child = ChildProcess.execFile(ant, args, {},
+                                      function(errmsg, stdlog, errlog) {
+
+        if (errlog && !errmsg) {
+            // Pass back errlog output as error message.
+            errmsg = errlog;
+        }
+
+        Console.log("Ant build finished, exit status " + exitStatus.status);
+        callback(stdlog, errmsg);
+        return;
+    });
+
+    child.on("exit", function(code, signal) {
+        Console.log("Exit status " + code);
+        exitStatus.status = code;
+    });
 };
 
 AndroidSDK.prototype.findAndroidScriptPath =
