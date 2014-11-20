@@ -21,17 +21,6 @@ function(message) {
 };
 
 /**
- * Log warning message.
- * @param {String} message
- * @memberOf ConsoleIface
- */
-ConsoleIface.prototype.warning =
-function(message) {
-
-    throw new Error("ConsoleIface.warning() not implemented.");
-};
-
-/**
  * Log message.
  * @param {String} message
  * @memberOf ConsoleIface
@@ -40,6 +29,18 @@ ConsoleIface.prototype.log =
 function(message) {
 
     throw new Error("ConsoleIface.log() not implemented.");
+};
+
+/**
+ * Output string without trailing newline.
+ * @param {String} message
+ * @param {[Boolean]} stderr Whether to write on stderr, default is stdout.
+ * @memberOf ConsoleIface
+ */
+ConsoleIface.prototype.put =
+function(message, stderr) {
+
+    throw new Error("ConsoleIface.put() not implemented.");
 };
 
 module.exports = ConsoleIface;

@@ -20,18 +20,27 @@ function(message) {
         console.error("ERROR: " + message);
 };
 
-StdioConsole.prototype.warning =
-function(message) {
-
-    if (!Config.getSilentConsole())
-        console.error("WARNING: " + message);
-};
-
 StdioConsole.prototype.log =
 function(message) {
 
     if (!Config.getSilentConsole())
         console.log(message);
+};
+
+StdioConsole.prototype.put =
+function(message, stderr) {
+
+    // Default to stdout.
+    if (typeof stderr === "undefined")
+        stderr = false;
+
+    if (!Config.getSilentConsole()) {
+        if (stderr) {
+            process.stderr.write(message);
+        } else {
+            process.stdout.write(message);
+        }
+    }
 };
 
 
