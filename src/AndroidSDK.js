@@ -31,12 +31,11 @@ function generateProjectTemplateCb(path, logmsg, errmsg) {}
 
 /**
  * Callback signature for {@link AndroidSDK.buildProject}
- * @param {String} logmsg Log message or null.
- * @param {String} errmsg Error message or null.
+ * @param {Boolean} success Whether build succeeded.
  * @memberOf AndroidSDK
  * @inner
  */
-function buildProjectCb(logmsg, errmsg) {}
+function buildProjectCb(success) {}
 
 /**
  * Create AndroidSDK object, wrapping Android cmd-line tool interactions.
@@ -160,22 +159,19 @@ function(release, callback) {
 
     var exitStatus = { "code" : 0 };
     var args = [ release ? "release" : "debug" ];
-    var child = ChildProcess.execFile(ant, args, {},
-                                      function(errmsg, stdlog, errlog) {
+    var child = ChildProcess.execFile(ant, args);
 
-        if (errlog && !errmsg) {
-            // Pass back errlog output as error message.
-            errmsg = errlog;
-        }
+    child.stdout.on("data", function(data) {
+        Console.put(data);
+    });
 
-        Console.log("Ant build finished, exit status " + exitStatus.code);
-        callback(stdlog, errmsg);
-        return;
+    child.stderr.on("data", function(data) {
+        Console.put(data, true);
     });
 
     child.on("exit", function(code, signal) {
-        Console.log("Exit status " + code);
-        exitStatus.code = code;
+        callback(code === 0);
+        return;
     });
 };
 
