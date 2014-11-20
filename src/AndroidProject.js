@@ -147,30 +147,143 @@ function() {
     // TODO implement
 };
 
+AndroidProject.prototype.enableABI =
+function(abi) {
+
+    if (!ShellJS.test("-d", "xwalk_core_library/libs")) {
+        Console.error("This does not appear to be the root of a Crosswalk project.");
+        return false;
+    }
+
+    ShellJS.pushd("xwalk_core_library/libs");
+
+    var abiMatched = false;
+    var list = ShellJS.ls(".");
+    for (var i = 0; i < list.length; i++) {
+
+        var entry = list[i];
+        if (ShellJS.test("-d", entry)) {
+            // This is a dir inside "libs", enable/disable depending
+            // on which ABI we want.
+            if (!abi) {
+                // No ABI passed, enable all of them, this is default
+                // status of the project.
+                ShellJS.chmod("+rx", entry);
+                abiMatched = true;
+            } else if (abi === entry) {
+                // enable
+                ShellJS.chmod("+rx", entry);
+                abiMatched = true;
+            } else {
+                // disable
+                ShellJS.chmod("-rx", entry);
+            }
+        }
+    }
+
+    ShellJS.popd();
+    return abiMatched;
+};
+
+AndroidProject.prototype.abifyAPK =
+function(abi, release) {
+
+    var apkInPattern;
+    if (release) {
+        apkInPattern = "*-release-unsigned.apk";
+    } else {
+        apkInPattern = "*-debug.apk";
+    }
+
+    var apkInPath = ShellJS.ls("bin" + Path.sep + apkInPattern)[0];
+    if (!apkInPath) {
+        Console.error("APK bin" + Path.sep + apkInPattern + " not found");
+        return false;
+    }
+
+    var apkInName = apkInPath.split(Path.sep)[1];
+    if (!ShellJS.test("-f", "bin" + Path.sep + apkInName)) {
+        Console.error("APK bin" + Path.sep + apkInName + " not found");
+        return false;
+    }
+
+    var base = apkInName.substring(0, apkInName.length - ".apk".length);
+    var apkOutName = base + "." + abi + ".apk";
+    ShellJS.mv("bin" + Path.sep + apkInName,
+               "bin" + Path.sep + apkOutName);
+
+    if (!ShellJS.test("-f", "bin" + Path.sep + apkOutName)) {
+        Console.error("APK bin" + Path.sep + apkOutName + " not found");
+        return false;
+    }
+
+    return true;
+};
+
+AndroidProject.prototype.buildABI =
+function(closure) {
+
+    // If done with all the ABIs, terminate successfully.
+    if (closure.abiIndex >= closure.abis.length) {
+        this.enableABI();
+        closure.callback(null);
+        return;
+    }
+
+    // Pick and enable ABI.
+    var abi = closure.abis[closure.abiIndex];
+    if (this.enableABI(abi)) {
+        closure.abiIndex++;
+    } else {
+        // Failed, enable all ABIs and terminate build.
+        this.enableABI();
+        closure.callback("Enabling ABI '" + abi + "' failed");
+        return;
+    }
+
+    // Build for ABI.
+    this._sdk.buildProject(closure.release, function(success) {
+
+        if (success) {
+
+            // Preserve APK by renaming it by ABI
+            // Otherwise IA and ARM APKs would overwrite each other,
+            // as we simply run ant twice.
+            if (!this.abifyAPK(abi, closure.release)) {
+                // Failed, enable all ABIs and terminate build.
+                this.enableABI();
+                callback("Building ABI '" + abi + "' failed");
+                return;
+            }
+
+            // Build next ABI.
+            this.buildABI(closure);
+            return;
+
+        } else {
+            // Failed, enable all ABIs and terminate build.
+            this.enableABI();
+            callback("Building ABI '" + abi + "' failed");
+            return;
+        }
+    }.bind(this));
+};
+
 /**
  * Implements {@link Project.build}
  */
 AndroidProject.prototype.build =
 function(abis, release, callback) {
 
-    // TODO implement handling abis
+    var closure = {
+        abis: abis,
+        abiIndex : 0,
+        release: release,
+        callback: callback
+    };
 
-    this._sdk.buildProject(release, function(logmsg, errormsg) {
-
-        if (errormsg) {
-            Console.error(errormsg);
-            callback("Build failed");
-            return;
-        } else if (logmsg) {
-            Console.log(logmsg);
-            callback(null);
-            return;
-        }
-
-        // Unknown situation
-        callback("It appears something went wrong");
-        return;
-    });
+    // This builds all ABIs in a recursion (of sorts).
+    this.buildABI(closure);
 };
 
 module.exports = AndroidProject;
