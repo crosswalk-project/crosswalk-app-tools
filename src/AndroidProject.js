@@ -11,6 +11,7 @@ var TemplateFile = require("./TemplateFile");
 
 /**
  * Android project class.
+ * @extends Project
  * @throws {@link AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
  * @constructor
  */
@@ -20,7 +21,16 @@ function AndroidProject() {
 }
 AndroidProject.prototype = Project;
 
-AndroidProject.prototype.generateTemplates =
+/**
+ * Fill template files and put them into the project skeleton.
+ * @function fillTemplates
+ * @param {String} packageId Qualified package name.
+ * @param {String} apiTarget Android API target (greater android-14).
+ * @param {String} path Path to root dir of project.
+ * @returns {Boolean} true on success.
+ * @memberOf AndroidProject
+ */
+AndroidProject.prototype.fillTemplates =
 function(packageId, apiTarget, path) {
 
     var parts = packageId.split('.');
@@ -100,6 +110,8 @@ function(packageId, apiTarget, path) {
 
 /**
  * Implements {@link Project.generate}
+ * @function generate
+ * @memberOf AndroidProject
  */
 AndroidProject.prototype.generate =
 function(packageId, callback) {
@@ -122,7 +134,7 @@ function(packageId, callback) {
                 return;
             }
 
-            var ret = this.generateTemplates(packageId, apiTarget, path);
+            var ret = this.fillTemplates(packageId, apiTarget, path);
             if (!ret) {
                 callback("Creating project template failed.");
                 return;
@@ -147,6 +159,14 @@ function() {
     // TODO implement
 };
 
+/**
+ * Enable ABIs so they are built into the APK.
+ * @function enableABI
+ * @param {String} [abi] ABI identifier "armeabi-v7a" / "x86". When not passed,
+ *                       all ABIs are enabled.
+ * @returns {Boolean} true on success or false.
+ * @memberOf AndroidProject
+ */
 AndroidProject.prototype.enableABI =
 function(abi) {
 
@@ -185,7 +205,17 @@ function(abi) {
     return abiMatched;
 };
 
-AndroidProject.prototype.abifyAPK =
+/**
+ * Rename the build APK to contain an ABI suffix, before the .apk suffix,
+ * so when building multiple ABIs one after another, the subsequent APKs
+ * do not overwrite the previously built ones.
+ * @function abifyAPKNameName
+ * @param {String} abi ABI name
+ * @param {Boolean} release Whether we're building release or debug packages.
+ * @returns {Boolean} true on success, or false.
+ * @memberOf AndroidProject
+ */
+AndroidProject.prototype.abifyAPKName =
 function(abi, release) {
 
     var apkInPattern;
@@ -220,6 +250,13 @@ function(abi, release) {
     return true;
 };
 
+/**
+ * Build APK for one ABI. This method is calling itself recursively, until
+ * all ABIs are built.
+ * @function buildABI
+ * @param {Object} closure Information to pass between ABI build runs.
+ * @memberOf AndroidProject
+ */
 AndroidProject.prototype.buildABI =
 function(closure) {
 
@@ -249,7 +286,7 @@ function(closure) {
             // Preserve APK by renaming it by ABI
             // Otherwise IA and ARM APKs would overwrite each other,
             // as we simply run ant twice.
-            if (!this.abifyAPK(abi, closure.release)) {
+            if (!this.abifyAPKName(abi, closure.release)) {
                 // Failed, enable all ABIs and terminate build.
                 this.enableABI();
                 callback("Building ABI '" + abi + "' failed");
@@ -271,6 +308,8 @@ function(closure) {
 
 /**
  * Implements {@link Project.build}
+ * @function build
+ * @memberOf AndroidProject
  */
 AndroidProject.prototype.build =
 function(abis, release, callback) {
