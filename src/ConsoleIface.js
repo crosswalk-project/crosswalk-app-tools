@@ -34,11 +34,11 @@ function(message) {
 /**
  * Output string without trailing newline.
  * @param {String} message
- * @param {Boolean|undefined} stderr Optional, whether to write on stderr, default is stdout.
+ * @param {Boolean} [toStderr] Optional, whether to write on stderr, default is stdout.
  * @memberOf ConsoleIface
  */
 ConsoleIface.prototype.put =
-function(message, stderr) {
+function(message, toStderr) {
 
     throw new Error("ConsoleIface.put() not implemented.");
 };
