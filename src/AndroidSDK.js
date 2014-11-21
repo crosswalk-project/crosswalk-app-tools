@@ -175,6 +175,12 @@ function(release, callback) {
     });
 };
 
+/**
+ * Try to find the "android" executable in the environment's search path.
+ * @function findAndroidScriptPath
+ * @returns {String} Path or null.
+ * @memberOf AndroidSDK
+ */
 AndroidSDK.prototype.findAndroidScriptPath =
 function() {
 
