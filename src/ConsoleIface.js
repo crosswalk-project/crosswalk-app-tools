@@ -34,7 +34,7 @@ function(message) {
 /**
  * Output string without trailing newline.
  * @param {String} message
- * @param {[Boolean]} stderr Whether to write on stderr, default is stdout.
+ * @param {Boolean|undefined} stderr Optional, whether to write on stderr, default is stdout.
  * @memberOf ConsoleIface
  */
 ConsoleIface.prototype.put =
