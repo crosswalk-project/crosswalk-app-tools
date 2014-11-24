@@ -177,6 +177,7 @@ module.exports = {
 
     test: {
         create: create,
+        build: build,
         printHelp: printHelp,
         printVersion: printVersion
     }

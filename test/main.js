@@ -73,6 +73,40 @@ exports.tests = {
         });
     },
 
+    build: function(test) {
+
+        test.expect(1);
+
+        // Create
+        // MkTemp creates temp dir in working dir, so cd tmp first.
+        ShellJS.pushd(OS.tmpdir());
+
+        var tmpdir = MkTemp.createDirSync("XXXXXX.crosswalk-app-tools");
+        Console.log("Tempdir: " + tmpdir);
+        ShellJS.pushd(tmpdir);
+
+        Main.test.create("com.example.Foo", function(success) {
+
+            if (success) {
+
+                // Build
+                ShellJS.pushd("com.example.Foo");
+                Main.test.build("debug", function(success) {
+
+                    test.equal(success, true);
+                    test.done();
+
+                    ShellJS.popd();
+                    ShellJS.popd();
+                    ShellJS.popd();
+                    ShellJS.rm("-rf", tmpdir);
+                });
+            } else {
+                test.done();
+            }
+        });
+    },
+
     printHelp: function(test) {
 
         // Prints to stdout, so just run the code to see if it breaks.
