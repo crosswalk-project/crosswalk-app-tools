@@ -46,7 +46,7 @@ exports.tests = {
         });
     },
 
-    generateProjectTemplate: function(test) {
+    generateProjectSkeleton: function(test) {
 
         test.expect(2);
 
@@ -67,7 +67,7 @@ exports.tests = {
             Console.log("Tempdir: " + tmpdir);
             ShellJS.pushd(tmpdir);
 
-            sdk.generateProjectTemplate("com.example.Foo", target,
+            sdk.generateProjectSkeleton("com.example.Foo", target,
                                         function(path, log, errormsg) {
 
                 if (errormsg) {

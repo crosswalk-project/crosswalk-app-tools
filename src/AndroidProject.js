@@ -165,7 +165,7 @@ function(packageId, callback) {
             return;
         }
 
-        this._sdk.generateProjectTemplate(packageId, apiTarget,
+        this._sdk.generateProjectSkeleton(packageId, apiTarget,
                                           function(path, logmsg, errormsg) {
 
             if (!path || errormsg) {

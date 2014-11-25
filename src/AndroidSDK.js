@@ -20,14 +20,14 @@ var Console = require("./Console");
 function queryTargetCb(apiTarget, errmsg) {}
 
 /**
- * Callback signature for {@link AndroidSDK.generateProjectTemplate}
+ * Callback signature for {@link AndroidSDK.generateProjectSkeleton}
  * @param {String} path Path of project template or null.
  * @param {String} logmsg Log message or null.
  * @param {String} errmsg Error message or null.
  * @memberOf AndroidSDK
  * @inner
  */
-function generateProjectTemplateCb(path, logmsg, errmsg) {}
+function generateProjectSkeletonCb(path, logmsg, errmsg) {}
 
 /**
  * Callback signature for {@link AndroidSDK.buildProject}
@@ -90,14 +90,14 @@ function(apiLevel, callback) {
 
 /**
  * Create project template by running "android create project ..."
- * @function generateProjectTemplate
+ * @function generateProjectSkeleton
  * @param {String} packageId Package name in the com.example.Foo format.
  * @param {String} apiTarget Android API target android-xy as per "android list targets".
- * @param {Function} callback see {@link AndroidSDK~generateProjectTemplateCb}
+ * @param {Function} callback see {@link AndroidSDK~generateProjectSkeletonCb}
  * @returns null
  * @memberOf AndroidSDK
  */
-AndroidSDK.prototype.generateProjectTemplate =
+AndroidSDK.prototype.generateProjectSkeleton =
 function(packageId, apiTarget, callback) {
 
     var errmsg = null;
