@@ -26,12 +26,12 @@ AndroidProject.prototype = Project;
  * @function fillTemplates
  * @param {String} packageId Qualified package name.
  * @param {String} apiTarget Android API target (greater android-14).
- * @param {String} path Path to root dir of project.
+ * @param {String} projectPath Path to root dir of project.
  * @returns {Boolean} true on success.
  * @memberOf AndroidProject
  */
 AndroidProject.prototype.fillTemplates =
-function(packageId, apiTarget, path) {
+function(packageId, apiTarget, projectPath) {
 
     var parts = packageId.split('.');
     var packageName = parts[parts.length - 1];
@@ -46,31 +46,86 @@ function(packageId, apiTarget, path) {
                                ".."+ Path.sep +
                                "data" + Path.sep +
                                "AndroidManifest.xml.tpl");
-    tpl.render(data, path + Path.sep + "AndroidManifest.xml");
+    tpl.render(data, projectPath + Path.sep + "AndroidManifest.xml");
 
     // build.xml
     tpl = new TemplateFile(__dirname + Path.sep +
                                ".."+ Path.sep +
                                "data" + Path.sep +
                                "build.xml.tpl");
-    tpl.render(data, path + Path.sep + "build.xml");
+    tpl.render(data, projectPath + Path.sep + "build.xml");
 
     // project.properties
     tpl = new TemplateFile(__dirname + Path.sep +
                                ".."+ Path.sep +
                                "data" + Path.sep +
                                "project.properties.tpl");
-    tpl.render(data, path + Path.sep + "project.properties");
+    tpl.render(data, projectPath + Path.sep + "project.properties");
 
     // MainActivity.java
     tpl = new TemplateFile(__dirname + Path.sep +
                                ".."+ Path.sep +
                                "data" + Path.sep +
                                "MainActivity.java.tpl");
-    var activityPath = path + Path.sep +
+    var activityPath = projectPath + Path.sep +
                        "src" + Path.sep +
                        parts.join(Path.sep);
     tpl.render(data, activityPath + Path.sep + "MainActivity.java");
+
+    // Make html5 app dir and copy sample content
+    ShellJS.mkdir("-p", projectPath + Path.sep + "assets");
+    ShellJS.cp("-r",
+               __dirname + Path.sep + ".."+ Path.sep + "data" + Path.sep + "www",
+               projectPath + Path.sep + "assets");
+
+    // TODO check for errors
+    return true;
+};
+
+/**
+ * Import Crosswalk libraries and auxiliary files into the project.
+ * @function importCrosswalkFromDir
+ * @param {String} crosswalkPath Location of unpacked Crosswalk distribution.
+ * @param {String} projectPath Location of project to import Crosswalk into.
+ * @returns {Boolean} true on success or false.
+ * @memberof AndroidProject
+ */
+AndroidProject.prototype.importCrosswalkFromDir =
+function(crosswalkPath, projectPath) {
+
+    // Copy xwalk_core_library
+    ShellJS.cp("-r",
+               crosswalkPath + Path.sep + "xwalk_core_library",
+               projectPath);
+
+    // Copy jars
+    ShellJS.cp(crosswalkPath + Path.sep + "template" + Path.sep + "libs" + Path.sep + "*.jar",
+               projectPath + Path.sep + "libs");
+
+    // Copy res
+    ShellJS.cp("-rf",
+               crosswalkPath + Path.sep + "template" + Path.sep + "res",
+               projectPath);
+
+    // TODO check for errors
+    return true;
+};
+
+/**
+ * Turn a freshly created empty Android project into a Crosswalk project.
+ * @function fillSkeletonProject
+ * @param {String} packageId Qualified package name.
+ * @param {String} apiTarget Android API target (greater android-14).
+ * @param {String} projectPath Path to root dir of project.
+ * @returns {Boolean} true on success.
+ * @memberOf AndroidProject
+ */
+AndroidProject.prototype.fillSkeletonProject =
+function(packageId, apiTarget, projectPath) {
+
+    if (!this.fillTemplates(packageId, apiTarget, projectPath)) {
+        return false;
+    }
 
     // Copy
     var dirs = ShellJS.ls('crosswalk-*.*.*.*');
@@ -85,25 +140,9 @@ function(packageId, apiTarget, path) {
     }
     var appTplPath = dirs[0];
 
-    // Copy xwalk_core_library
-    ShellJS.cp("-r",
-               appTplPath + Path.sep + "xwalk_core_library",
-               path);
-
-    // Copy jars
-    ShellJS.cp(appTplPath + Path.sep + "template" + Path.sep + "libs" + Path.sep + "*.jar",
-               path + Path.sep + "libs");
-
-    // Copy res
-    ShellJS.cp("-rf",
-               appTplPath + Path.sep + "template" + Path.sep + "res",
-               path);
-
-    // Make html5 app dir and copy sample content
-    ShellJS.mkdir("-p", path + Path.sep + "assets");
-    ShellJS.cp("-r",
-               __dirname + Path.sep + ".."+ Path.sep + "data" + Path.sep + "www",
-               path + Path.sep + "assets");
+    if (!this.importCrosswalkFromDir(appTplPath, projectPath)) {
+        return false;
+    }
 
     return true;
 };
@@ -134,7 +173,7 @@ function(packageId, callback) {
                 return;
             }
 
-            var ret = this.fillTemplates(packageId, apiTarget, path);
+            var ret = this.fillSkeletonProject(packageId, apiTarget, path);
             if (!ret) {
                 callback("Creating project template failed.");
                 return;
