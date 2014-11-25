@@ -15,6 +15,7 @@
     "url": "https://github.com/crosswalk-project/crosswalk-app-tools.git"
   },
   "dependencies": {
+    "adm-zip": "~0.4.4",
     "mustache": "~0.8.2",
     "shelljs": "~0.3.0"
   },
