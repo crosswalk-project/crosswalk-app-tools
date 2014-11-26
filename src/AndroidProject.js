@@ -8,6 +8,7 @@ var AndroidSDK = require("./AndroidSDK");
 var Console = require("./Console");
 var Project = require("./Project");
 var TemplateFile = require("./TemplateFile");
+var AdmZip = require("adm-zip");
 
 /**
  * Android project class.
@@ -112,6 +113,79 @@ function(crosswalkPath, projectPath) {
 };
 
 /**
+ * Import Crosswalk libraries and auxiliary files into the project.
+ * @function importCrosswalkFromZip
+ * @param {String} crosswalkPath Location of unpacked Crosswalk distribution.
+ * @param {String} projectPath Location of project to import Crosswalk into.
+ * @returns {Boolean} true on success or false.
+ * @memberof AndroidProject
+ */
+AndroidProject.prototype.importCrosswalkFromZip =
+function(crosswalkPath, projectPath) {
+
+    var zip = new AdmZip(crosswalkPath);
+    if (!zip) {
+        Console.error("Failed to open " + crosswalkPath);
+        return false;
+    }
+
+    // Derive root entry from file name.
+    var parts = crosswalkPath.split(Path.sep);
+    var filename = parts[parts.length - 1];
+    var base = filename.substring(0, filename.length - ".zip".length) + "/";
+
+    var entry = zip.getEntry(base);
+    if (!entry) {
+        Console.error("Failed to find root entry " + base);
+        return false;
+    }
+
+    // Extract xwalk_core_library
+    var path;
+    var name = base + "xwalk_core_library/";
+    var entry = zip.getEntry(name);
+    if (entry) {
+        path = projectPath + Path.sep + "xwalk_core_library";
+        ShellJS.mkdir(path);
+        zip.extractEntryTo(entry, path, false, true);
+    } else {
+        Console.error("Failed to find entry " + name);
+        return false;
+    }
+
+    // Extract jars
+    name = base + "template/libs/xwalk_runtime_java.jar";
+    entry = zip.getEntry(name);
+    if (entry) {
+        zip.extractEntryTo(entry, projectPath + Path.sep + "libs", false, true);
+    } else {
+        Console.error("Failed to find entry " + name);
+        return false;
+    }
+
+    name = base + "template/libs/xwalk_app_runtime_java.jar";
+    entry = zip.getEntry(name);
+    if (entry) {
+        zip.extractEntryTo(entry, projectPath + Path.sep + "libs", false, true);
+    } else {
+        Console.error("Failed to find entry " + name);
+        return false;
+    }
+
+    // Extract res
+    name = base + "template/res/";
+    entry = zip.getEntry(name);
+    if (entry) {
+        zip.extractEntryTo(entry, projectPath + Path.sep + "res", false, true);
+    } else {
+        Console.error("Failed to find entry " + name);
+        return false;
+    }
+
+    return true;
+};
+
+/**
  * Turn a freshly created empty Android project into a Crosswalk project.
  * @function fillSkeletonProject
  * @param {String} packageId Qualified package name.
@@ -127,6 +201,8 @@ function(packageId, apiTarget, projectPath) {
         return false;
     }
 
+/* Import crosswalk from dir, maybe we need this again later on
+ * for building against local app template.
     // Copy
     var dirs = ShellJS.ls('crosswalk-*.*.*.*');
     if (dirs.length === 0) {
@@ -143,8 +219,16 @@ function(packageId, apiTarget, projectPath) {
     if (!this.importCrosswalkFromDir(appTplPath, projectPath)) {
         return false;
     }
+*/
 
-    return true;
+    var zips = ShellJS.ls('crosswalk-*.*.*.*.zip');
+    if (zips.length === 0) {
+        Console.error("Crosswalk Zip not found in current directory " + ShellJS.pwd());
+        return false;
+    }
+    var zipFile = zips[zips.length - 1];
+
+    return this.importCrosswalkFromZip(zipFile, projectPath);
 };
 
 /**
