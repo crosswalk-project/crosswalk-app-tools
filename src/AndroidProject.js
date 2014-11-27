@@ -143,7 +143,7 @@ function(crosswalkPath, projectPath) {
     // Extract xwalk_core_library
     var path;
     var name = base + "xwalk_core_library/";
-    var entry = zip.getEntry(name);
+    entry = zip.getEntry(name);
     if (entry) {
         path = projectPath + Path.sep + "xwalk_core_library";
         ShellJS.mkdir(path);
@@ -223,8 +223,13 @@ function(packageId, apiTarget, projectPath) {
 
     var zips = ShellJS.ls('crosswalk-*.*.*.*.zip');
     if (zips.length === 0) {
-        Console.error("Crosswalk Zip not found in current directory " + ShellJS.pwd());
-        return false;
+        // Also try parent dir.
+        // This is especially useful for tests that run in a temporary dir.
+        zips = ShellJS.ls('../crosswalk-*.*.*.*.zip');
+        if (zips.length === 0) {
+            Console.error("Crosswalk Zip not found in current or parent directory " + ShellJS.pwd());
+            return false;
+        }
     }
     var zipFile = zips[zips.length - 1];
 
