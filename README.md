@@ -12,8 +12,9 @@ Linux is the only tested platform. Node.js, the Android SDK, and git must be fun
 
 1. Download: `git clone https://github.com/crosswalk-project/crosswalk-app-tools.git`
 2. Optionally select a version: `git checkout 0.1.0`
-3. The main script is `crosswalk-app-tools/bin/crosswalk-app`. Set environment PATH or invoke with directory.
-4. Download Crosswalk, e.g. https://download.01.org/crosswalk/releases/crosswalk/android/stable/8.37.189.14/crosswalk-8.37.189.14.zip to the same directory.
+3. Install dependencies: `cd crosswalk-app-tools`, then `npm install`, and `cd ..`
+4. The main script is `crosswalk-app-tools/bin/crosswalk-app`. Set environment PATH or invoke with directory.
+5. Download Crosswalk, e.g. https://download.01.org/crosswalk/releases/crosswalk/android/stable/8.37.189.14/crosswalk-8.37.189.14.zip to the same directory.
 
 ### Usage
 
