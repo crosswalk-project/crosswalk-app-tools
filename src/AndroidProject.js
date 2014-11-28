@@ -421,6 +421,10 @@ function(closure) {
                 return;
             }
 
+            // Delete unaligned APK, so only the ones that are to be used
+            // remain, and there's no confusion.
+            ShellJS.rm("bin" + Path.sep + "*-debug-unaligned.apk");
+
             // Build next ABI.
             this.buildABI(closure);
             return;
