@@ -134,6 +134,16 @@ function(crosswalkPath, projectPath) {
     var filename = parts[parts.length - 1];
     var base = filename.substring(0, filename.length - ".zip".length) + "/";
 
+    // Extract major version
+    var numbers = base.split("-")[1].split(".");
+    var major = numbers[0];
+    if (major < 8) {
+        Console.error("Crosswalk version " + major + " not supported. Use 8+.");
+        return false;
+    } else if (major > 9) {
+        Console.log("*** WARNING: This tool has not been tested with Crosswalk " + major + ".");
+    }
+
     var entry = zip.getEntry(base);
     if (!entry) {
         Console.error("Failed to find root entry " + base);
@@ -154,13 +164,17 @@ function(crosswalkPath, projectPath) {
     }
 
     // Extract jars
-    name = base + "template/libs/xwalk_runtime_java.jar";
-    entry = zip.getEntry(name);
-    if (entry) {
-        zip.extractEntryTo(entry, projectPath + Path.sep + "libs", false, true);
-    } else {
-        Console.error("Failed to find entry " + name);
-        return false;
+
+    if (major === 8) {
+        // Only for Version 8.
+        name = base + "template/libs/xwalk_runtime_java.jar";
+        entry = zip.getEntry(name);
+        if (entry) {
+            zip.extractEntryTo(entry, projectPath + Path.sep + "libs", false, true);
+        } else {
+            Console.error("Failed to find entry " + name);
+            return false;
+        }
     }
 
     name = base + "template/libs/xwalk_app_runtime_java.jar";
