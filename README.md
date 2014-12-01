@@ -6,6 +6,10 @@ Version 2.0, please refer to the LICENSE-APACHE-V2 included with the package.
 
 Crosswalk-app-tools is in very early stages of development, and not suitable for use in a production environment. "Releases" and announcements are made available as a technology preview only. No packages are being published at this time, but git tags serve as reference points for release milestones.
 
+### Version compatibility
+
+The supported Crosswalk version for Crosswalk-app-tools 0.1.0 (as obtained by `git checkout 0.1.0` below) is Crosswalk 8. Due to changes to Crosswalk internals, newer versions will fail to create usable projects. The master branch of Crosswalk-app-tools is being moved to support Crosswalk 9.
+
 ### Preparation
 
 Linux is the only tested platform. Node.js, the Android SDK, and git must be functional.
