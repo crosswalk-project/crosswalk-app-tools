@@ -7,7 +7,7 @@
     <application android:name="org.xwalk.core.XWalkApplication"
         android:hardwareAccelerated="true"
         android:label="{{ packageName }}"
-        android:icon="@drawable/ic_launcher">
+        android:icon="@drawable/crosswalk">
         <activity android:name=".MainActivity"
                   android:theme="@style/AppTheme"
                   android:configChanges="orientation|keyboardHidden|keyboard|screenSize"
