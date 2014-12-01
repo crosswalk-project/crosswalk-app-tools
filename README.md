@@ -20,6 +20,12 @@ Linux is the only tested platform. Node.js, the Android SDK, and git must be fun
 4. The main script is `crosswalk-app-tools/bin/crosswalk-app`. Set environment PATH or invoke with directory.
 5. Download Crosswalk, e.g. https://download.01.org/crosswalk/releases/crosswalk/android/stable/8.37.189.14/crosswalk-8.37.189.14.zip to the same directory.
 
+Your current directory should have those entries now.
+```
+drwxrwxr-x. 11 user user     4096 Dec  1 15:43 crosswalk-app-tools
+-rw-rw-r--. 1  user user 35043139 Sep 30 11:43 crosswalk-8.37.189.12.zip
+```
+
 ### Usage
 
 `crosswalk-app-tools/bin/crosswalk-app create com.example.Foo`: This sets up a skeleton project in directory com.example.Foo/, imports Crosswalk from the zip, and puts a sample "hello world" web app under com.example.Foo/assets/www/.
