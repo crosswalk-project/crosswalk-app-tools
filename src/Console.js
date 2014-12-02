@@ -27,6 +27,13 @@ function(message) {
         console.log(message);
 };
 
+StdioConsole.prototype.highlight =
+function(message) {
+
+    if (!Config.getSilentConsole())
+        console.log('\033[1m' + message + '\033[0m');
+};
+
 StdioConsole.prototype.put =
 function(message, stderr) {
 

@@ -32,6 +32,18 @@ function(message) {
 };
 
 /**
+ * Highlight message.
+ * @param {String} message
+ * @memberOf ConsoleIface
+ */
+ConsoleIface.prototype.highlight =
+function(message) {
+
+    throw new Error("ConsoleIface.highlight() not implemented.");
+};
+
+
+/**
  * Output string without trailing newline.
  * @param {String} message
  * @param {Boolean} [toStderr] Optional, whether to write on stderr, default is stdout.
