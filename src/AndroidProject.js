@@ -354,7 +354,7 @@ function(abi) {
  * @function abifyAPKNameName
  * @param {String} abi ABI name
  * @param {Boolean} release Whether we're building release or debug packages.
- * @returns {Boolean} true on success, or false.
+ * @returns {String} Filename on success, or null.
  * @memberOf AndroidProject
  */
 AndroidProject.prototype.abifyAPKName =
@@ -370,13 +370,13 @@ function(abi, release) {
     var apkInPath = ShellJS.ls("bin" + Path.sep + apkInPattern)[0];
     if (!apkInPath) {
         Console.error("APK bin" + Path.sep + apkInPattern + " not found");
-        return false;
+        return null;
     }
 
     var apkInName = apkInPath.split(Path.sep)[1];
     if (!ShellJS.test("-f", "bin" + Path.sep + apkInName)) {
         Console.error("APK bin" + Path.sep + apkInName + " not found");
-        return false;
+        return null;
     }
 
     var base = apkInName.substring(0, apkInName.length - ".apk".length);
@@ -386,10 +386,10 @@ function(abi, release) {
 
     if (!ShellJS.test("-f", "bin" + Path.sep + apkOutName)) {
         Console.error("APK bin" + Path.sep + apkOutName + " not found");
-        return false;
+        return null;
     }
 
-    return true;
+    return apkOutName;
 };
 
 /**
@@ -428,7 +428,10 @@ function(closure) {
             // Preserve APK by renaming it by ABI
             // Otherwise IA and ARM APKs would overwrite each other,
             // as we simply run ant twice.
-            if (!this.abifyAPKName(abi, closure.release)) {
+            var apk = this.abifyAPKName(abi, closure.release);
+            if (apk) {
+                closure.apks.push(apk);
+            } else {
                 // Failed, enable all ABIs and terminate build.
                 this.enableABI();
                 callback("Building ABI '" + abi + "' failed");
@@ -464,7 +467,16 @@ function(abis, release, callback) {
         abis: abis,
         abiIndex : 0,
         release: release,
-        callback: callback
+        apks: [],
+        callback: function(errormsg) {
+
+            if (!errormsg) {
+                for (var i = 0; i < closure.apks.length; i++) {
+                    Console.highlight("  bin/" + closure.apks[i]);
+                }
+            }
+            callback(errormsg);
+        }
     };
 
     // This builds all ABIs in a recursion (of sorts).
