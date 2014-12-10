@@ -2,6 +2,8 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var Config = require("./Config");
+
 /**
  * The AndroidTargets object wraps targets enumeration and selection.
  * @param {String} buffer Output from "android list targets" for evaluation.

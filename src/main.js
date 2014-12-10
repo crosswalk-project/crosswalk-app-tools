@@ -3,8 +3,10 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var ShellJS = require("shelljs");
+
 var AndroidProject = require("./AndroidProject");
 var CommandParser = require("./CommandParser");
+var Config = require("./Config");
 var Console = require("./Console");
 
 /**

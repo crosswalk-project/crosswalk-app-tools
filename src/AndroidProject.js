@@ -2,13 +2,15 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var AdmZip = require("adm-zip");
 var Path = require('path');
 var ShellJS = require("shelljs");
+
 var AndroidSDK = require("./AndroidSDK");
+var Config = require("./Config");
 var Console = require("./Console");
 var Project = require("./Project");
 var TemplateFile = require("./TemplateFile");
-var AdmZip = require("adm-zip");
 
 /**
  * Android project class.
