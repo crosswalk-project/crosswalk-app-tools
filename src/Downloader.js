@@ -4,6 +4,7 @@
 
 var FS = require("fs");
 var Http = require("http");
+var Https = require("https");
 var Url = require("url");
 
 var Config = require("./Config");
@@ -65,7 +66,18 @@ function(callback) {
         return;
     }
 
-    Http.get(this._url, function(res) {
+    var getFunc;
+    var urlInfo = Url.parse(this._url);
+    if (urlInfo.protocol == "http:") {
+        getFunc = Http.get;
+    } else if (urlInfo.protocol == "https:") {
+        getFunc = Https.get;
+    } else {
+        callback("Unsupported protocol " + urlInfo.protocol);
+        return;
+    }
+    
+    getFunc(urlInfo, function(res) {
 
         if (res.statusCode != 200) {
             callback("Download failed: HTTP Status " + res.statusCode);
