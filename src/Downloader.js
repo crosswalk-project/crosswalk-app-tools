@@ -21,11 +21,14 @@ function downloadFinishedCb(errormsg) {}
 
 /**
  * Create Downloader object.
+ * @param {String} url URL to download.
  * @param {String} toPath Path do download to.
  * @throws {Downloader~FileCreationFailedError} If file toPath could not be opened.
  * @constructor
  */
-function Downloader(toPath) {
+function Downloader(url, toPath) {
+
+    this._url = url;
 
     var options = {
         flags: "wx",
@@ -44,12 +47,17 @@ function Downloader(toPath) {
 /**
  * Download file.
  * @function get
- * @param {String} url Url to download
  * @param {Function} callback see {@link Downloader~downloadFinishedCb}
  * @memberOf Downloader
  */
 Downloader.prototype.get =
-function(url, callback) {
+function(callback) {
+
+    // Object can only be used once.
+    if (!this._url) {
+        callback("Invalid URL null");
+        return;
+    }
 
     // Object can only be used once.
     if (!this._fp) {
@@ -57,7 +65,7 @@ function(url, callback) {
         return;
     }
 
-    Http.get(url, function(res) {
+    Http.get(this._url, function(res) {
 
         if (res.statusCode != 200) {
             callback("Download failed: HTTP Status " + res.statusCode);
@@ -70,6 +78,7 @@ function(url, callback) {
 
             this._fp.end();
             this._fp = null;
+            this._url = null;
             callback("Download failed: " + e.message);
 
         }.bind(this));
@@ -86,6 +95,7 @@ function(url, callback) {
 
             this._fp.end();
             this._fp = null;
+            this._url = null;
             callback(null);
 
         }.bind(this))
