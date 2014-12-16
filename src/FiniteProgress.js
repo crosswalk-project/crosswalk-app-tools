@@ -45,7 +45,7 @@ function(progress) {
     }
 
     // Remaining
-    for (var i = percentageInTens; i < 10; i++) {
+    for (i = percentageInTens; i < 10; i++) {
         this._console.put(' ');
     }
     this._console.put(']');

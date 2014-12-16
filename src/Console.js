@@ -4,6 +4,7 @@
 
 var Config = require("./Config");
 var ConsoleIface = require("./ConsoleIface");
+var FiniteProgress = require("./FiniteProgress");
 
 /**
  * Creates a logging console.
@@ -48,6 +49,13 @@ function(message, stderr) {
             process.stdout.write(message);
         }
     }
+};
+
+StdioConsole.prototype.createFiniteProgress =
+function(label) {
+
+    var indicator = new FiniteProgress(this, label);
+    return indicator;
 };
 
 
