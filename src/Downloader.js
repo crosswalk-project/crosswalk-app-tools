@@ -110,7 +110,7 @@ function(callback) {
             this._url = null;
             callback(null);
 
-        }.bind(this))
+        }.bind(this));
 
     }.bind(this));
 };

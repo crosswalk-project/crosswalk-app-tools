@@ -6,6 +6,7 @@ var AdmZip = require("adm-zip");
 var Path = require('path');
 var ShellJS = require("shelljs");
 
+var AndroidProjectDeps = require("./AndroidProjectDeps");
 var AndroidSDK = require("./AndroidSDK");
 var Config = require("./Config");
 var Console = require("./Console");
@@ -217,37 +218,11 @@ function(packageId, apiTarget, projectPath) {
         return false;
     }
 
-/* Import crosswalk from dir, maybe we need this again later on
- * for building against local app template.
-    // Copy
-    var dirs = ShellJS.ls('crosswalk-*.*.*.*');
-    if (dirs.length === 0) {
-        // Also try parent dir.
-        // This is especially useful for tests that run in a temporary dir.
-        dirs = ShellJS.ls('../crosswalk-*.*.*.*');
-        if (dirs.length === 0) {
-            Console.error("Unpacked Crosswalk not found in current or parent directory " + ShellJS.pwd());
-            return false;
-        }
-    }
-    var appTplPath = dirs[0];
-
-    if (!this.importCrosswalkFromDir(appTplPath, projectPath)) {
+    var deps = new AndroidProjectDeps();
+    var zipFile = deps.findCrosswalkZip();
+    if (!zipFile) {
         return false;
     }
-*/
-
-    var zips = ShellJS.ls('crosswalk-*.*.*.*.zip');
-    if (zips.length === 0) {
-        // Also try parent dir.
-        // This is especially useful for tests that run in a temporary dir.
-        zips = ShellJS.ls('../crosswalk-*.*.*.*.zip');
-        if (zips.length === 0) {
-            Console.error("Crosswalk Zip not found in current or parent directory " + ShellJS.pwd());
-            return false;
-        }
-    }
-    var zipFile = zips[zips.length - 1];
 
     return this.importCrosswalkFromZip(zipFile, projectPath);
 };
