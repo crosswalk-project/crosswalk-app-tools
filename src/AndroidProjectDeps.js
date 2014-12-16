@@ -5,6 +5,7 @@
 var ShellJS = require("shelljs");
 
 var Config = require("./Config");
+var Console = require("./Console");
 
 /**
  * Android project dependencies download and lookup.

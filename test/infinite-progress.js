@@ -10,25 +10,25 @@ exports.tests = {
 
     progress: function(test) {
 
-        test.expect(10);
+        test.expect(4);
 
-        var progress = 0;
-        var indicator = Console.createFiniteProgress("foo");
-        var interval = setInterval(callback, 200);
+        var tags = ["foo", "bar", "baz", "maman"];
+        var index = 0;
+        var indicator = Console.createInfiniteProgress("foo");
+        var interval = setInterval(callback, 300);
 
         function callback() {
 
-            indicator.update(progress);
-            progress += 0.1;
+            indicator.update(tags[index]);
+            index++;
+            test.equal(true, true);
 
-            if (progress > 1) {
-                clearInterval(interval);
+            if (index >= tags.length) {
                 Console.log("");
+                clearInterval(interval);
                 test.done();
                 return;
             }
-
-            test.equal(true, true);
         }
     }
 };
