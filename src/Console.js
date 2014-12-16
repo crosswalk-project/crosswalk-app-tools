@@ -55,12 +55,18 @@ function(message, stderr) {
 StdioConsole.prototype.createFiniteProgress =
 function(label) {
 
+    if (typeof label === "undefined")
+        label = "";
+
     var indicator = new FiniteProgress(this, label);
     return indicator;
 };
 
 StdioConsole.prototype.createInfiniteProgress =
 function(label) {
+
+    if (typeof label === "undefined")
+        label = "";
 
     var indicator = new InfiniteProgress(this, label);
     return indicator;

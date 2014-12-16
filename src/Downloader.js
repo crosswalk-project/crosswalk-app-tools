@@ -32,7 +32,7 @@ function Downloader(url, toPath) {
     this._url = url;
 
     var options = {
-        flags: "wx",
+        flags: "w",
         mode: 0600
     };
     this._fp = FS.createWriteStream(toPath, options);

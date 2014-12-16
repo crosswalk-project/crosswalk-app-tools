@@ -2,27 +2,80 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
 
 var Config = require("./Config");
 var Console = require("./Console");
 var Downloader = require("./Downloader");
+var FS = require("fs");
+var IndexParser = require("./IndexParser");
+
+var BASE_URL = "https://download.01.org/crosswalk/releases/crosswalk/android/";
+var CHANNELS = ["beta", "canary", "stable"];
 
 /**
  * Android project dependencies download and lookup.
+ * @param {String} channel Crosswalk channel beta/canary/stable
  * @constructor
  */
-function AndroidProjectDeps() {
+function AndroidProjectDeps(channel) {
 
+    if (CHANNELS.indexOf(channel) == -1) {
+        throw new InvalidChannelError("Unknown channel " + channel);
+    }
+
+    this._channel = channel;
 }
+
+// TODO document, also the callback
+AndroidProjectDeps.prototype.load =
+function(callback) {
+
+    var url = BASE_URL + this._channel + "/";
+    var indexFile = MkTemp.createFileSync('index.html.XXXXXX');
+    if (indexFile) {
+
+        // Download
+        var indicator = Console.createFiniteProgress();
+        var downloader = new Downloader(url, indexFile);
+        downloader.progress = function(progress) {
+            indicator.update(progress);
+        };
+        downloader.get(function(errormsg) {
+
+            if (errormsg) {
+
+                callback(null, errormsg);
+
+            } else {
+
+                indicator.done("");
+
+                // Parse
+                var buffer = FS.readFileSync(indexFile, {"encoding": "utf8"});
+                var parser = new IndexParser(buffer);
+                var versions = parser.parse();
+                callback(versions);
+            }
+
+            ShellJS.rm(indexFile);
+        });
+    } else {
+
+        callback(null, "Failed to download package index.");
+        ShellJS.rm(indexFile);
+        return;
+    }
+};
 
 /**
  * Locate Crosswalk distribution zip.
- * @function findCrosswalkZip
+ * @function find
  * @returns {String} Relative path to zip file
  * @memberOf AndroidProjectDeps
  */
-AndroidProjectDeps.prototype.findCrosswalkZip =
+AndroidProjectDeps.prototype.find =
 function() {
 
     var zips = ShellJS.ls('crosswalk-*.*.*.*.zip');
@@ -41,10 +94,29 @@ function() {
     return zipFile;
 };
 
-AndroidProjectDeps.prototype.downloadCrosswalkZip =
+AndroidProjectDeps.prototype.download =
 function(callback) {
 
-    var url = "https://download.01.org/crosswalk/releases/crosswalk/android/stable/";
+
 };
+
+
+
+/**
+ * Creates a new InvalidChannelError.
+ * @extends Error
+ * @param {String} message Error message.
+ * @constructor
+ * @memberOf AndroidProjectDeps
+ * @inner
+ */
+function InvalidChannelError(message) {
+    Error.call(this, message);
+}
+InvalidChannelError.prototype = Error.prototype;
+
+AndroidProjectDeps.InvalidChannelError = InvalidChannelError;
+
+
 
 module.exports = AndroidProjectDeps;
