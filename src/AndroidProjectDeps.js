@@ -6,6 +6,7 @@ var ShellJS = require("shelljs");
 
 var Config = require("./Config");
 var Console = require("./Console");
+var Downloader = require("./Downloader");
 
 /**
  * Android project dependencies download and lookup.
@@ -41,8 +42,9 @@ function() {
 };
 
 AndroidProjectDeps.prototype.downloadCrosswalkZip =
-function() {
+function(callback) {
 
+    var url = "https://download.01.org/crosswalk/releases/crosswalk/android/stable/";
 };
 
 module.exports = AndroidProjectDeps;

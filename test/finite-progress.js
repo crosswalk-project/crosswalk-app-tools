@@ -23,7 +23,7 @@ exports.tests = {
 
             if (progress > 1) {
                 clearInterval(interval);
-                Console.log("");
+                indicator.done("done");
                 test.done();
                 return;
             }

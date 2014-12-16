@@ -24,7 +24,7 @@ exports.tests = {
             test.equal(true, true);
 
             if (index >= tags.length) {
-                Console.log("");
+                indicator.done("done");
                 clearInterval(interval);
                 test.done();
                 return;

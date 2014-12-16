@@ -51,4 +51,17 @@ function(progress) {
     this._console.put(']');
 };
 
+/**
+ * Final update of progress indicator.
+ * @function done
+ * @param {String} message Completion message to the right of the progress bar.
+ * @memberOf FiniteProgress
+ */
+FiniteProgress.prototype.done =
+function(message) {
+
+    // Also prints \r\n so we're ready for the next output.
+    this._console.log(" " + message);
+};
+
 module.exports = FiniteProgress;
