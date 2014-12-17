@@ -26,6 +26,23 @@ exports.tests = {
             test.equal(versions.length > 0, true);
             test.done();
         });
+    },
+    download: function(test) {
 
+        test.expect(1);
+
+        var deps = new AndroidProjectDeps("stable");
+        deps.download("9.38.208.10", function(filename, errormsg) {
+
+            if (filename)
+                Console.log(filename);
+
+            if (errormsg)
+                Console.log(errormsg);
+
+            test.equal(typeof filename === "string", true);
+            test.equal(filename.length > 0, true);
+            test.done();
+        });
     }
 };

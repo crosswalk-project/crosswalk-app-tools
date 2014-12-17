@@ -33,6 +33,7 @@ AndroidProjectDeps.prototype.load =
 function(callback) {
 
     var url = BASE_URL + this._channel + "/";
+    // TODO use memory stream instead of tmpfile
     var indexFile = MkTemp.createFileSync('index.html.XXXXXX');
     if (indexFile) {
 
@@ -44,13 +45,13 @@ function(callback) {
         };
         downloader.get(function(errormsg) {
 
+            indicator.done("");
+
             if (errormsg) {
 
                 callback(null, errormsg);
 
             } else {
-
-                indicator.done("");
 
                 // Parse
                 var buffer = FS.readFileSync(indexFile, {"encoding": "utf8"});
@@ -94,10 +95,42 @@ function() {
     return zipFile;
 };
 
+/**
+ * Download crosswalk zip.
+ * @function downnload
+ * @param {String} version Crosswalk version string
+ * @param {Function} callback Callback function.
+ * @memberOf AndroidProjectDeps
+ */
 AndroidProjectDeps.prototype.download =
-function(callback) {
+function(version, callback) {
 
+    var filename = "crosswalk-" + version + ".zip";
+    var url = BASE_URL +
+              this._channel + "/" +
+              version + "/" +
+              filename;
+              
+    // Download
+    // At the moment we unconditionally download, overwriting the existing copy.
+    var indicator = Console.createFiniteProgress();
+    var downloader = new Downloader(url, filename);
+    downloader.progress = function(progress) {
+        indicator.update(progress);
+    };
+    downloader.get(function(errormsg) {
 
+        indicator.done("");
+
+        if (errormsg) {
+
+            callback(null, errormsg);
+
+        } else {
+
+            callback(filename);
+        }
+    });
 };
 
 
