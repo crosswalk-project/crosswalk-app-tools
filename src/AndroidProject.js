@@ -127,7 +127,7 @@ function(crosswalkPath, projectPath) {
 AndroidProject.prototype.importCrosswalkFromZip =
 function(crosswalkPath, projectPath) {
 
-    var indicator = Console.createFiniteProgress("Extracting ");
+    var indicator = Console.createFiniteProgress("Extracting from " + crosswalkPath + " ");
 
     var zip = new AdmZip(crosswalkPath);
     if (!zip) {
