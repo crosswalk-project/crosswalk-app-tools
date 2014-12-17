@@ -2,7 +2,9 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
-var MkTemp = require('mktemp');
+var Path = require("path");
+
+var MkTemp = require("mktemp");
 var ShellJS = require("shelljs");
 
 var Config = require("./Config");
@@ -38,7 +40,7 @@ function(callback) {
     if (indexFile) {
 
         // Download
-        var indicator = Console.createFiniteProgress();
+        var indicator = Console.createFiniteProgress("Fetching version index ");
         var downloader = new Downloader(url, indexFile);
         downloader.progress = function(progress) {
             indicator.update(progress);
@@ -99,22 +101,24 @@ function() {
  * Download crosswalk zip.
  * @function downnload
  * @param {String} version Crosswalk version string
+ * @param {String} dir Directory to download to
  * @param {Function} callback Callback function.
  * @memberOf AndroidProjectDeps
  */
 AndroidProjectDeps.prototype.download =
-function(version, callback) {
+function(version, dir, callback) {
 
     var filename = "crosswalk-" + version + ".zip";
     var url = BASE_URL +
               this._channel + "/" +
               version + "/" +
               filename;
-              
+
     // Download
     // At the moment we unconditionally download, overwriting the existing copy.
-    var indicator = Console.createFiniteProgress();
-    var downloader = new Downloader(url, filename);
+    var indicator = Console.createFiniteProgress("Downloading " + version + " ");
+    var path = Path.join(dir, filename);
+    var downloader = new Downloader(url, path);
     downloader.progress = function(progress) {
         indicator.update(progress);
     };

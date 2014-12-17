@@ -22,6 +22,7 @@ var TemplateFile = require("./TemplateFile");
 function AndroidProject() {
 
     this._sdk = new AndroidSDK();
+    this._channel = "stable";
 }
 AndroidProject.prototype = Project;
 
@@ -126,16 +127,22 @@ function(crosswalkPath, projectPath) {
 AndroidProject.prototype.importCrosswalkFromZip =
 function(crosswalkPath, projectPath) {
 
+    var indicator = Console.createFiniteProgress("Extracting ");
+
     var zip = new AdmZip(crosswalkPath);
     if (!zip) {
         Console.error("Failed to open " + crosswalkPath);
         return false;
     }
 
+    indicator.update(0.1);
+
     // Derive root entry from file name.
     var parts = crosswalkPath.split(Path.sep);
     var filename = parts[parts.length - 1];
     var base = filename.substring(0, filename.length - ".zip".length) + "/";
+
+    indicator.update(0.2);
 
     // Extract major version
     var numbers = base.split("-")[1].split(".");
@@ -147,11 +154,15 @@ function(crosswalkPath, projectPath) {
         Console.log("*** WARNING: This tool has not been tested with Crosswalk " + major + ".");
     }
 
+    indicator.update(0.3);
+
     var entry = zip.getEntry(base);
     if (!entry) {
         Console.error("Failed to find root entry " + base);
         return false;
     }
+
+    indicator.update(0.4);
 
     // Extract xwalk_core_library
     var path;
@@ -167,6 +178,7 @@ function(crosswalkPath, projectPath) {
     }
 
     // Extract jars
+    indicator.update(0.5);
 
     if (major === 8) {
         // Only for Version 8.
@@ -180,6 +192,8 @@ function(crosswalkPath, projectPath) {
         }
     }
 
+    indicator.update(0.6);
+
     name = base + "template/libs/xwalk_app_runtime_java.jar";
     entry = zip.getEntry(name);
     if (entry) {
@@ -188,6 +202,8 @@ function(crosswalkPath, projectPath) {
         Console.error("Failed to find entry " + name);
         return false;
     }
+
+    indicator.update(0.7);
 
     // Extract res
     name = base + "template/res/";
@@ -199,8 +215,41 @@ function(crosswalkPath, projectPath) {
         return false;
     }
 
+    indicator.update(1);
+    indicator.done();
+
     return true;
 };
+
+/**
+ * Download crosswalk zip.
+ * @function downloadCrosswalk
+ * @param {String} channel Crosswalk channel beta/canary/stable.
+ * @param {Function} callback Completion callback (filename, errormsg)
+ * @memberOf AndroidProject
+ */
+AndroidProject.prototype.downloadCrosswalk =
+function(channel, callback) {
+
+    var deps = new AndroidProjectDeps(channel);
+    deps.load(function(versions, errormsg) {
+
+        if (errormsg) {
+            callback(null, errormsg);
+            return;
+        }
+
+        if (versions.length == 0) {
+            callback(null, "No available crosswalk versions found");
+            return;
+        }
+
+        var latest = versions[versions.length - 1];
+        deps.download(latest, function(filename, errormsg) {
+            callback(filename, errormsg);
+        });
+    });
+}
 
 /**
  * Turn a freshly created empty Android project into a Crosswalk project.
@@ -212,19 +261,48 @@ function(crosswalkPath, projectPath) {
  * @memberOf AndroidProject
  */
 AndroidProject.prototype.fillSkeletonProject =
-function(packageId, apiTarget, projectPath) {
+function(packageId, apiTarget, projectPath, callback) {
 
     if (!this.fillTemplates(packageId, apiTarget, projectPath)) {
-        return false;
+        callback("Failed to initialise project templates");
+        return;
     }
 
-    var deps = new AndroidProjectDeps();
-    var zipFile = deps.findCrosswalkZip();
-    if (!zipFile) {
-        return false;
-    }
+    var deps = new AndroidProjectDeps(this._channel);
+    deps.load(function(versions, errormsg) {
 
-    return this.importCrosswalkFromZip(zipFile, projectPath);
+        if (errormsg) {
+            callback(errormsg);
+            return;
+        }
+
+        if (versions.length == 0) {
+            callback("Failed to load available Crosswalk versions for channel " + this._channel);
+            return;
+        }
+
+        var version = versions[versions.length - 1];
+        deps.download(version, ".", function(filename, errormsg) {
+
+            if (errormsg) {
+                callback(errormsg);
+                return;
+            }
+
+            if (!filename) {
+                callback("Failed to download Crosswalk");
+                return;
+            }
+
+            errormsg = null;
+            var ret = this.importCrosswalkFromZip(filename, projectPath);
+            if (!ret) {
+                errormsg = "Failed to extract Crosswalk";
+            }
+            callback(errormsg);
+
+        }.bind(this));
+    }.bind(this));
 };
 
 /**
@@ -253,15 +331,18 @@ function(packageId, callback) {
                 return;
             }
 
-            var ret = this.fillSkeletonProject(packageId, apiTarget, path);
-            if (!ret) {
-                callback("Creating project template failed.");
-                return;
-            }
+            this.fillSkeletonProject(packageId, apiTarget, path,
+                                     function(errormsg) {
 
-            Console.log("Project template created at '" + path + "'");
-            callback(null);
+                if (errormsg) {
+                    Console.log(errormsg);
+                    callback("Creating project template failed.");
+                    return;
+                }
 
+                Console.log("Project template created at '" + path + "'");
+                callback(null);
+            });
         }.bind(this));
     }.bind(this));
 };
