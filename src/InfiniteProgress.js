@@ -48,11 +48,14 @@ function(tag) {
 /**
  * Final update of progress indicator.
  * @function done
- * @param {String} message Completion message to the right of the progress bar.
+ * @param {String} [message] Completion message to the right of the progress bar.
  * @memberOf InfiniteProgress
  */
 InfiniteProgress.prototype.done =
 function(message) {
+
+    if (typeof message == "undefined")
+        message = "";
 
     // Also prints \r\n so we're ready for the next output.
     this._console.log(" " + message);
