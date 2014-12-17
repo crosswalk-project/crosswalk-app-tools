@@ -246,12 +246,25 @@ function(packageId, apiTarget, projectPath, callback) {
             return;
         }
 
-        if (versions.length == 0) {
+        if (versions.length === 0) {
             callback("Failed to load available Crosswalk versions for channel " + this._channel);
             return;
         }
 
+        // Look for existing download
         var version = versions[versions.length - 1];
+        var filename = deps.findLocally(version);
+        if (filename) {
+            Console.log("Using local " + filename);
+            var ret = this.importCrosswalkFromZip(filename, projectPath);
+            if (!ret) {
+                errormsg = "Failed to extract " + filename;
+            }
+            callback(errormsg);
+            return;
+        }
+
+        // Download
         deps.download(version, ".", function(filename, errormsg) {
 
             if (errormsg) {
@@ -267,7 +280,7 @@ function(packageId, apiTarget, projectPath, callback) {
             errormsg = null;
             var ret = this.importCrosswalkFromZip(filename, projectPath);
             if (!ret) {
-                errormsg = "Failed to extract Crosswalk";
+                errormsg = "Failed to extract " + filename;
             }
             callback(errormsg);
 

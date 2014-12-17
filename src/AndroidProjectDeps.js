@@ -92,27 +92,24 @@ function(callback) {
 
 /**
  * Locate Crosswalk distribution zip.
- * @function find
+ * @function findLocally
+ * @param {String} version Crosswalk version to look for
  * @returns {String} Relative path to zip file
  * @memberOf AndroidProjectDeps
  */
-AndroidProjectDeps.prototype.find =
-function() {
+AndroidProjectDeps.prototype.findLocally =
+function(version) {
 
-    var zips = ShellJS.ls('crosswalk-*.*.*.*.zip');
-    if (zips.length === 0) {
+    var filename = "crosswalk-" + version + ".zip";
+    if (ShellJS.test("-f", filename))  {
+        return filename;
+    } else if (ShellJS.test("-f", "../" + filename)) {
         // Also try parent dir.
         // This is especially useful for tests that run in a temporary dir.
-        zips = ShellJS.ls('../crosswalk-*.*.*.*.zip');
-        if (zips.length === 0) {
-            Console.error("Crosswalk Zip not found in current or parent directory " + ShellJS.pwd());
-            return false;
-        }
+        return "../" + filename;
     }
 
-    var zipFile = zips[zips.length - 1];
-
-    return zipFile;
+    return null;
 };
 
 /**
