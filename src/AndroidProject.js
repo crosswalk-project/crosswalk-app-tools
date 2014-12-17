@@ -239,7 +239,7 @@ function(packageId, apiTarget, projectPath, callback) {
     }
 
     var deps = new AndroidProjectDeps(this._channel);
-    deps.load(function(versions, errormsg) {
+    deps.fetchVersions(function(versions, errormsg) {
 
         if (errormsg) {
             callback(errormsg);

@@ -9,12 +9,12 @@ var AndroidProjectDeps = require("../src/AndroidProjectDeps");
 
 exports.tests = {
 
-    load: function(test) {
+    fetchVersions: function(test) {
 
         test.expect(2);
 
         var deps = new AndroidProjectDeps("stable");
-        deps.load(function(versions, errormsg) {
+        deps.fetchVersions(function(versions, errormsg) {
 
             if (versions)
                 Console.log(versions);
@@ -27,12 +27,13 @@ exports.tests = {
             test.done();
         });
     },
+
     download: function(test) {
 
         test.expect(1);
 
         var deps = new AndroidProjectDeps("stable");
-        deps.download("9.38.208.10", function(filename, errormsg) {
+        deps.download("9.38.208.10", ".", function(filename, errormsg) {
 
             if (filename)
                 Console.log(filename);

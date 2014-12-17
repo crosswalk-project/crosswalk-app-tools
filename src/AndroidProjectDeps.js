@@ -16,6 +16,19 @@ var IndexParser = require("./IndexParser");
 var BASE_URL = "https://download.01.org/crosswalk/releases/crosswalk/android/";
 var CHANNELS = ["beta", "canary", "stable"];
 
+
+
+/**
+ * Callback signature for {@link AndroidProjectDeps.fetchVersions}
+ * @param {String[]} versions Array of available Crosswalk versions sorted oldest - newest
+ * @param {String} errormsg Message in case of Error
+ * @memberOf AndroidProjectDeps
+ * @inner
+ */
+function fetchVersionsFinishedCb(versions, errormsg) {}
+
+
+
 /**
  * Android project dependencies download and lookup.
  * @param {String} channel Crosswalk channel beta/canary/stable
@@ -30,8 +43,13 @@ function AndroidProjectDeps(channel) {
     this._channel = channel;
 }
 
-// TODO document, also the callback
-AndroidProjectDeps.prototype.load =
+/**
+ * Fetch available Crosswalk versions index.
+ * @function fetchVersions
+ * @param {Function} callback see {@link AndroidProjectDeps~fetchVersionsFinishedCb}
+ * @memberOf AndroidProjectDeps
+ */
+AndroidProjectDeps.prototype.fetchVersions =
 function(callback) {
 
     var url = BASE_URL + this._channel + "/";
