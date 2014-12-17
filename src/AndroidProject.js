@@ -222,36 +222,6 @@ function(crosswalkPath, projectPath) {
 };
 
 /**
- * Download crosswalk zip.
- * @function downloadCrosswalk
- * @param {String} channel Crosswalk channel beta/canary/stable.
- * @param {Function} callback Completion callback (filename, errormsg)
- * @memberOf AndroidProject
- */
-AndroidProject.prototype.downloadCrosswalk =
-function(channel, callback) {
-
-    var deps = new AndroidProjectDeps(channel);
-    deps.load(function(versions, errormsg) {
-
-        if (errormsg) {
-            callback(null, errormsg);
-            return;
-        }
-
-        if (versions.length == 0) {
-            callback(null, "No available crosswalk versions found");
-            return;
-        }
-
-        var latest = versions[versions.length - 1];
-        deps.download(latest, function(filename, errormsg) {
-            callback(filename, errormsg);
-        });
-    });
-}
-
-/**
  * Turn a freshly created empty Android project into a Crosswalk project.
  * @function fillSkeletonProject
  * @param {String} packageId Qualified package name.
