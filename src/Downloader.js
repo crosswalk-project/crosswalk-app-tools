@@ -7,6 +7,8 @@ var Http = require("http");
 var Https = require("https");
 var Url = require("url");
 
+var ShellJS = require("shelljs");
+
 var Config = require("./Config");
 
 
@@ -30,6 +32,10 @@ function downloadFinishedCb(errormsg) {}
 function Downloader(url, toPath) {
 
     this._url = url;
+
+    if (ShellJS.test("-e", toPath)) {
+        throw new FileCreationFailedError("File already exists " + toPath);
+    }
 
     var options = {
         flags: "w",
@@ -76,7 +82,7 @@ function(callback) {
         callback("Unsupported protocol " + urlInfo.protocol);
         return;
     }
-    
+
     getFunc(urlInfo, function(res) {
 
         if (res.statusCode != 200) {

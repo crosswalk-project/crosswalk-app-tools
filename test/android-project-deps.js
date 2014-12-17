@@ -2,8 +2,10 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var OS = require('os');
+
 // Run tests silently to avoid spew from tests failing on purpose.
-require("../src/Config").setSilentConsole(true);
+require("../src/Config").setSilentConsole(false);
 var Console = require("../src/Console");
 var AndroidProjectDeps = require("../src/AndroidProjectDeps");
 
@@ -16,9 +18,6 @@ exports.tests = {
         var deps = new AndroidProjectDeps("stable");
         deps.fetchVersions(function(versions, errormsg) {
 
-            if (versions)
-                Console.log(versions);
-
             if (errormsg)
                 Console.log(errormsg);
 
@@ -30,13 +29,10 @@ exports.tests = {
 
     download: function(test) {
 
-        test.expect(1);
+        test.expect(2);
 
         var deps = new AndroidProjectDeps("stable");
-        deps.download("9.38.208.10", ".", function(filename, errormsg) {
-
-            if (filename)
-                Console.log(filename);
+        deps.download("9.38.208.10", OS.tmpDir(), function(filename, errormsg) {
 
             if (errormsg)
                 Console.log(errormsg);

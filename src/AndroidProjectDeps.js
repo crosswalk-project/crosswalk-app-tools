@@ -57,6 +57,9 @@ function(callback) {
     var indexFile = MkTemp.createFileSync('index.html.XXXXXX');
     if (indexFile) {
 
+        // TODO fix this hack by creating and opening tmpfiles atomically somehow
+        ShellJS.rm(indexFile);
+
         // Download
         var indicator = Console.createFiniteProgress("Fetching version index ");
         var downloader = new Downloader(url, indexFile);
@@ -147,7 +150,7 @@ function(version, dir, callback) {
 
         } else {
 
-            callback(filename);
+            callback(path);
         }
     });
 };
