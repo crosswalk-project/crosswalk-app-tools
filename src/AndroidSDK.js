@@ -114,6 +114,8 @@ function(packageId, apiTarget, callback) {
         return;
     }
 
+    var indicator = Console.createInfiniteProgress("Creating " + packageId + " ");
+
     // Create project
     // "android create project -t android-18 -p $(pwd)/Foo -k com.example.Foo -a MainActivity"
     var args = ["create", "project",
@@ -123,6 +125,8 @@ function(packageId, apiTarget, callback) {
                 "-a", "MainActivity"];
     var stdlog = null;
     var errlog = null;
+
+    indicator.update("...");
     var child = ChildProcess.execFile(this._scriptPath, args, {},
                                       function(errmsg, stdlog, errlog) {
 
@@ -131,6 +135,7 @@ function(packageId, apiTarget, callback) {
             errmsg = errlog;
         }
 
+        indicator.done();
         callback(path, stdlog, errmsg);
         return;
     });
