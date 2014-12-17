@@ -4,7 +4,7 @@
 
 var OS = require('os');
 
-// Run tests silently to avoid spew from tests failing on purpose.
+// Test involves progress output, make it visible.
 require("../src/Config").setSilentConsole(false);
 var Console = require("../src/Console");
 var AndroidProjectDeps = require("../src/AndroidProjectDeps");

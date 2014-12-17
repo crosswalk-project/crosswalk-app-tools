@@ -2,7 +2,7 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
-// Run tests silently to avoid spew from tests failing on purpose.
+// Test involves progress output, make it visible.
 require("../src/Config").setSilentConsole(false);
 var Console = require("../src/Console");
 
