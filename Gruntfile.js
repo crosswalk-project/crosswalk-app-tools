@@ -33,13 +33,28 @@ module.exports = function(grunt) {
                 destination: 'doc'
             }
         }
-    }
+    },
 
+    release: {
+      options: {
+        add: true,
+        commit: true,
+        push: true,
+        bump: true,
+        tag: true,
+        pushTags: true,
+        npm: true,
+        folder: '.',
+        tagName: '<%= version %>',
+        tagMessage: 'Version <%= version %>'
+      }
+    }
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
   grunt.loadNpmTasks('grunt-jsdoc');
+  grunt.loadNpmTasks('grunt-release');
 
   grunt.registerTask('default', ['jshint', 'nodeunit']);
   grunt.registerTask('doc', ['jshint', 'nodeunit', 'jsdoc']);
