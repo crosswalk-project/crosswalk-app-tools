@@ -38,7 +38,7 @@ function(progress) {
     this._console.put(this._label);
 
     // Progress
-    this._console.put('[');
+    this._console.put(" [");
     var percentageInTens = Math.round(progress * 10);
     for (var i = 0; i < percentageInTens; i++) {
         this._console.put('#');
