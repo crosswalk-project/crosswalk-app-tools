@@ -14,7 +14,6 @@ function InfiniteProgress(console, label) {
 
     this._console = console;
     this._label = label;
-    this._length = 0;
 }
 
 /**
@@ -26,22 +25,13 @@ function InfiniteProgress(console, label) {
 InfiniteProgress.prototype.update =
 function(tag) {
 
-    // Clear
-    if (this._length > 0) {
-
-        // Go to column 0
-        this._console.put('\033[0G');
-
-        var a = new Array(this._length, ' ');
-        var s = a.join();
-        this._console.put(s);
-    }
+    // Clear line
+    this._console.put('\033[2K');
 
     // Go to column 0
     this._console.put('\033[0G');
 
-    var line = this._label + " [" + tag + "]";
-    this._length = line.length;
+    var line = this._label + " [" + tag + ']';
     this._console.put(line);
 };
 

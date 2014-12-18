@@ -127,7 +127,7 @@ function(crosswalkPath, projectPath) {
 AndroidProject.prototype.importCrosswalkFromZip =
 function(crosswalkPath, projectPath) {
 
-    var indicator = Console.createFiniteProgress("Extracting " + crosswalkPath + " ");
+    var indicator = Console.createFiniteProgress("Extracting " + crosswalkPath);
 
     var zip = new AdmZip(crosswalkPath);
     if (!zip) {
@@ -461,9 +461,33 @@ function(closure) {
         return;
     }
 
+    // Progress display
+    var indicator = Console.createInfiniteProgress("Building " + abi);
+    this._sdk.onData = function(data) {
+
+        // Scan first 7 chars if data starts with a [tag]
+        var tag = null;
+        for (var i = 0; i < 7 && i < data.length; i++) {
+            if (data[i] === '[') {
+
+                // Scan on a bit if there's a closing ']'
+                for (j = i+1; j < i+15; j++) {
+                    if (data[j] === ']') {
+                        tag = data.substring(i+1, j);
+                        indicator.update(tag);
+                        return;
+                    }
+                }
+            } else if (data[i] != ' ') {
+                break;
+            }
+        }
+    };
+
     // Build for ABI.
     this._sdk.buildProject(closure.release, function(success) {
 
+        indicator.done();
         if (success) {
 
             // Preserve APK by renaming it by ABI
@@ -475,7 +499,7 @@ function(closure) {
             } else {
                 // Failed, enable all ABIs and terminate build.
                 this.enableABI();
-                callback("Building ABI '" + abi + "' failed");
+                closure.callback("Building ABI '" + abi + "' failed");
                 return;
             }
 
@@ -490,7 +514,7 @@ function(closure) {
         } else {
             // Failed, enable all ABIs and terminate build.
             this.enableABI();
-            callback("Building ABI '" + abi + "' failed");
+            closure.callback("Building ABI '" + abi + "' failed");
             return;
         }
     }.bind(this));

@@ -169,8 +169,11 @@ function(release, callback) {
     var child = ChildProcess.execFile(ant, args);
 
     child.stdout.on("data", function(data) {
-        Console.put(data);
-    });
+
+        // TODO write logfile?
+        if (this.onData)
+            this.onData(data);
+    }.bind(this));
 
     child.stderr.on("data", function(data) {
         Console.put(data, true);
@@ -180,6 +183,11 @@ function(release, callback) {
         callback(code === 0);
         return;
     });
+};
+
+AndroidSDK.prototype.onData =
+function(data) {
+
 };
 
 /**

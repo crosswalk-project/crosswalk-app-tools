@@ -61,7 +61,7 @@ function(callback) {
         ShellJS.rm(indexFile);
 
         // Download
-        var label = "Fetching '" + this._channel + "' versions index ";
+        var label = "Fetching '" + this._channel + "' versions index";
         var indicator = Console.createFiniteProgress(label);
         var downloader = new Downloader(url, indexFile);
         downloader.progress = function(progress) {
@@ -135,7 +135,7 @@ function(version, dir, callback) {
 
     // Download
     // At the moment we unconditionally download, overwriting the existing copy.
-    var label = "Downloading '" + this._channel + "' " + version + " ";
+    var label = "Downloading '" + this._channel + "' " + version;
     var indicator = Console.createFiniteProgress(label);
     var path = Path.join(dir, filename);
     var downloader = new Downloader(url, path);
