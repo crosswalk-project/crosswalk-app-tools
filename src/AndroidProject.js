@@ -23,8 +23,6 @@ function AndroidProject() {
 
     this._sdk = new AndroidSDK();
     this._channel = "stable";
-}
-AndroidProject.prototype = Project;
 
 /**
  * Fill template files and put them into the project skeleton.
@@ -35,57 +33,57 @@ AndroidProject.prototype = Project;
  * @returns {Boolean} true on success.
  * @memberOf AndroidProject
  */
-AndroidProject.prototype.fillTemplates =
-function(packageId, apiTarget, projectPath) {
+    this.fillTemplates =
+        function(packageId, apiTarget, projectPath) {
 
-    var parts = packageId.split('.');
-    var packageName = parts[parts.length - 1];
-    var data = {
-        "packageId" : packageId,
-        "packageName" : packageName,
-        "apiTarget" : apiTarget
-    };
+            var parts = packageId.split('.');
+            var packageName = parts[parts.length - 1];
+            var data = {
+                "packageId" : packageId,
+                "packageName" : packageName,
+                "apiTarget" : apiTarget
+            };
 
-    // AndroidManifest.xml
-    var tpl = new TemplateFile(__dirname + Path.sep +
-                               ".."+ Path.sep +
-                               "data" + Path.sep +
-                               "AndroidManifest.xml.tpl");
-    tpl.render(data, projectPath + Path.sep + "AndroidManifest.xml");
+            // AndroidManifest.xml
+            var tpl = new TemplateFile(__dirname + Path.sep +
+                                       ".."+ Path.sep +
+                                       "data" + Path.sep +
+                                       "AndroidManifest.xml.tpl");
+            tpl.render(data, projectPath + Path.sep + "AndroidManifest.xml");
 
-    // build.xml
-    tpl = new TemplateFile(__dirname + Path.sep +
-                               ".."+ Path.sep +
-                               "data" + Path.sep +
-                               "build.xml.tpl");
-    tpl.render(data, projectPath + Path.sep + "build.xml");
+            // build.xml
+            tpl = new TemplateFile(__dirname + Path.sep +
+                                   ".."+ Path.sep +
+                                   "data" + Path.sep +
+                                   "build.xml.tpl");
+            tpl.render(data, projectPath + Path.sep + "build.xml");
 
-    // project.properties
-    tpl = new TemplateFile(__dirname + Path.sep +
-                               ".."+ Path.sep +
-                               "data" + Path.sep +
-                               "project.properties.tpl");
-    tpl.render(data, projectPath + Path.sep + "project.properties");
+            // project.properties
+            tpl = new TemplateFile(__dirname + Path.sep +
+                                   ".."+ Path.sep +
+                                   "data" + Path.sep +
+                                   "project.properties.tpl");
+            tpl.render(data, projectPath + Path.sep + "project.properties");
 
-    // MainActivity.java
-    tpl = new TemplateFile(__dirname + Path.sep +
-                               ".."+ Path.sep +
-                               "data" + Path.sep +
-                               "MainActivity.java.tpl");
-    var activityPath = projectPath + Path.sep +
-                       "src" + Path.sep +
-                       parts.join(Path.sep);
-    tpl.render(data, activityPath + Path.sep + "MainActivity.java");
+            // MainActivity.java
+            tpl = new TemplateFile(__dirname + Path.sep +
+                                   ".."+ Path.sep +
+                                   "data" + Path.sep +
+                                   "MainActivity.java.tpl");
+            var activityPath = projectPath + Path.sep +
+                "src" + Path.sep +
+                parts.join(Path.sep);
+            tpl.render(data, activityPath + Path.sep + "MainActivity.java");
 
-    // Make html5 app dir and copy sample content
-    ShellJS.mkdir("-p", projectPath + Path.sep + "assets");
-    ShellJS.cp("-r",
-               __dirname + Path.sep + ".."+ Path.sep + "data" + Path.sep + "www",
-               projectPath + Path.sep + "assets");
+            // Make html5 app dir and copy sample content
+            ShellJS.mkdir("-p", projectPath + Path.sep + "assets");
+            ShellJS.cp("-r",
+                       __dirname + Path.sep + ".."+ Path.sep + "data" + Path.sep + "www",
+                       projectPath + Path.sep + "assets");
 
-    // TODO check for errors
-    return true;
-};
+            // TODO check for errors
+            return true;
+        };
 
 /**
  * Import Crosswalk libraries and auxiliary files into the project.
@@ -95,26 +93,26 @@ function(packageId, apiTarget, projectPath) {
  * @returns {Boolean} true on success or false.
  * @memberof AndroidProject
  */
-AndroidProject.prototype.importCrosswalkFromDir =
-function(crosswalkPath, projectPath) {
+    this.importCrosswalkFromDir =
+        function(crosswalkPath, projectPath) {
 
-    // Copy xwalk_core_library
-    ShellJS.cp("-r",
-               crosswalkPath + Path.sep + "xwalk_core_library",
-               projectPath);
+            // Copy xwalk_core_library
+            ShellJS.cp("-r",
+                       crosswalkPath + Path.sep + "xwalk_core_library",
+                       projectPath);
 
-    // Copy jars
-    ShellJS.cp(crosswalkPath + Path.sep + "template" + Path.sep + "libs" + Path.sep + "*.jar",
-               projectPath + Path.sep + "libs");
+            // Copy jars
+            ShellJS.cp(crosswalkPath + Path.sep + "template" + Path.sep + "libs" + Path.sep + "*.jar",
+                       projectPath + Path.sep + "libs");
 
-    // Copy res
-    ShellJS.cp("-rf",
-               crosswalkPath + Path.sep + "template" + Path.sep + "res",
-               projectPath);
+            // Copy res
+            ShellJS.cp("-rf",
+                       crosswalkPath + Path.sep + "template" + Path.sep + "res",
+                       projectPath);
 
-    // TODO check for errors
-    return true;
-};
+            // TODO check for errors
+            return true;
+        };
 
 /**
  * Import Crosswalk libraries and auxiliary files into the project.
@@ -124,102 +122,102 @@ function(crosswalkPath, projectPath) {
  * @returns {Boolean} true on success or false.
  * @memberof AndroidProject
  */
-AndroidProject.prototype.importCrosswalkFromZip =
-function(crosswalkPath, projectPath) {
+    this.importCrosswalkFromZip =
+        function(crosswalkPath, projectPath) {
 
-    var indicator = Console.createFiniteProgress("Extracting " + crosswalkPath);
+            var indicator = Console.createFiniteProgress("Extracting " + crosswalkPath);
 
-    var zip = new AdmZip(crosswalkPath);
-    if (!zip) {
-        Console.error("Failed to open " + crosswalkPath);
-        return false;
-    }
+            var zip = new AdmZip(crosswalkPath);
+            if (!zip) {
+                Console.error("Failed to open " + crosswalkPath);
+                return false;
+            }
 
-    indicator.update(0.1);
+            indicator.update(0.1);
 
-    // Derive root entry from file name.
-    var parts = crosswalkPath.split(Path.sep);
-    var filename = parts[parts.length - 1];
-    var base = filename.substring(0, filename.length - ".zip".length) + "/";
+            // Derive root entry from file name.
+            var parts = crosswalkPath.split(Path.sep);
+            var filename = parts[parts.length - 1];
+            var base = filename.substring(0, filename.length - ".zip".length) + "/";
 
-    indicator.update(0.2);
+            indicator.update(0.2);
 
-    // Extract major version
-    var numbers = base.split("-")[1].split(".");
-    var major = numbers[0];
-    if (major < 8) {
-        Console.error("Crosswalk version " + major + " not supported. Use 8+.");
-        return false;
-    } else if (major > 9) {
-        Console.log("*** WARNING: This tool has not been tested with Crosswalk " + major + ".");
-    }
+            // Extract major version
+            var numbers = base.split("-")[1].split(".");
+            var major = numbers[0];
+            if (major < 8) {
+                Console.error("Crosswalk version " + major + " not supported. Use 8+.");
+                return false;
+            } else if (major > 9) {
+                Console.log("*** WARNING: This tool has not been tested with Crosswalk " + major + ".");
+            }
 
-    indicator.update(0.3);
+            indicator.update(0.3);
 
-    var entry = zip.getEntry(base);
-    if (!entry) {
-        Console.error("Failed to find root entry " + base);
-        return false;
-    }
+            var entry = zip.getEntry(base);
+            if (!entry) {
+                Console.error("Failed to find root entry " + base);
+                return false;
+            }
 
-    indicator.update(0.4);
+            indicator.update(0.4);
 
-    // Extract xwalk_core_library
-    var path;
-    var name = base + "xwalk_core_library/";
-    entry = zip.getEntry(name);
-    if (entry) {
-        path = projectPath + Path.sep + "xwalk_core_library";
-        ShellJS.mkdir(path);
-        zip.extractEntryTo(entry, path, false, true);
-    } else {
-        Console.error("Failed to find entry " + name);
-        return false;
-    }
+            // Extract xwalk_core_library
+            var path;
+            var name = base + "xwalk_core_library/";
+            entry = zip.getEntry(name);
+            if (entry) {
+                path = projectPath + Path.sep + "xwalk_core_library";
+                ShellJS.mkdir(path);
+                zip.extractEntryTo(entry, path, false, true);
+            } else {
+                Console.error("Failed to find entry " + name);
+                return false;
+            }
 
-    // Extract jars
-    indicator.update(0.5);
+            // Extract jars
+            indicator.update(0.5);
 
-    if (major === 8) {
-        // Only for Version 8.
-        name = base + "template/libs/xwalk_runtime_java.jar";
-        entry = zip.getEntry(name);
-        if (entry) {
-            zip.extractEntryTo(entry, projectPath + Path.sep + "libs", false, true);
-        } else {
-            Console.error("Failed to find entry " + name);
-            return false;
-        }
-    }
+            if (major === 8) {
+                // Only for Version 8.
+                name = base + "template/libs/xwalk_runtime_java.jar";
+                entry = zip.getEntry(name);
+                if (entry) {
+                    zip.extractEntryTo(entry, projectPath + Path.sep + "libs", false, true);
+                } else {
+                    Console.error("Failed to find entry " + name);
+                    return false;
+                }
+            }
 
-    indicator.update(0.6);
+            indicator.update(0.6);
 
-    name = base + "template/libs/xwalk_app_runtime_java.jar";
-    entry = zip.getEntry(name);
-    if (entry) {
-        zip.extractEntryTo(entry, projectPath + Path.sep + "libs", false, true);
-    } else {
-        Console.error("Failed to find entry " + name);
-        return false;
-    }
+            name = base + "template/libs/xwalk_app_runtime_java.jar";
+            entry = zip.getEntry(name);
+            if (entry) {
+                zip.extractEntryTo(entry, projectPath + Path.sep + "libs", false, true);
+            } else {
+                Console.error("Failed to find entry " + name);
+                return false;
+            }
 
-    indicator.update(0.7);
+            indicator.update(0.7);
 
-    // Extract res
-    name = base + "template/res/";
-    entry = zip.getEntry(name);
-    if (entry) {
-        zip.extractEntryTo(entry, projectPath + Path.sep + "res", false, true);
-    } else {
-        Console.error("Failed to find entry " + name);
-        return false;
-    }
+            // Extract res
+            name = base + "template/res/";
+            entry = zip.getEntry(name);
+            if (entry) {
+                zip.extractEntryTo(entry, projectPath + Path.sep + "res", false, true);
+            } else {
+                Console.error("Failed to find entry " + name);
+                return false;
+            }
 
-    indicator.update(1);
-    indicator.done();
+            indicator.update(1);
+            indicator.done();
 
-    return true;
-};
+            return true;
+        };
 
 /**
  * Turn a freshly created empty Android project into a Crosswalk project.
@@ -230,117 +228,117 @@ function(crosswalkPath, projectPath) {
  * @returns {Boolean} true on success.
  * @memberOf AndroidProject
  */
-AndroidProject.prototype.fillSkeletonProject =
-function(packageId, apiTarget, projectPath, callback) {
+    this.fillSkeletonProject =
+        function(packageId, apiTarget, projectPath, callback) {
 
-    if (!this.fillTemplates(packageId, apiTarget, projectPath)) {
-        callback("Failed to initialise project templates");
-        return;
-    }
-
-    var deps = new AndroidProjectDeps(this._channel);
-    deps.fetchVersions(function(versions, errormsg) {
-
-        if (errormsg) {
-            callback(errormsg);
-            return;
-        }
-
-        if (versions.length === 0) {
-            callback("Failed to load available Crosswalk versions for channel " + this._channel);
-            return;
-        }
-
-        // Look for existing download
-        var version = versions[versions.length - 1];
-        var filename = deps.findLocally(version);
-        if (filename) {
-            Console.log("Using local " + filename);
-            var ret = this.importCrosswalkFromZip(filename, projectPath);
-            if (!ret) {
-                errormsg = "Failed to extract " + filename;
-            }
-            callback(errormsg);
-            return;
-        }
-
-        // Download
-        deps.download(version, ".", function(filename, errormsg) {
-
-            if (errormsg) {
-                callback(errormsg);
+            if (!this.fillTemplates(packageId, apiTarget, projectPath)) {
+                callback("Failed to initialise project templates");
                 return;
             }
 
-            if (!filename) {
-                callback("Failed to download Crosswalk");
-                return;
-            }
+            var deps = new AndroidProjectDeps(this._channel);
+            deps.fetchVersions(function(versions, errormsg) {
 
-            errormsg = null;
-            var ret = this.importCrosswalkFromZip(filename, projectPath);
-            if (!ret) {
-                errormsg = "Failed to extract " + filename;
-            }
-            callback(errormsg);
+                if (errormsg) {
+                    callback(errormsg);
+                    return;
+                }
 
-        }.bind(this));
-    }.bind(this));
-};
+                if (versions.length === 0) {
+                    callback("Failed to load available Crosswalk versions for channel " + this._channel);
+                    return;
+                }
+
+                // Look for existing download
+                var version = versions[versions.length - 1];
+                var filename = deps.findLocally(version);
+                if (filename) {
+                    Console.log("Using local " + filename);
+                    var ret = this.importCrosswalkFromZip(filename, projectPath);
+                    if (!ret) {
+                        errormsg = "Failed to extract " + filename;
+                    }
+                    callback(errormsg);
+                    return;
+                }
+
+                // Download
+                deps.download(version, ".", function(filename, errormsg) {
+
+                    if (errormsg) {
+                        callback(errormsg);
+                        return;
+                    }
+
+                    if (!filename) {
+                        callback("Failed to download Crosswalk");
+                        return;
+                    }
+
+                    errormsg = null;
+                    var ret = this.importCrosswalkFromZip(filename, projectPath);
+                    if (!ret) {
+                        errormsg = "Failed to extract " + filename;
+                    }
+                    callback(errormsg);
+
+                }.bind(this));
+            }.bind(this));
+        };
 
 /**
  * Implements {@link Project.generate}
  * @function generate
  * @memberOf AndroidProject
  */
-AndroidProject.prototype.generate =
-function(packageId, callback) {
+    this.generate =
+        function(packageId, callback) {
 
-    var minApiLevel = 19;
-    var apiTarget;
-    this._sdk.queryTarget(minApiLevel,
-                          function(apiTarget, errormsg) {
+            var minApiLevel = 19;
+            var apiTarget;
+            this._sdk.queryTarget(minApiLevel,
+                                  function(apiTarget, errormsg) {
 
-        if (errormsg) {
-            callback(errormsg);
-            return;
-        }
-
-        this._sdk.generateProjectSkeleton(packageId, apiTarget,
-                                          function(path, logmsg, errormsg) {
-
-            if (!path || errormsg) {
+            if (errormsg) {
                 callback(errormsg);
                 return;
             }
 
-            this.fillSkeletonProject(packageId, apiTarget, path,
-                                     function(errormsg) {
+            this._sdk.generateProjectSkeleton(packageId, apiTarget,
+                                              function(path, logmsg, errormsg) {
 
-                if (errormsg) {
-                    Console.log(errormsg);
-                    callback("Creating project template failed.");
+                if (!path || errormsg) {
+                    callback(errormsg);
                     return;
                 }
 
-                Console.log("Project template created at '" + path + "'");
-                callback(null);
-            });
+                this.fillSkeletonProject(packageId, apiTarget, path,
+                                         function(errormsg) {
+
+                    if (errormsg) {
+                        Console.log(errormsg);
+                        callback("Creating project template failed.");
+                        return;
+                    }
+
+                    Console.log("Project template created at '" + path + "'");
+                    callback(null);
+                });
+            }.bind(this));
         }.bind(this));
-    }.bind(this));
-};
+    };
 
-AndroidProject.prototype.update =
-function() {
+    this.update =
+        function() {
 
-    // TODO implement
-};
+            // TODO implement
+        };
 
-AndroidProject.prototype.refresh =
-function() {
+    this.refresh =
+        function() {
 
-    // TODO implement
-};
+            // TODO implement
+        };
 
 /**
  * Enable ABIs so they are built into the APK.
@@ -350,43 +348,43 @@ function() {
  * @returns {Boolean} true on success or false.
  * @memberOf AndroidProject
  */
-AndroidProject.prototype.enableABI =
-function(abi) {
+    this.enableABI =
+        function(abi) {
 
-    if (!ShellJS.test("-d", "xwalk_core_library/libs")) {
-        Console.error("This does not appear to be the root of a Crosswalk project.");
-        return false;
-    }
-
-    ShellJS.pushd("xwalk_core_library/libs");
-
-    var abiMatched = false;
-    var list = ShellJS.ls(".");
-    for (var i = 0; i < list.length; i++) {
-
-        var entry = list[i];
-        if (ShellJS.test("-d", entry)) {
-            // This is a dir inside "libs", enable/disable depending
-            // on which ABI we want.
-            if (!abi) {
-                // No ABI passed, enable all of them, this is default
-                // status of the project.
-                ShellJS.chmod("+rx", entry);
-                abiMatched = true;
-            } else if (abi === entry) {
-                // enable
-                ShellJS.chmod("+rx", entry);
-                abiMatched = true;
-            } else {
-                // disable
-                ShellJS.chmod("-rx", entry);
+            if (!ShellJS.test("-d", "xwalk_core_library/libs")) {
+                Console.error("This does not appear to be the root of a Crosswalk project.");
+                return false;
             }
-        }
-    }
 
-    ShellJS.popd();
-    return abiMatched;
-};
+            ShellJS.pushd("xwalk_core_library/libs");
+
+            var abiMatched = false;
+            var list = ShellJS.ls(".");
+            for (var i = 0; i < list.length; i++) {
+
+                var entry = list[i];
+                if (ShellJS.test("-d", entry)) {
+                    // This is a dir inside "libs", enable/disable depending
+                    // on which ABI we want.
+                    if (!abi) {
+                        // No ABI passed, enable all of them, this is default
+                        // status of the project.
+                        ShellJS.chmod("+rx", entry);
+                        abiMatched = true;
+                    } else if (abi === entry) {
+                        // enable
+                        ShellJS.chmod("+rx", entry);
+                        abiMatched = true;
+                    } else {
+                        // disable
+                        ShellJS.chmod("-rx", entry);
+                    }
+                }
+            }
+
+            ShellJS.popd();
+            return abiMatched;
+        };
 
 /**
  * Rename the build APK to contain an ABI suffix, before the .apk suffix,
@@ -398,40 +396,40 @@ function(abi) {
  * @returns {String} Filename on success, or null.
  * @memberOf AndroidProject
  */
-AndroidProject.prototype.abifyAPKName =
-function(abi, release) {
+    this.abifyAPKName =
+        function(abi, release) {
 
-    var apkInPattern;
-    if (release) {
-        apkInPattern = "*-release-unsigned.apk";
-    } else {
-        apkInPattern = "*-debug.apk";
-    }
+            var apkInPattern;
+            if (release) {
+                apkInPattern = "*-release-unsigned.apk";
+            } else {
+                apkInPattern = "*-debug.apk";
+            }
 
-    var apkInPath = ShellJS.ls("bin" + Path.sep + apkInPattern)[0];
-    if (!apkInPath) {
-        Console.error("APK bin" + Path.sep + apkInPattern + " not found");
-        return null;
-    }
+            var apkInPath = ShellJS.ls("bin" + Path.sep + apkInPattern)[0];
+            if (!apkInPath) {
+                Console.error("APK bin" + Path.sep + apkInPattern + " not found");
+                return null;
+            }
 
-    var apkInName = apkInPath.split(Path.sep)[1];
-    if (!ShellJS.test("-f", "bin" + Path.sep + apkInName)) {
-        Console.error("APK bin" + Path.sep + apkInName + " not found");
-        return null;
-    }
+            var apkInName = apkInPath.split(Path.sep)[1];
+            if (!ShellJS.test("-f", "bin" + Path.sep + apkInName)) {
+                Console.error("APK bin" + Path.sep + apkInName + " not found");
+                return null;
+            }
 
-    var base = apkInName.substring(0, apkInName.length - ".apk".length);
-    var apkOutName = base + "." + abi + ".apk";
-    ShellJS.mv("bin" + Path.sep + apkInName,
-               "bin" + Path.sep + apkOutName);
+            var base = apkInName.substring(0, apkInName.length - ".apk".length);
+            var apkOutName = base + "." + abi + ".apk";
+            ShellJS.mv("bin" + Path.sep + apkInName,
+                       "bin" + Path.sep + apkOutName);
 
-    if (!ShellJS.test("-f", "bin" + Path.sep + apkOutName)) {
-        Console.error("APK bin" + Path.sep + apkOutName + " not found");
-        return null;
-    }
+            if (!ShellJS.test("-f", "bin" + Path.sep + apkOutName)) {
+                Console.error("APK bin" + Path.sep + apkOutName + " not found");
+                return null;
+            }
 
-    return apkOutName;
-};
+            return apkOutName;
+        };
 
 /**
  * Build APK for one ABI. This method is calling itself recursively, until
@@ -440,112 +438,115 @@ function(abi, release) {
  * @param {Object} closure Information to pass between ABI build runs.
  * @memberOf AndroidProject
  */
-AndroidProject.prototype.buildABI =
-function(closure) {
+    this.buildABI =
+        function(closure) {
 
-    // If done with all the ABIs, terminate successfully.
-    if (closure.abiIndex >= closure.abis.length) {
-        this.enableABI();
-        closure.callback(null);
-        return;
-    }
-
-    // Pick and enable ABI.
-    var abi = closure.abis[closure.abiIndex];
-    if (this.enableABI(abi)) {
-        closure.abiIndex++;
-    } else {
-        // Failed, enable all ABIs and terminate build.
-        this.enableABI();
-        closure.callback("Enabling ABI '" + abi + "' failed");
-        return;
-    }
-
-    // Progress display
-    var indicator = Console.createInfiniteProgress("Building " + abi);
-    this._sdk.onData = function(data) {
-
-        // Scan first 7 chars if data starts with a [tag]
-        var tag = null;
-        for (var i = 0; i < 7 && i < data.length; i++) {
-            if (data[i] === '[') {
-
-                // Scan on a bit if there's a closing ']'
-                for (j = i+1; j < i+15; j++) {
-                    if (data[j] === ']') {
-                        tag = data.substring(i+1, j);
-                        indicator.update(tag);
-                        return;
-                    }
-                }
-            } else if (data[i] != ' ') {
-                break;
-            }
-        }
-    };
-
-    // Build for ABI.
-    this._sdk.buildProject(closure.release, function(success) {
-
-        indicator.done();
-        if (success) {
-
-            // Preserve APK by renaming it by ABI
-            // Otherwise IA and ARM APKs would overwrite each other,
-            // as we simply run ant twice.
-            var apk = this.abifyAPKName(abi, closure.release);
-            if (apk) {
-                closure.apks.push(apk);
-            } else {
-                // Failed, enable all ABIs and terminate build.
+            // If done with all the ABIs, terminate successfully.
+            if (closure.abiIndex >= closure.abis.length) {
                 this.enableABI();
-                closure.callback("Building ABI '" + abi + "' failed");
+                closure.callback(null);
                 return;
             }
 
-            // Delete unaligned APK, so only the ones that are to be used
-            // remain, and there's no confusion.
-            ShellJS.rm("bin" + Path.sep + "*-debug-unaligned.apk");
+            // Pick and enable ABI.
+            var abi = closure.abis[closure.abiIndex];
+            if (this.enableABI(abi)) {
+                closure.abiIndex++;
+            } else {
+                // Failed, enable all ABIs and terminate build.
+                this.enableABI();
+                closure.callback("Enabling ABI '" + abi + "' failed");
+                return;
+            }
 
-            // Build next ABI.
-            this.buildABI(closure);
-            return;
+            // Progress display
+            var indicator = Console.createInfiniteProgress("Building " + abi);
+            this._sdk.onData = function(data) {
 
-        } else {
-            // Failed, enable all ABIs and terminate build.
-            this.enableABI();
-            closure.callback("Building ABI '" + abi + "' failed");
-            return;
-        }
-    }.bind(this));
-};
+                // Scan first 7 chars if data starts with a [tag]
+                var tag = null;
+                for (var i = 0; i < 7 && i < data.length; i++) {
+                    if (data[i] === '[') {
+
+                        // Scan on a bit if there's a closing ']'
+                        for (j = i+1; j < i+15; j++) {
+                            if (data[j] === ']') {
+                                tag = data.substring(i+1, j);
+                                indicator.update(tag);
+                                return;
+                            }
+                        }
+                    } else if (data[i] != ' ') {
+                        break;
+                    }
+                }
+            };
+
+            // Build for ABI.
+            this._sdk.buildProject(closure.release, function(success) {
+
+                indicator.done();
+                if (success) {
+
+                    // Preserve APK by renaming it by ABI
+                    // Otherwise IA and ARM APKs would overwrite each other,
+                    // as we simply run ant twice.
+                    var apk = this.abifyAPKName(abi, closure.release);
+                    if (apk) {
+                        closure.apks.push(apk);
+                    } else {
+                        // Failed, enable all ABIs and terminate build.
+                        this.enableABI();
+                        closure.callback("Building ABI '" + abi + "' failed");
+                        return;
+                    }
+
+                    // Delete unaligned APK, so only the ones that are to be used
+                    // remain, and there's no confusion.
+                    ShellJS.rm("bin" + Path.sep + "*-debug-unaligned.apk");
+
+                    // Build next ABI.
+                    this.buildABI(closure);
+                    return;
+
+                } else {
+                    // Failed, enable all ABIs and terminate build.
+                    this.enableABI();
+                    closure.callback("Building ABI '" + abi + "' failed");
+                    return;
+                }
+            }.bind(this));
+        };
 
 /**
  * Implements {@link Project.build}
  * @function build
  * @memberOf AndroidProject
  */
-AndroidProject.prototype.build =
-function(abis, release, callback) {
+    this.build =
+        function(abis, release, callback) {
 
-    var closure = {
-        abis: abis,
-        abiIndex : 0,
-        release: release,
-        apks: [],
-        callback: function(errormsg) {
+            var closure = {
+                abis: abis,
+                abiIndex : 0,
+                release: release,
+                apks: [],
+                callback: function(errormsg) {
 
-            if (!errormsg) {
-                for (var i = 0; i < closure.apks.length; i++) {
-                    Console.highlight("  bin/" + closure.apks[i]);
+                    if (!errormsg) {
+                        for (var i = 0; i < closure.apks.length; i++) {
+                            Console.highlight("  bin/" + closure.apks[i]);
+                        }
+                    }
+                    callback(errormsg);
                 }
-            }
-            callback(errormsg);
-        }
-    };
+            };
 
-    // This builds all ABIs in a recursion (of sorts).
-    this.buildABI(closure);
-};
+            // This builds all ABIs in a recursion (of sorts).
+            this.buildABI(closure);
+        };
+}
+
+AndroidProject.prototype = Project;
 
 module.exports = AndroidProject;
