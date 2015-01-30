@@ -19,9 +19,9 @@ var TemplateFile = require("./TemplateFile");
  * @throws {@link AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
  * @constructor
  */
-function AndroidProject(Config, Console) {
+function AndroidProject(Config, Console, Downloader) {
 
-    // TODO use passed Config, Console, not required ones.
+    // TODO use passed Config, Console, Downloader not required ones.
 
     this._sdk = new AndroidSDK();
     this._channel = "stable";

@@ -4,10 +4,10 @@
 
 var ShellJS = require("shelljs");
 
-// var AndroidProject = require("./AndroidProject");
 var CommandParser = require("./CommandParser");
 var Config = require("./Config");
 var Console = require("./Console");
+var Downloader = require("./Downloader");
 var ProjectBackends = require("./ProjectBackends");
 
 /**
@@ -37,7 +37,7 @@ function instantiateProject() {
     var project;
 
     try {
-        project = new Backend(Config, Console);
+        project = new Backend(Config, Console, Downloader);
     } catch (e) {
         Console.error("The Android SDK could not be found. " +
                       "Make sure the directory containing the 'android' " +
