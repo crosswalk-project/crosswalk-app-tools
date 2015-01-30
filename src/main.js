@@ -94,11 +94,13 @@ function build(type, callback) {
         callback = function() {};
 
     // Check we're inside a project
+    /* TODO move this inside the AndroidProject
     if (!workingDirectoryIsProject()) {
         Console.error("This does not appear to be a Crosswalk project.");
         callback(false);
         return;
     }
+    */
 
     var project = instantiateProject();
     if (!project) {
