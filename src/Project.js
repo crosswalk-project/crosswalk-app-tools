@@ -18,7 +18,7 @@ function projectOperationCb(result) {}
  * @constructor
  * @protected
  */
-function Project() {}
+function Project(Config, Console) {}
 
 /**
  * Generate project template.
