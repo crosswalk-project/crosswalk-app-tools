@@ -2,6 +2,7 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var Application = require("./Application.js");
 var Config = require("./Config.js");
 
 /**
@@ -16,9 +17,10 @@ function projectOperationCb(result) {}
 /**
  * Interface for project implementations.
  * @constructor
+ * @param {Object} application global {@link Application} instance
  * @protected
  */
-function Project(Config, Console, Downloader) {}
+function Project(application) {}
 
 /**
  * Generate project template.
