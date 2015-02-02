@@ -21,7 +21,7 @@ ProjectBackends.loadDefault = function() {
 
         try {
 
-            var ProjectImpl = require(implementations[i]);
+            ProjectImpl = require(implementations[i]);
 
             // If we get here there backend has been instantiated successfully.
             Console.log("Using backend " + implementations[i]);
