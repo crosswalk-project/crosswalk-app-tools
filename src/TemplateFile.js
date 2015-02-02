@@ -9,9 +9,9 @@ var Config = require("./Config");
 
 /**
  * Class to handle reading and writing template files.
+ * @constructor
  * @param {String} path Path to template file.
  * @throws {Error} When file could not be read.
- * @constructor
  */
 function TemplateFile(path) {
 

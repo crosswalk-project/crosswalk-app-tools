@@ -6,9 +6,9 @@ var Config = require("./Config");
 
 /**
  * The AndroidTargets object wraps targets enumeration and selection.
+ * @constructor
  * @param {String} buffer Output from "android list targets" for evaluation.
  * @throws {TypeError} When buffer is not a string.
- * @constructor
  */
 function AndroidTargets(buffer) {
 

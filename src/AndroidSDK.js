@@ -41,8 +41,8 @@ function buildProjectCb(success) {}
 
 /**
  * Create AndroidSDK object, wrapping Android cmd-line tool interactions.
- * @throws {AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
  * @constructor
+ * @throws {AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
  */
 function AndroidSDK() {
 
@@ -207,8 +207,8 @@ function() {
 /**
  * Creates a new SDKNotFoundError.
  * @extends Error
- * @param {String} message Error message.
  * @constructor
+ * @param {String} message Error message.
  * @memberOf AndroidSDK
  * @inner
  */

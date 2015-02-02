@@ -31,8 +31,8 @@ function fetchVersionsFinishedCb(versions, errormsg) {}
 
 /**
  * Android project dependencies download and lookup.
- * @param {String} channel Crosswalk channel beta/canary/stable
  * @constructor
+ * @param {String} channel Crosswalk channel beta/canary/stable
  */
 function AndroidProjectDeps(channel) {
 
@@ -162,8 +162,8 @@ function(version, dir, callback) {
 /**
  * Creates a new InvalidChannelError.
  * @extends Error
- * @param {String} message Error message.
  * @constructor
+ * @param {String} message Error message.
  * @memberOf AndroidProjectDeps
  * @inner
  */

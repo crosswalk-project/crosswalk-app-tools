@@ -7,8 +7,8 @@ var Config = require("./Config");
 /**
  * Create an IndexParser object.
  * This is used to determine available versions from the Crosswalk download page.
- * @param {String} data Index page data.
  * @constructor
+ * @param {String} data Index page data.
  */
 function IndexParser(data) {
 

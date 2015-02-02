@@ -24,10 +24,10 @@ function downloadFinishedCb(errormsg) {}
 
 /**
  * Create Downloader object.
+ * @constructor
  * @param {String} url URL to download.
  * @param {String} toPath Path do download to.
  * @throws {Downloader~FileCreationFailedError} If file toPath could not be opened.
- * @constructor
  */
 function Downloader(url, toPath) {
 
@@ -131,8 +131,8 @@ function(progress) {
 /**
  * Creates a new FileCreationFailedError.
  * @extends Error
- * @param {String} message Error message.
  * @constructor
+ * @param {String} message Error message.
  * @memberOf Downloader
  * @inner
  */

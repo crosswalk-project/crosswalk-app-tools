@@ -16,8 +16,8 @@ var TemplateFile = require("./TemplateFile");
 /**
  * Android project class.
  * @extends Project
- * @throws {@link AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
  * @constructor
+ * @throws {@link AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
  */
 function AndroidProject(Config, Console, Downloader) {
 

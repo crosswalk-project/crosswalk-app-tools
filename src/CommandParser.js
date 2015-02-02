@@ -7,9 +7,9 @@ var Console = require("./Console");
 
 /**
  * Parsing and validation of command-line arguments.
+ * @constructor
  * @param {String[]} argv Command-line arguments.
  * @throws {TypeError} When argv is not an array.
- * @constructor
  */
 function CommandParser(argv) {
 
