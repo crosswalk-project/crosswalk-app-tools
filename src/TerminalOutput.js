@@ -3,40 +3,41 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var Config = require("./Config");
-var ConsoleIface = require("./ConsoleIface");
 var FiniteProgress = require("./FiniteProgress");
 var InfiniteProgress = require("./InfiniteProgress");
+var OutputIface = require("./OutputIface");
 
 /**
- * Creates a logging console.
+ * Creates a logging output.
+ * @extends OutputIface
  * @constructor
  */
-function StdioConsole() {}
+function TerminalOutput() {}
 
-StdioConsole.prototype = ConsoleIface.prototype;
+TerminalOutput.prototype = OutputIface.prototype;
 
-StdioConsole.prototype.error =
+TerminalOutput.prototype.error =
 function(message) {
 
     if (!Config.getSilentConsole())
         console.error("ERROR: " + message);
 };
 
-StdioConsole.prototype.log =
+TerminalOutput.prototype.log =
 function(message) {
 
     if (!Config.getSilentConsole())
         console.log(message);
 };
 
-StdioConsole.prototype.highlight =
+TerminalOutput.prototype.highlight =
 function(message) {
 
     if (!Config.getSilentConsole())
         console.log('\033[1m' + message + '\033[0m');
 };
 
-StdioConsole.prototype.put =
+TerminalOutput.prototype.put =
 function(message, stderr) {
 
     // Default to stdout.
@@ -52,7 +53,12 @@ function(message, stderr) {
     }
 };
 
-StdioConsole.prototype.createFiniteProgress =
+/**
+ * Create progress indicator.
+ * @param {String} [label] descriptive label
+ * @returns {@link FiniteProgress}
+ */
+TerminalOutput.prototype.createFiniteProgress =
 function(label) {
 
     if (typeof label === "undefined")
@@ -62,7 +68,12 @@ function(label) {
     return indicator;
 };
 
-StdioConsole.prototype.createInfiniteProgress =
+/**
+ * Create progress indicator.
+ * @param {String} [label] descriptive label
+ * @returns {@link InfiniteProgress}
+ */
+TerminalOutput.prototype.createInfiniteProgress =
 function(label) {
 
     if (typeof label === "undefined")
@@ -72,23 +83,4 @@ function(label) {
     return indicator;
 };
 
-
-
-/**
- * Creates a silent console.
- * @constructor
- */
-/*
-function SilentConsole() {}
-
-SilentConsole.prototype = ConsoleIface.prototype;
-
-SilentConsole.prototype.error = function(message) {};
-
-SilentConsole.prototype.warning = function(message) {};
-
-SilentConsole.prototype.log = function(message) {};
-*/
-
-
-module.exports = new StdioConsole();
+module.exports = new TerminalOutput();

@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var Config = require("./Config");
-var Console = require("./Console");
+var Output = require("./Application").getOutput();
 
 /**
  * Parsing and validation of command-line arguments.
@@ -109,22 +109,22 @@ function() {
     var packageId = this._argv[3];
     var match = packageId.match("[A-Za-z0-9_\\.]*");
     if (match[0] != packageId) {
-        Console.error(errormsg);
+        Output.error(errormsg);
         return null;
     }
 
     // Package name must not start or end with '.'
     if (packageId[0] == '.' || packageId[packageId.length - 1] == '.') {
-        Console.error(errormsg);
-        Console.error("Name must not start or end with '.'");
+        Output.error(errormsg);
+        Output.error("Name must not start or end with '.'");
         return null;
     }
 
     // Require 3 or more elements.
     var parts = packageId.split('.');
     if (parts.length < 3) {
-        Console.error(errormsg);
-        Console.error("Name needs to consist of 3+ elements");
+        Output.error(errormsg);
+        Output.error("Name needs to consist of 3+ elements");
         return null;
     }
 
@@ -148,13 +148,13 @@ function() {
     var version = this._argv[3];
     var match = version.match("[0-9\\.]*");
     if (match[0] != version) {
-        Console.error(errormsg);
+        Output.error(errormsg);
         return null;
     }
 
     var parts = version.split('.');
     if (parts.length != 4) {
-        Console.error(errormsg);
+        Output.error(errormsg);
         return null;
     }
 

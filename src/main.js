@@ -4,12 +4,12 @@
 
 var ShellJS = require("shelljs");
 
+var Application = require('./Application');
 var CommandParser = require("./CommandParser");
 var Config = require("./Config");
-var Console = require("./Console");
+var Output = Application.getOutput();
 var ProjectBackends = require("./ProjectBackends");
 
-var _application = require("./Application");
 
 /**
  * Main script
@@ -38,16 +38,16 @@ function instantiateProject() {
 
     var Backend = ProjectBackends.loadDefault();
     if (!Backend) {
-        Console.error("Failed to load project backend");
+        Output.error("Failed to load project backend");
         return null;
     }
 
     var project;
 
     try {
-        project = new Backend(_application);
+        project = new Backend(Application);
     } catch (e) {
-        Console.error("The Android SDK could not be found. " +
+        Output.error("The Android SDK could not be found. " +
                       "Make sure the directory containing the 'android' " +
                       "executable is mentioned in the PATH environment variable.");
         return null;
@@ -78,7 +78,7 @@ function create(packageId, callback) {
     project.generate(packageId, function(errormsg) {
 
         if (errormsg) {
-            Console.error(errormsg);
+            Output.error(errormsg);
             callback(false);
             return;
         } else {
@@ -104,7 +104,7 @@ function build(type, callback) {
     // Check we're inside a project
     /* TODO move this inside the AndroidProject
     if (!workingDirectoryIsProject()) {
-        Console.error("This does not appear to be a Crosswalk project.");
+        Output.error("This does not appear to be a Crosswalk project.");
         callback(false);
         return;
     }
@@ -122,7 +122,7 @@ function build(type, callback) {
     project.build(abis, release, function(errormsg) {
 
         if (errormsg) {
-            Console.error(errormsg);
+            Output.error(errormsg);
             callback(false);
             return;
         } else {

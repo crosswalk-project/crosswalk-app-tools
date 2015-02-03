@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var Config = require("./Config.js");
-var Console = require("./Console.js");
+var TerminalOutput = require("./TerminalOutput.js");
 
 /**
  * Create Application object.
@@ -35,7 +35,7 @@ function() {
 Application.prototype.getOutput =
 function() {
 
-    return Console;
+    return TerminalOutput;
 };
 
 module.exports = new Application();

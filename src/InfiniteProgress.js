@@ -7,12 +7,12 @@ var Config = require("./Config");
 /**
  * Progress indicator.
  * @constructor
- * @param {Object} console see {@link Console}
+ * @param {Object} output see {@link OutputIface}
  * @param {String} label Label text
  */
-function InfiniteProgress(console, label) {
+function InfiniteProgress(output, label) {
 
-    this._console = console;
+    this._output = output;
     this._label = label;
 }
 
@@ -24,13 +24,13 @@ InfiniteProgress.prototype.update =
 function(tag) {
 
     // Clear line
-    this._console.put('\033[2K');
+    this._output.put('\033[2K');
 
     // Go to column 0
-    this._console.put('\033[0G');
+    this._output.put('\033[0G');
 
     var line = this._label + " [" + tag + ']';
-    this._console.put(line);
+    this._output.put(line);
 };
 
 /**
@@ -44,7 +44,7 @@ function(message) {
         message = "";
 
     // Also prints \r\n so we're ready for the next output.
-    this._console.log(" " + message);
+    this._output.log(" " + message);
 };
 
 module.exports = InfiniteProgress;

@@ -9,14 +9,13 @@ var Config = require("./Config");
  * @constructor
  * @protected
  */
-function ConsoleIface() {}
+function OutputIface() {}
 
 /**
  * Log error message.
  * @param {String} message
- * @memberOf ConsoleIface
  */
-ConsoleIface.prototype.error =
+OutputIface.prototype.error =
 function(message) {
 
     throw new Error("ConsoleIface.error() not implemented.");
@@ -25,9 +24,8 @@ function(message) {
 /**
  * Log message.
  * @param {String} message
- * @memberOf ConsoleIface
  */
-ConsoleIface.prototype.log =
+OutputIface.prototype.log =
 function(message) {
 
     throw new Error("ConsoleIface.log() not implemented.");
@@ -36,9 +34,8 @@ function(message) {
 /**
  * Highlight message.
  * @param {String} message
- * @memberOf ConsoleIface
  */
-ConsoleIface.prototype.highlight =
+OutputIface.prototype.highlight =
 function(message) {
 
     throw new Error("ConsoleIface.highlight() not implemented.");
@@ -49,12 +46,11 @@ function(message) {
  * Output string without trailing newline.
  * @param {String} message
  * @param {Boolean} [toStderr] Optional, whether to write on stderr, default is stdout.
- * @memberOf ConsoleIface
  */
-ConsoleIface.prototype.put =
+OutputIface.prototype.put =
 function(message, toStderr) {
 
     throw new Error("ConsoleIface.put() not implemented.");
 };
 
-module.exports = ConsoleIface;
+module.exports = OutputIface;

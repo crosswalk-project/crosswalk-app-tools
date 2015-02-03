@@ -3,14 +3,14 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var Config = require("./Config");
-var Console = require("./Console");
+var Output = require("./Application").getOutput();
 
 /**
  * Class that manages platform backends
  * @constructor
  * @private
  */
-function ProjectBackends() {
+function ProjectBackends(application) {
 
 }
 
@@ -37,12 +37,12 @@ function() {
             ProjectImpl = require(implementations[i]);
 
             // If we get here there backend has been instantiated successfully.
-            Console.log("Using backend " + implementations[i]);
+            Output.log("Using backend " + implementations[i]);
             break;
 
         } catch (e) {
 
-            Console.log("Loading backend " + implementations[i] + " failed (" + e + ")");
+            Output.log("Loading backend " + implementations[i] + " failed (" + e + ")");
         }
     }
 

@@ -7,12 +7,12 @@ var Config = require("./Config");
 /**
  * Progress indicator.
  * @constructor
- * @param {Object} console see {@link Console}
+ * @param {Object} output see {@link OutputIface}
  * @param {String} label Label text
  */
-function FiniteProgress(console, label) {
+function FiniteProgress(output, label) {
 
-    this._console = console;
+    this._output = output;
     this._label = label;
 }
 
@@ -30,23 +30,23 @@ function(progress) {
 
 
     // Go to column 0
-    this._console.put('\033[0G');
+    this._output.put('\033[0G');
 
     // Label
-    this._console.put(this._label);
+    this._output.put(this._label);
 
     // Progress
-    this._console.put(" [");
+    this._output.put(" [");
     var percentageInTens = Math.round(progress * 10);
     for (var i = 0; i < percentageInTens; i++) {
-        this._console.put('#');
+        this._output.put('#');
     }
 
     // Remaining
     for (i = percentageInTens; i < 10; i++) {
-        this._console.put(' ');
+        this._output.put(' ');
     }
-    this._console.put(']');
+    this._output.put(']');
 };
 
 /**
@@ -60,7 +60,7 @@ function(message) {
         message = "";
 
     // Also prints \r\n so we're ready for the next output.
-    this._console.log(" " + message);
+    this._output.log(" " + message);
 };
 
 module.exports = FiniteProgress;

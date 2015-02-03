@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 // Run tests silently to avoid spew from tests failing on purpose.
-require("../src/Config").setSilentConsole(true);
+require("../src/Application").getConfig().setSilentConsole(true);
 var CommandParser = require("../src/CommandParser");
 
 exports.tests = {

@@ -6,9 +6,9 @@ var OS = require('os');
 var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
 // Run tests silently to avoid spew from tests failing on purpose.
-require("../src/Config").setSilentConsole(true);
+require("../src/Application").getConfig().setSilentConsole(true);
+var Console = require("../src/Application").getOutput();
 var CommandParser = require("../src/CommandParser");
-var Console = require("../src/Console");
 var Main = require("../src/main.js");
 
 exports.tests = {
