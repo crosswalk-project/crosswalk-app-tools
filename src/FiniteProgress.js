@@ -20,6 +20,7 @@ function FiniteProgress(console, label) {
  * Update progress indicator.
  * @function update
  * @param {Number} progress Progress value between 0 and 1.
+ * @instance
  * @memberOf FiniteProgress
  */
 FiniteProgress.prototype.update =
@@ -55,6 +56,7 @@ function(progress) {
  * Final update of progress indicator.
  * @function done
  * @param {String} [message] Completion message to the right of the progress bar.
+ * @instance
  * @memberOf FiniteProgress
  */
 FiniteProgress.prototype.done =
