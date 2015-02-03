@@ -2,14 +2,14 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var FS = require("fs");
 var Path = require("path");
 
 var MkTemp = require("mktemp");
 var ShellJS = require("shelljs");
 
-var Downloader = require("./Downloader");
-var FS = require("fs");
-var IndexParser = require("./IndexParser");
+var Downloader = require("../util//Downloader");
+var IndexParser = require("../util/IndexParser");
 
 var BASE_URL = "https://download.01.org/crosswalk/releases/crosswalk/android/";
 var CHANNELS = ["beta", "canary", "stable"];

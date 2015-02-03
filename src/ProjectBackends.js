@@ -12,7 +12,7 @@ ProjectBackends.loadDefault = function() {
     var implementations = [
         "crosswalk-app-tools-backend-ios",
         "crosswalk-app-tools-backend-demo",
-        "./AndroidProject"
+        "./android/AndroidProject"
     ];
 
     var ProjectImpl = null;
@@ -29,7 +29,7 @@ ProjectBackends.loadDefault = function() {
 
         } catch (e) {
 
-            Console.log("Loading backend " + implementations[i] + " failed");
+            Console.log("Loading backend " + implementations[i] + " failed (" + e + ")");
         }
     }
 

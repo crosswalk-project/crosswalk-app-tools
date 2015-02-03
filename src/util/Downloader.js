@@ -9,8 +9,6 @@ var Url = require("url");
 
 var ShellJS = require("shelljs");
 
-var Config = require("./Config");
-
 
 
 /**

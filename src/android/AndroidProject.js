@@ -8,8 +8,9 @@ var ShellJS = require("shelljs");
 
 var AndroidProjectDeps = require("./AndroidProjectDeps");
 var AndroidSDK = require("./AndroidSDK");
-var Project = require("./Project");
-var TemplateFile = require("./TemplateFile");
+var Project = require("../Project");
+
+var TemplateFile = require("../util/TemplateFile");
 
 /**
  * Android project class.
@@ -48,28 +49,28 @@ function(packageId, apiTarget, projectPath) {
 
     // AndroidManifest.xml
     var tpl = new TemplateFile(__dirname + Path.sep +
-                               ".."+ Path.sep +
+                               ".."+ Path.sep + ".."+ Path.sep +
                                "data" + Path.sep +
                                "AndroidManifest.xml.tpl");
     tpl.render(data, projectPath + Path.sep + "AndroidManifest.xml");
 
     // build.xml
     tpl = new TemplateFile(__dirname + Path.sep +
-                               ".."+ Path.sep +
+                               ".."+ Path.sep + ".."+ Path.sep +
                                "data" + Path.sep +
                                "build.xml.tpl");
     tpl.render(data, projectPath + Path.sep + "build.xml");
 
     // project.properties
     tpl = new TemplateFile(__dirname + Path.sep +
-                               ".."+ Path.sep +
+                               ".."+ Path.sep + ".."+ Path.sep +
                                "data" + Path.sep +
                                "project.properties.tpl");
     tpl.render(data, projectPath + Path.sep + "project.properties");
 
     // MainActivity.java
     tpl = new TemplateFile(__dirname + Path.sep +
-                               ".."+ Path.sep +
+                               ".."+ Path.sep + ".."+ Path.sep +
                                "data" + Path.sep +
                                "MainActivity.java.tpl");
     var activityPath = projectPath + Path.sep +

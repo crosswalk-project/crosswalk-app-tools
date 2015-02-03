@@ -5,7 +5,7 @@
 var FS = require("fs");
 var Mustache = require("mustache");
 
-var Config = require("./Config");
+
 
 /**
  * Class to handle reading and writing template files.

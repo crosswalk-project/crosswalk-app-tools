@@ -7,7 +7,6 @@ var ShellJS = require("shelljs");
 var CommandParser = require("./CommandParser");
 var Config = require("./Config");
 var Console = require("./Console");
-var Downloader = require("./Downloader");
 var ProjectBackends = require("./ProjectBackends");
 
 var _application = require("./Application");
