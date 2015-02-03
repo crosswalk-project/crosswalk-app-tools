@@ -22,9 +22,7 @@ function CommandParser(argv) {
 
 /**
  * Get program usage information.
- * @function help
  * @returns {String} Usage information string.
- * @memberOf CommandParser
  */
 CommandParser.prototype.help =
 function() {
@@ -38,9 +36,7 @@ function() {
 /**
  * Check whether the current instance represents a valid command line and if so,
  * get the main command.
- * @function getCommand
  * @returns {String} Command string if valid, otherwise null.
- * @memberOf CommandParser
  */
 CommandParser.prototype.getCommand =
 function() {
@@ -68,9 +64,7 @@ function() {
 
 /**
  * Get primary command.
- * @function peekCommand
  * @returns {String} One of "create", "update", "refresh", "build" or null.
- * @memberOf CommandParser
  */
 CommandParser.prototype.peekCommand =
 function() {
@@ -98,9 +92,7 @@ function() {
 
 /**
  * Get package name when command is "create".
- * @function createGetPackageId
  * @returns {String} Package name as per Android conventions or null.
- * @memberOf CommandParser
  * @see {@link http://developer.android.com/guide/topics/manifest/manifest-element.html#package}
  */
 CommandParser.prototype.createGetPackageId =
@@ -141,9 +133,7 @@ function() {
 
 /**
  * Get version when command is "update".
- * @function updateGetVersion
  * @returns {String} Crosswalk version string or null.
- * @memberOf CommandParser
  * @see {@link https://crosswalk-project.org/documentation/downloads.html}
  */
 CommandParser.prototype.updateGetVersion =
@@ -173,9 +163,7 @@ function() {
 
 /**
  * Get build type when command is "build".
- * @function buildGetType
  * @returns {String} One of "debug", "release", or null.
- * @memberOf CommandParser
  */
 CommandParser.prototype.buildGetType =
 function() {

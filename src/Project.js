@@ -7,7 +7,6 @@ var Config = require("./Config.js");
 
 /**
  * Callback signature for {@link Project.generate}
- * @function projectOperationCb
  * @param {String} errormsg null on success, otherwise error message.
  * @memberOf Project
  * @inner
@@ -24,12 +23,9 @@ function Project(application) {}
 
 /**
  * Generate project template.
- * @function generate
  * @param {String} packageId Package name in com.example.Foo format.
  * @param {Function} callback see {@link Project~projectOperationCb}.
  * @abstract
- * @instance
- * @memberOf Project
  */
 Project.prototype.generate =
 function(packageId, callback) {
@@ -39,10 +35,7 @@ function(packageId, callback) {
 
 /**
  * Update project to latest Crosswalk.
- * @function update
  * @abstract
- * @instance
- * @memberOf Project
  */
 Project.prototype.update =
 function() {
@@ -52,10 +45,7 @@ function() {
 
 /**
  * Refresh project after environment changes.
- * @function refresh
  * @abstract
- * @instance
- * @memberOf Project
  */
 Project.prototype.refresh =
 function() {
@@ -65,13 +55,10 @@ function() {
 
 /**
  * Build application package.
- * @function build
  * @param {String[]} abi Array of ABIs, supported armeabi-v7a, x86.
  * @param {Boolean} release Whether to build debug or release package.
  * @param {Function} callback see {@link Project~projectOperationCb}.
  * @abstract
- * @instance
- * @memberOf Project
  */
 Project.prototype.build =
 function(abis, release, callback) {

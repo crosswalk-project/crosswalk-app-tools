@@ -16,10 +16,8 @@ function ProjectBackends() {
 
 /**
  * Load default backend
- * @function loadDefault
  * @returns {Function} Constructor for {@link Project} subclass or null.
  * @static
- * @memberOf ProjectBackends
  */
 ProjectBackends.prototype.loadDefault =
 function() {

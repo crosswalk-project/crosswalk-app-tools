@@ -18,10 +18,7 @@ function InfiniteProgress(console, label) {
 
 /**
  * Update progress indicator.
- * @function update
  * @param {String} tag Tag for current activity
- * @instance
- * @memberOf InfiniteProgress
  */
 InfiniteProgress.prototype.update =
 function(tag) {
@@ -38,10 +35,7 @@ function(tag) {
 
 /**
  * Final update of progress indicator.
- * @function done
  * @param {String} [message] Completion message to the right of the progress bar.
- * @instance
- * @memberOf InfiniteProgress
  */
 InfiniteProgress.prototype.done =
 function(message) {

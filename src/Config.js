@@ -18,6 +18,7 @@ function Config() {
 /**
  * Whether to log or suppress output.
  * @function getSilentConsole
+ * @returns {Boolean} Whether output is suppressed
  * @memberOf Config
  */
 Config.prototype.getSilentConsole =
