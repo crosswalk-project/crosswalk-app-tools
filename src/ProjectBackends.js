@@ -5,9 +5,24 @@
 var Config = require("./Config");
 var Console = require("./Console");
 
-var ProjectBackends = {};
+/**
+ * Class that manages platform backends
+ * @constructor
+ * @private
+ */
+function ProjectBackends() {
 
-ProjectBackends.loadDefault = function() {
+}
+
+/**
+ * Load default backend
+ * @function loadDefault
+ * @returns {Function} Constructor for {@link Project} subclass or null.
+ * @static
+ * @memberOf ProjectBackends
+ */
+ProjectBackends.prototype.loadDefault =
+function() {
 
     var implementations = [
         "crosswalk-app-tools-backend-ios",
@@ -36,4 +51,4 @@ ProjectBackends.loadDefault = function() {
     return ProjectImpl;
 };
 
-module.exports = ProjectBackends;
+module.exports = new ProjectBackends();
