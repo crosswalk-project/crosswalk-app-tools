@@ -10,6 +10,8 @@ require("../src/Config").setSilentConsole(true);
 var Console = require("../src/Console");
 var AndroidSDK = require("../src/AndroidSDK");
 
+var _application = require("../src/Application");
+
 exports.tests = {
 
     ctor: function(test) {
@@ -18,7 +20,7 @@ exports.tests = {
 
         // Throws exception if not available.
         try {
-            var sdk = new AndroidSDK();
+            var sdk = new AndroidSDK(_application);
             test.equal(true, true);
         } catch (e) {
             // Fall through
@@ -32,7 +34,7 @@ exports.tests = {
 
         test.expect(1);
 
-        var sdk = new AndroidSDK();
+        var sdk = new AndroidSDK(_application);
         sdk.queryTarget(14, function(target, error) {
 
             Console.log("  " + target);
@@ -50,7 +52,7 @@ exports.tests = {
 
         test.expect(2);
 
-        var sdk = new AndroidSDK();
+        var sdk = new AndroidSDK(_application);
         sdk.queryTarget(14, function(target, error) {
 
             Console.log("  " + target);

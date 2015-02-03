@@ -7,8 +7,6 @@ var Path = require("path");
 var ShellJS = require("shelljs");
 
 var AndroidTargets = require("./AndroidTargets");
-var Config = require("./Config");
-var Console = require("./Console");
 
 
 
@@ -42,9 +40,12 @@ function buildProjectCb(success) {}
 /**
  * Create AndroidSDK object, wrapping Android cmd-line tool interactions.
  * @constructor
+ * @param {Object} application global {@link Application} instance
  * @throws {AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
  */
-function AndroidSDK() {
+function AndroidSDK(application) {
+
+    this._application = application;
 
     this._scriptPath = this.findAndroidScriptPath();
     if (this._scriptPath === null) {
@@ -102,6 +103,7 @@ function(apiLevel, callback) {
 AndroidSDK.prototype.generateProjectSkeleton =
 function(packageId, apiTarget, callback) {
 
+    var output = this._application.getOutput();
     var errmsg = null;
 
     // Construct path and fail if exists.
@@ -109,12 +111,12 @@ function(packageId, apiTarget, callback) {
     var path = wd + Path.sep + packageId;
     if (ShellJS.test("-e", path)) {
         errmsg = "Error: project dir '" + path + "' already exists";
-        Console.error(errmsg);
+        output.error(errmsg);
         callback(null, null, errmsg);
         return;
     }
 
-    var indicator = Console.createInfiniteProgress("Creating " + packageId + " ");
+    var indicator = output.createInfiniteProgress("Creating " + packageId + " ");
 
     // Create project
     // "android create project -t android-18 -p $(pwd)/Foo -k com.example.Foo -a MainActivity"
@@ -176,7 +178,7 @@ function(release, callback) {
     }.bind(this));
 
     child.stderr.on("data", function(data) {
-        Console.put(data, true);
+        output.put(data, true);
     });
 
     child.on("exit", function(code, signal) {

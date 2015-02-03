@@ -7,8 +7,6 @@ var Path = require("path");
 var MkTemp = require("mktemp");
 var ShellJS = require("shelljs");
 
-var Config = require("./Config");
-var Console = require("./Console");
 var Downloader = require("./Downloader");
 var FS = require("fs");
 var IndexParser = require("./IndexParser");
@@ -32,9 +30,12 @@ function fetchVersionsFinishedCb(versions, errormsg) {}
 /**
  * Android project dependencies download and lookup.
  * @constructor
+ * @param {Object} application global {@link Application} instance
  * @param {String} channel Crosswalk channel beta/canary/stable
  */
-function AndroidProjectDeps(channel) {
+function AndroidProjectDeps(application, channel) {
+
+    this._application = application;
 
     if (CHANNELS.indexOf(channel) == -1) {
         throw new InvalidChannelError("Unknown channel " + channel);
@@ -52,6 +53,7 @@ function AndroidProjectDeps(channel) {
 AndroidProjectDeps.prototype.fetchVersions =
 function(callback) {
 
+    var output = this._application.getOutput();
     var url = BASE_URL + this._channel + "/";
     // TODO use memory stream instead of tmpfile
     var indexFile = MkTemp.createFileSync('index.html.XXXXXX');
@@ -62,7 +64,7 @@ function(callback) {
 
         // Download
         var label = "Fetching '" + this._channel + "' versions index";
-        var indicator = Console.createFiniteProgress(label);
+        var indicator = output.createFiniteProgress(label);
         var downloader = new Downloader(url, indexFile);
         downloader.progress = function(progress) {
             indicator.update(progress);
@@ -127,6 +129,7 @@ function(version) {
 AndroidProjectDeps.prototype.download =
 function(version, dir, callback) {
 
+    var output = this._application.getOutput();
     var filename = "crosswalk-" + version + ".zip";
     var url = BASE_URL +
               this._channel + "/" +
@@ -136,7 +139,7 @@ function(version, dir, callback) {
     // Download
     // At the moment we unconditionally download, overwriting the existing copy.
     var label = "Downloading '" + this._channel + "' " + version;
-    var indicator = Console.createFiniteProgress(label);
+    var indicator = output.createFiniteProgress(label);
     var path = Path.join(dir, filename);
     var downloader = new Downloader(url, path);
     downloader.progress = function(progress) {

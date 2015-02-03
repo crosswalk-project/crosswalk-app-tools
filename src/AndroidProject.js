@@ -8,8 +8,6 @@ var ShellJS = require("shelljs");
 
 var AndroidProjectDeps = require("./AndroidProjectDeps");
 var AndroidSDK = require("./AndroidSDK");
-var Config = require("./Config");
-var Console = require("./Console");
 var Project = require("./Project");
 var TemplateFile = require("./TemplateFile");
 
@@ -22,9 +20,8 @@ var TemplateFile = require("./TemplateFile");
  */
 function AndroidProject(application) {
 
-    // TODO use passed Config, Console, Downloader not required ones.
     this._application = application;
-    this._sdk = new AndroidSDK();
+    this._sdk = new AndroidSDK(this._application);
     this._channel = "stable";
 }
 AndroidProject.prototype = Project;
@@ -130,11 +127,12 @@ function(crosswalkPath, projectPath) {
 AndroidProject.prototype.importCrosswalkFromZip =
 function(crosswalkPath, projectPath) {
 
-    var indicator = Console.createFiniteProgress("Extracting " + crosswalkPath);
+    var output = this._application.getOutput();
+    var indicator = output.createFiniteProgress("Extracting " + crosswalkPath);
 
     var zip = new AdmZip(crosswalkPath);
     if (!zip) {
-        Console.error("Failed to open " + crosswalkPath);
+        output.error("Failed to open " + crosswalkPath);
         return false;
     }
 
@@ -151,17 +149,17 @@ function(crosswalkPath, projectPath) {
     var numbers = base.split("-")[1].split(".");
     var major = numbers[0];
     if (major < 8) {
-        Console.error("Crosswalk version " + major + " not supported. Use 8+.");
+        output.error("Crosswalk version " + major + " not supported. Use 8+.");
         return false;
     } else if (major > 9) {
-        Console.log("*** WARNING: This tool has not been tested with Crosswalk " + major + ".");
+        output.log("*** WARNING: This tool has not been tested with Crosswalk " + major + ".");
     }
 
     indicator.update(0.3);
 
     var entry = zip.getEntry(base);
     if (!entry) {
-        Console.error("Failed to find root entry " + base);
+        output.error("Failed to find root entry " + base);
         return false;
     }
 
@@ -176,7 +174,7 @@ function(crosswalkPath, projectPath) {
         ShellJS.mkdir(path);
         zip.extractEntryTo(entry, path, false, true);
     } else {
-        Console.error("Failed to find entry " + name);
+        output.error("Failed to find entry " + name);
         return false;
     }
 
@@ -190,7 +188,7 @@ function(crosswalkPath, projectPath) {
         if (entry) {
             zip.extractEntryTo(entry, projectPath + Path.sep + "libs", false, true);
         } else {
-            Console.error("Failed to find entry " + name);
+            output.error("Failed to find entry " + name);
             return false;
         }
     }
@@ -202,7 +200,7 @@ function(crosswalkPath, projectPath) {
     if (entry) {
         zip.extractEntryTo(entry, projectPath + Path.sep + "libs", false, true);
     } else {
-        Console.error("Failed to find entry " + name);
+        output.error("Failed to find entry " + name);
         return false;
     }
 
@@ -214,7 +212,7 @@ function(crosswalkPath, projectPath) {
     if (entry) {
         zip.extractEntryTo(entry, projectPath + Path.sep + "res", false, true);
     } else {
-        Console.error("Failed to find entry " + name);
+        output.error("Failed to find entry " + name);
         return false;
     }
 
@@ -236,12 +234,14 @@ function(crosswalkPath, projectPath) {
 AndroidProject.prototype.fillSkeletonProject =
 function(packageId, apiTarget, projectPath, callback) {
 
+    var output = this._application.getOutput();
+
     if (!this.fillTemplates(packageId, apiTarget, projectPath)) {
         callback("Failed to initialise project templates");
         return;
     }
 
-    var deps = new AndroidProjectDeps(this._channel);
+    var deps = new AndroidProjectDeps(this._application, this._channel);
     deps.fetchVersions(function(versions, errormsg) {
 
         if (errormsg) {
@@ -258,7 +258,7 @@ function(packageId, apiTarget, projectPath, callback) {
         var version = versions[versions.length - 1];
         var filename = deps.findLocally(version);
         if (filename) {
-            Console.log("Using local " + filename);
+            output.log("Using local " + filename);
             var ret = this.importCrosswalkFromZip(filename, projectPath);
             if (!ret) {
                 errormsg = "Failed to extract " + filename;
@@ -299,6 +299,8 @@ function(packageId, apiTarget, projectPath, callback) {
 AndroidProject.prototype.generate =
 function(packageId, callback) {
 
+    var output = this._application.getOutput();
+
     var minApiLevel = 19;
     var apiTarget;
     this._sdk.queryTarget(minApiLevel,
@@ -321,12 +323,12 @@ function(packageId, callback) {
                                      function(errormsg) {
 
                 if (errormsg) {
-                    Console.log(errormsg);
+                    output.log(errormsg);
                     callback("Creating project template failed.");
                     return;
                 }
 
-                Console.log("Project template created at '" + path + "'");
+                output.log("Project template created at '" + path + "'");
                 callback(null);
             });
         }.bind(this));
@@ -356,8 +358,10 @@ function() {
 AndroidProject.prototype.enableABI =
 function(abi) {
 
+    var output = this._application.getOutput();
+
     if (!ShellJS.test("-d", "xwalk_core_library/libs")) {
-        Console.error("This does not appear to be the root of a Crosswalk project.");
+        output.error("This does not appear to be the root of a Crosswalk project.");
         return false;
     }
 
@@ -404,6 +408,8 @@ function(abi) {
 AndroidProject.prototype.abifyAPKName =
 function(abi, release) {
 
+    var output = this._application.getOutput();
+
     var apkInPattern;
     if (release) {
         apkInPattern = "*-release-unsigned.apk";
@@ -413,13 +419,13 @@ function(abi, release) {
 
     var apkInPath = ShellJS.ls("bin" + Path.sep + apkInPattern)[0];
     if (!apkInPath) {
-        Console.error("APK bin" + Path.sep + apkInPattern + " not found");
+        output.error("APK bin" + Path.sep + apkInPattern + " not found");
         return null;
     }
 
     var apkInName = apkInPath.split(Path.sep)[1];
     if (!ShellJS.test("-f", "bin" + Path.sep + apkInName)) {
-        Console.error("APK bin" + Path.sep + apkInName + " not found");
+        output.error("APK bin" + Path.sep + apkInName + " not found");
         return null;
     }
 
@@ -429,7 +435,7 @@ function(abi, release) {
                "bin" + Path.sep + apkOutName);
 
     if (!ShellJS.test("-f", "bin" + Path.sep + apkOutName)) {
-        Console.error("APK bin" + Path.sep + apkOutName + " not found");
+        output.error("APK bin" + Path.sep + apkOutName + " not found");
         return null;
     }
 
@@ -445,6 +451,8 @@ function(abi, release) {
  */
 AndroidProject.prototype.buildABI =
 function(closure) {
+
+    var output = this._application.getOutput();
 
     // If done with all the ABIs, terminate successfully.
     if (closure.abiIndex >= closure.abis.length) {
@@ -465,7 +473,7 @@ function(closure) {
     }
 
     // Progress display
-    var indicator = Console.createInfiniteProgress("Building " + abi);
+    var indicator = output.createInfiniteProgress("Building " + abi);
     this._sdk.onData = function(data) {
 
         // Scan first 7 chars if data starts with a [tag]
@@ -531,6 +539,8 @@ function(closure) {
 AndroidProject.prototype.build =
 function(abis, release, callback) {
 
+    var output = this._application.getOutput();
+
     var closure = {
         abis: abis,
         abiIndex : 0,
@@ -540,7 +550,7 @@ function(abis, release, callback) {
 
             if (!errormsg) {
                 for (var i = 0; i < closure.apks.length; i++) {
-                    Console.highlight("  bin/" + closure.apks[i]);
+                    output.highlight("  bin/" + closure.apks[i]);
                 }
             }
             callback(errormsg);

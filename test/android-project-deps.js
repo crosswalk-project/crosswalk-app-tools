@@ -9,13 +9,15 @@ require("../src/Config").setSilentConsole(false);
 var Console = require("../src/Console");
 var AndroidProjectDeps = require("../src/AndroidProjectDeps");
 
+var _application = require("../src/Application");
+
 exports.tests = {
 
     fetchVersions: function(test) {
 
         test.expect(2);
 
-        var deps = new AndroidProjectDeps("stable");
+        var deps = new AndroidProjectDeps(_application, "stable");
         deps.fetchVersions(function(versions, errormsg) {
 
             if (errormsg)
@@ -31,7 +33,7 @@ exports.tests = {
 
         test.expect(2);
 
-        var deps = new AndroidProjectDeps("stable");
+        var deps = new AndroidProjectDeps(_application, "stable");
         deps.download("9.38.208.10", OS.tmpDir(), function(filename, errormsg) {
 
             if (errormsg)

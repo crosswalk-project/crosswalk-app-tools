@@ -28,11 +28,11 @@ function() {
 
 /**
  * Get singleton {@link Console} object.
- * @function getConsole
+ * @function getOutput
  * @returns {@link Console} object
  * @memberOf Application
  */
-Application.prototype.getConsole =
+Application.prototype.getOutput =
 function() {
 
     return Console;
