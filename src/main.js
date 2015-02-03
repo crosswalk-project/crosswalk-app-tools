@@ -10,6 +10,8 @@ var Console = require("./Console");
 var Downloader = require("./Downloader");
 var ProjectBackends = require("./ProjectBackends");
 
+var _application = require("./Application");
+
 /**
  * Main script.
  * @namespace main
@@ -37,7 +39,7 @@ function instantiateProject() {
     var project;
 
     try {
-        project = new Backend(Config, Console, Downloader);
+        project = new Backend(_application);
     } catch (e) {
         Console.error("The Android SDK could not be found. " +
                       "Make sure the directory containing the 'android' " +
