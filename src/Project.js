@@ -28,6 +28,7 @@ function Project(application) {}
  * @param {String} packageId Package name in com.example.Foo format.
  * @param {Function} callback see {@link Project~projectOperationCb}.
  * @abstract
+ * @instance
  * @memberOf Project
  */
 Project.prototype.generate =
@@ -36,12 +37,26 @@ function(packageId, callback) {
     throw new Error("Project.generate() not implemented.");
 };
 
+/**
+ * Update project to latest Crosswalk.
+ * @function update
+ * @abstract
+ * @instance
+ * @memberOf Project
+ */
 Project.prototype.update =
 function() {
 
     throw new Error("Project.update() not implemented.");
 };
 
+/**
+ * Refresh project after environment changes.
+ * @function refresh
+ * @abstract
+ * @instance
+ * @memberOf Project
+ */
 Project.prototype.refresh =
 function() {
 
@@ -55,6 +70,7 @@ function() {
  * @param {Boolean} release Whether to build debug or release package.
  * @param {Function} callback see {@link Project~projectOperationCb}.
  * @abstract
+ * @instance
  * @memberOf Project
  */
 Project.prototype.build =
