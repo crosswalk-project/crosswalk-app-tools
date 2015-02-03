@@ -13,9 +13,10 @@ var _application = require("./Application");
 
 /**
  * Main script
- * @namespace main
+ * @module main
  */
 
+// TODO move to android project
 function workingDirectoryIsProject() {
 
     if (ShellJS.test("-f", "AndroidManifest.xml") &&
@@ -27,6 +28,12 @@ function workingDirectoryIsProject() {
     return false;
 }
 
+/**
+ * Instantiate project backend
+ * @returns {Object} Implementation of {@link Project}
+ * @private
+ * @static
+ */
 function instantiateProject() {
 
     var Backend = ProjectBackends.loadDefault();
@@ -53,8 +60,8 @@ function instantiateProject() {
  * Create skeleton project.
  * @param {String} packageId Identifier in the form of com.example.Foo
  * @param {Function} [callback] Callback returning true/false.
- * @memberOf main
  * @private
+ * @static
  */
 function create(packageId, callback) {
 
@@ -85,8 +92,8 @@ function create(packageId, callback) {
  * Build application package.
  * @param {String} type "debug" or "release".
  * @param {Function} [callback] Callback returning true/false.
- * @memberOf main
  * @private
+ * @static
  */
 function build(type, callback) {
 
@@ -128,8 +135,8 @@ function build(type, callback) {
 /**
  * Display usage information.
  * @param {CommandParser} parser.
- * @memberOf main
  * @private
+ * @static
  */
 function printHelp(parser) {
 
@@ -139,8 +146,8 @@ function printHelp(parser) {
 
 /**
  * Display version information.
- * @memberOf main
  * @private
+ * @static
  */
 function printVersion() {
 
@@ -149,6 +156,11 @@ function printVersion() {
     console.log(Package.version);
 }
 
+/**
+ * Main entry point.
+ * @public
+ * @static
+ */
 function main() {
 
     var parser = new CommandParser(process.argv);
