@@ -4,7 +4,7 @@
 
 // Run tests silently to avoid spew from tests failing on purpose.
 require("../src/Config").setSilentConsole(true);
-var AndroidTargets = require("../src/AndroidTargets");
+var AndroidTargets = require("../src/android/AndroidTargets");
 
 var _androidTargets = "" +
 'Available Android targets:\n' +

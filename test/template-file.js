@@ -9,7 +9,7 @@ var ShellJS = require("shelljs");
 // Run tests silently to avoid spew from tests failing on purpose.
 require("../src/Config").setSilentConsole(true);
 var Console = require("../src/Console");
-var TemplateFile = require("../src/TemplateFile");
+var TemplateFile = require("../src/util/TemplateFile");
 
 
 exports.tests = {
