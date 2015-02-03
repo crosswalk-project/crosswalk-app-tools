@@ -25,7 +25,6 @@ function Project(application) {}
  * Generate project template.
  * @param {String} packageId Package name in com.example.Foo format.
  * @param {Function} callback see {@link Project~projectOperationCb}.
- * @abstract
  */
 Project.prototype.generate =
 function(packageId, callback) {
@@ -35,7 +34,6 @@ function(packageId, callback) {
 
 /**
  * Update project to latest Crosswalk.
- * @abstract
  */
 Project.prototype.update =
 function() {
@@ -45,7 +43,6 @@ function() {
 
 /**
  * Refresh project after environment changes.
- * @abstract
  */
 Project.prototype.refresh =
 function() {
@@ -58,7 +55,6 @@ function() {
  * @param {String[]} abi Array of ABIs, supported armeabi-v7a, x86.
  * @param {Boolean} release Whether to build debug or release package.
  * @param {Function} callback see {@link Project~projectOperationCb}.
- * @abstract
  */
 Project.prototype.build =
 function(abis, release, callback) {

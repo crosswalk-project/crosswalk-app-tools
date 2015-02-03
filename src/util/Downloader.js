@@ -13,8 +13,9 @@ var ShellJS = require("shelljs");
 
 /**
  * Callback signature for {@link Downloader.get}
- * @memberOf Downloader
+ * @param {String} errormsg Error or null upon success
  * @inner
+ * @memberOf Downloader
  */
 function downloadFinishedCb(errormsg) {}
 
@@ -26,7 +27,6 @@ function downloadFinishedCb(errormsg) {}
  * @param {String} url URL to download.
  * @param {String} toPath Path do download to.
  * @throws {Downloader~FileCreationFailedError} If file toPath could not be opened.
- * @memberof util
  */
 function Downloader(url, toPath) {
 
@@ -52,9 +52,7 @@ function Downloader(url, toPath) {
 
 /**
  * Download file.
- * @function get
  * @param {Function} callback see {@link Downloader~downloadFinishedCb}
- * @memberOf Downloader
  */
 Downloader.prototype.get =
 function(callback) {
@@ -132,8 +130,8 @@ function(progress) {
  * @extends Error
  * @constructor
  * @param {String} message Error message.
- * @memberOf Downloader
  * @inner
+ * @memberOf Downloader
  */
 function FileCreationFailedError(message) {
     Error.call(this, message);

@@ -9,7 +9,6 @@
  * This is used to determine available versions from the Crosswalk download page.
  * @constructor
  * @param {String} data Index page data.
- * @memberof util
  */
 function IndexParser(data) {
 
@@ -18,9 +17,7 @@ function IndexParser(data) {
 
 /**
  * Parse page and return available versions (subdirectories).
- * @function parse
  * @returns {String[]} Array of versions in w.x.y.z format.
- * @memberOf IndexParser
  */
 IndexParser.prototype.parse =
 function() {

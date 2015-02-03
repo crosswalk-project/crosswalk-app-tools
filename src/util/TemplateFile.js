@@ -5,14 +5,11 @@
 var FS = require("fs");
 var Mustache = require("mustache");
 
-
-
 /**
  * Class to handle reading and writing template files.
  * @constructor
  * @param {String} path Path to template file.
  * @throws {Error} When file could not be read.
- * @memberof util
  */
 function TemplateFile(path) {
 
@@ -24,13 +21,12 @@ function TemplateFile(path) {
 
 /**
  * Render template file to output file.
- * @function render
  * @param {Object} data Data according to Mustache docs.
  * @param {String} path Path to output file.
  * @returns {Error} when failed, null on success.
- * @memberOf TemplateFile
  */
-TemplateFile.prototype.render = function(data, path) {
+TemplateFile.prototype.render =
+function(data, path) {
 
     var output = Mustache.render(this._buffer, data);
     return FS.writeFileSync(path, output);
