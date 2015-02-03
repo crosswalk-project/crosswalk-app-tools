@@ -9,7 +9,6 @@
  * @constructor
  * @param {String} buffer Output from "android list targets" for evaluation.
  * @throws {TypeError} When buffer is not a string.
- * @memberOf android
  */
 function AndroidTargets(buffer) {
 
@@ -24,7 +23,6 @@ function AndroidTargets(buffer) {
  * Parse SDK targets buffer passed to the constructor.
  * @param {Boolean} [onlyABI] Optionally only return targets with ABI installed when true.
  * @returns Targets object in the form of \{ target : ABIs \}.
- * @memberOf AndroidTargets
  */
 AndroidTargets.prototype.parse =
 function(onlyABI) {
@@ -75,7 +73,6 @@ function(onlyABI) {
 /**
  * Pick preferred target for creation of new projects.
  * @returns Target identifier string or null if no ABIs are installed.
- * @memberOf AndroidTargets
  */
 AndroidTargets.prototype.pick =
 function() {
@@ -131,7 +128,6 @@ function() {
  * Pick lowest target above minAPILevel.
  * @param {Number} minAPILevel lowest permitted target API level.
  * @returns Target identifier string or null if no matching target found.
- * @memberOf AndroidTargets
  */
 AndroidTargets.prototype.pickLowest =
 function(minAPILevel) {

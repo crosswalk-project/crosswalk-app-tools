@@ -20,8 +20,8 @@ var CHANNELS = ["beta", "canary", "stable"];
  * Callback signature for {@link AndroidProjectDeps.fetchVersions}
  * @param {String[]} versions Array of available Crosswalk versions sorted oldest - newest
  * @param {String} errormsg Message in case of Error
- * @memberOf AndroidProjectDeps
  * @inner
+ * @memberOf AndroidProjectDeps
  */
 function fetchVersionsFinishedCb(versions, errormsg) {}
 
@@ -32,7 +32,6 @@ function fetchVersionsFinishedCb(versions, errormsg) {}
  * @constructor
  * @param {Object} application global {@link Application} instance
  * @param {String} channel Crosswalk channel beta/canary/stable
- * @memberOf android
  */
 function AndroidProjectDeps(application, channel) {
 
@@ -47,9 +46,7 @@ function AndroidProjectDeps(application, channel) {
 
 /**
  * Fetch available Crosswalk versions index.
- * @function fetchVersions
  * @param {Function} callback see {@link AndroidProjectDeps~fetchVersionsFinishedCb}
- * @memberOf AndroidProjectDeps
  */
 AndroidProjectDeps.prototype.fetchVersions =
 function(callback) {
@@ -99,10 +96,8 @@ function(callback) {
 
 /**
  * Locate Crosswalk distribution zip.
- * @function findLocally
  * @param {String} version Crosswalk version to look for
  * @returns {String} Relative path to zip file
- * @memberOf AndroidProjectDeps
  */
 AndroidProjectDeps.prototype.findLocally =
 function(version) {
@@ -121,11 +116,9 @@ function(version) {
 
 /**
  * Download crosswalk zip.
- * @function downnload
  * @param {String} version Crosswalk version string
  * @param {String} dir Directory to download to
  * @param {Function} callback Callback function.
- * @memberOf AndroidProjectDeps
  */
 AndroidProjectDeps.prototype.download =
 function(version, dir, callback) {
@@ -168,8 +161,8 @@ function(version, dir, callback) {
  * @extends Error
  * @constructor
  * @param {String} message Error message.
- * @memberOf AndroidProjectDeps
  * @inner
+ * @memberOf AndroidProjectDeps
  */
 function InvalidChannelError(message) {
     Error.call(this, message);

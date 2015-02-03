@@ -18,7 +18,6 @@ var TemplateFile = require("../util/TemplateFile");
  * @constructor
  * @param {Object} application global {@link Application} instance
  * @throws {@link AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
- * @memberOf android
  */
 function AndroidProject(application) {
 
@@ -30,12 +29,10 @@ AndroidProject.prototype = Project;
 
 /**
  * Fill template files and put them into the project skeleton.
- * @function fillTemplates
  * @param {String} packageId Qualified package name.
  * @param {String} apiTarget Android API target (greater android-14).
  * @param {String} projectPath Path to root dir of project.
  * @returns {Boolean} true on success.
- * @memberOf AndroidProject
  */
 AndroidProject.prototype.fillTemplates =
 function(packageId, apiTarget, projectPath) {
@@ -91,11 +88,9 @@ function(packageId, apiTarget, projectPath) {
 
 /**
  * Import Crosswalk libraries and auxiliary files into the project.
- * @function importCrosswalkFromDir
  * @param {String} crosswalkPath Location of unpacked Crosswalk distribution.
  * @param {String} projectPath Location of project to import Crosswalk into.
  * @returns {Boolean} true on success or false.
- * @memberof AndroidProject
  */
 AndroidProject.prototype.importCrosswalkFromDir =
 function(crosswalkPath, projectPath) {
@@ -120,11 +115,9 @@ function(crosswalkPath, projectPath) {
 
 /**
  * Import Crosswalk libraries and auxiliary files into the project.
- * @function importCrosswalkFromZip
  * @param {String} crosswalkPath Location of unpacked Crosswalk distribution.
  * @param {String} projectPath Location of project to import Crosswalk into.
  * @returns {Boolean} true on success or false.
- * @memberof AndroidProject
  */
 AndroidProject.prototype.importCrosswalkFromZip =
 function(crosswalkPath, projectPath) {
@@ -226,12 +219,10 @@ function(crosswalkPath, projectPath) {
 
 /**
  * Turn a freshly created empty Android project into a Crosswalk project.
- * @function fillSkeletonProject
  * @param {String} packageId Qualified package name.
  * @param {String} apiTarget Android API target (greater android-14).
  * @param {String} projectPath Path to root dir of project.
  * @returns {Boolean} true on success.
- * @memberOf AndroidProject
  */
 AndroidProject.prototype.fillSkeletonProject =
 function(packageId, apiTarget, projectPath, callback) {
@@ -295,8 +286,6 @@ function(packageId, apiTarget, projectPath, callback) {
 
 /**
  * Implements {@link Project.generate}
- * @function generate
- * @memberOf AndroidProject
  */
 AndroidProject.prototype.generate =
 function(packageId, callback) {
@@ -351,11 +340,9 @@ function() {
 
 /**
  * Enable ABIs so they are built into the APK.
- * @function enableABI
  * @param {String} [abi] ABI identifier "armeabi-v7a" / "x86". When not passed,
  *                       all ABIs are enabled.
  * @returns {Boolean} true on success or false.
- * @memberOf AndroidProject
  */
 AndroidProject.prototype.enableABI =
 function(abi) {
@@ -401,11 +388,9 @@ function(abi) {
  * Rename the build APK to contain an ABI suffix, before the .apk suffix,
  * so when building multiple ABIs one after another, the subsequent APKs
  * do not overwrite the previously built ones.
- * @function abifyAPKNameName
  * @param {String} abi ABI name
  * @param {Boolean} release Whether we're building release or debug packages.
  * @returns {String} Filename on success, or null.
- * @memberOf AndroidProject
  */
 AndroidProject.prototype.abifyAPKName =
 function(abi, release) {
@@ -447,9 +432,7 @@ function(abi, release) {
 /**
  * Build APK for one ABI. This method is calling itself recursively, until
  * all ABIs are built.
- * @function buildABI
  * @param {Object} closure Information to pass between ABI build runs.
- * @memberOf AndroidProject
  */
 AndroidProject.prototype.buildABI =
 function(closure) {
@@ -535,8 +518,6 @@ function(closure) {
 
 /**
  * Implements {@link Project.build}
- * @function build
- * @memberOf AndroidProject
  */
 AndroidProject.prototype.build =
 function(abis, release, callback) {
