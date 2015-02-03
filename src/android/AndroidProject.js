@@ -18,6 +18,7 @@ var TemplateFile = require("../util/TemplateFile");
  * @constructor
  * @param {Object} application global {@link Application} instance
  * @throws {@link AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
+ * @memberOf android
  */
 function AndroidProject(application) {
 

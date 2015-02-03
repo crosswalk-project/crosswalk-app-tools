@@ -42,6 +42,7 @@ function buildProjectCb(success) {}
  * @constructor
  * @param {Object} application global {@link Application} instance
  * @throws {AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
+ * @memberOf android
  */
 function AndroidSDK(application) {
 

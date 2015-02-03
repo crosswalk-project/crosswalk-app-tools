@@ -12,7 +12,7 @@ var ProjectBackends = require("./ProjectBackends");
 var _application = require("./Application");
 
 /**
- * Main script.
+ * Main script
  * @namespace main
  */
 

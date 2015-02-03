@@ -32,6 +32,7 @@ function fetchVersionsFinishedCb(versions, errormsg) {}
  * @constructor
  * @param {Object} application global {@link Application} instance
  * @param {String} channel Crosswalk channel beta/canary/stable
+ * @memberOf android
  */
 function AndroidProjectDeps(application, channel) {
 

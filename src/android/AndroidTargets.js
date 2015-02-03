@@ -9,6 +9,7 @@
  * @constructor
  * @param {String} buffer Output from "android list targets" for evaluation.
  * @throws {TypeError} When buffer is not a string.
+ * @memberOf android
  */
 function AndroidTargets(buffer) {
 

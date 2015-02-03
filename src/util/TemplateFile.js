@@ -12,6 +12,7 @@ var Mustache = require("mustache");
  * @constructor
  * @param {String} path Path to template file.
  * @throws {Error} When file could not be read.
+ * @memberof util
  */
 function TemplateFile(path) {
 

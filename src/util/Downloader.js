@@ -26,6 +26,7 @@ function downloadFinishedCb(errormsg) {}
  * @param {String} url URL to download.
  * @param {String} toPath Path do download to.
  * @throws {Downloader~FileCreationFailedError} If file toPath could not be opened.
+ * @memberof util
  */
 function Downloader(url, toPath) {
 
