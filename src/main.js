@@ -8,7 +8,7 @@ var Application = require('./Application');
 var CommandParser = require("./CommandParser");
 var Config = require("./Config");
 var Output = Application.getOutput();
-var ProjectBackends = require("./ProjectBackends");
+var PlatformsManager = require("./PlatformsManager");
 
 
 /**
@@ -36,8 +36,8 @@ function workingDirectoryIsProject() {
  */
 function instantiateProject() {
 
-    var Backend = ProjectBackends.loadDefault();
-    if (!Backend) {
+    var Platform = PlatformsManager.loadDefault();
+    if (!Platform) {
         Output.error("Failed to load project backend");
         return null;
     }
@@ -45,7 +45,7 @@ function instantiateProject() {
     var project;
 
     try {
-        project = new Backend(Application);
+        project = new Platform(Application);
     } catch (e) {
         Output.error("The Android SDK could not be found. " +
                       "Make sure the directory containing the 'android' " +

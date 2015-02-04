@@ -10,31 +10,31 @@ var Output = require("./Application").getOutput();
  * @constructor
  * @private
  */
-function ProjectBackends(application) {
+function PlatformsManager(application) {
 
 }
 
 /**
  * Load default backend
- * @returns {Function} Constructor for {@link Project} subclass or null.
+ * @returns {Function} Constructor for {@link PlatformIface} subclass or null.
  * @static
  */
-ProjectBackends.prototype.loadDefault =
+PlatformsManager.prototype.loadDefault =
 function() {
 
     var implementations = [
         "crosswalk-app-tools-backend-ios",
         "crosswalk-app-tools-backend-demo",
-        "./android/AndroidProject"
+        "./android/AndroidPlatform"
     ];
 
-    var ProjectImpl = null;
+    var PlatformImpl = null;
 
     for (var i = 0; i < implementations.length; i++) {
 
         try {
 
-            ProjectImpl = require(implementations[i]);
+            PlatformImpl = require(implementations[i]);
 
             // If we get here there backend has been instantiated successfully.
             Output.log("Using backend " + implementations[i]);
@@ -46,7 +46,7 @@ function() {
         }
     }
 
-    return ProjectImpl;
+    return PlatformImpl;
 };
 
-module.exports = new ProjectBackends();
+module.exports = new PlatformsManager();

@@ -8,35 +8,35 @@
 // tests standalone.
 
 var Config = require("../src/Config");
-var Console = require("../src/Console");
+var Output = require("../src/TerminalOutput");
 
 function Driver() {}
 
 Driver.prototype.expect = function(asserts) {
 
-    Console.log("  Expect " + asserts);
+    Output.log("  Expect " + asserts);
 };
 
 Driver.prototype.equal = function(exp1, exp2) {
 
-    Console.log("  Equal " + exp1 + " == " + exp2);
+    Output.log("  Equal " + exp1 + " == " + exp2);
 };
 
 Driver.prototype.done = function() {
 
-    Console.log("Done.\n");
+    Output.log("Done.\n");
 };
 
 
 
 if (process.argv.length <= 2) {
 
-    Console.log("Usage: run.js <script>");
+    Output.log("Usage: run.js <script>");
 
 } else {
 
     var script = process.argv[2];
-    Console.log("Running " + script);
+    Output.log("Running " + script);
 
     var test = require(script);
     // Force verbose
@@ -53,7 +53,7 @@ if (process.argv.length <= 2) {
             if (key == "setUp" || key == "tearDown")
                 continue;
 
-            Console.log("Testing " + key);
+            Output.log("Testing " + key);
             test.tests[key](new Driver());
         }
 

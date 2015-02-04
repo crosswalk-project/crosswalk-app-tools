@@ -8,24 +8,24 @@ var ShellJS = require("shelljs");
 
 var AndroidProjectDeps = require("./AndroidProjectDeps");
 var AndroidSDK = require("./AndroidSDK");
-var Project = require("../Project");
+var PlatformIface = require("../PlatformIface");
 
 var TemplateFile = require("../util/TemplateFile");
 
 /**
  * Android project class.
- * @extends Project
+ * @extends PlatformIface
  * @constructor
- * @param {Object} application global {@link Application} instance
+ * @param {Object} application {@link Application} instance
  * @throws {@link AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
  */
-function AndroidProject(application) {
+function AndroidPlatform(application) {
 
     this._application = application;
     this._sdk = new AndroidSDK(this._application);
     this._channel = "stable";
 }
-AndroidProject.prototype = Project;
+AndroidPlatform.prototype = PlatformIface;
 
 /**
  * Fill template files and put them into the project skeleton.
@@ -34,7 +34,7 @@ AndroidProject.prototype = Project;
  * @param {String} projectPath Path to root dir of project.
  * @returns {Boolean} true on success.
  */
-AndroidProject.prototype.fillTemplates =
+AndroidPlatform.prototype.fillTemplates =
 function(packageId, apiTarget, projectPath) {
 
     var parts = packageId.split('.');
@@ -92,7 +92,7 @@ function(packageId, apiTarget, projectPath) {
  * @param {String} projectPath Location of project to import Crosswalk into.
  * @returns {Boolean} true on success or false.
  */
-AndroidProject.prototype.importCrosswalkFromDir =
+AndroidPlatform.prototype.importCrosswalkFromDir =
 function(crosswalkPath, projectPath) {
 
     // Copy xwalk_core_library
@@ -119,7 +119,7 @@ function(crosswalkPath, projectPath) {
  * @param {String} projectPath Location of project to import Crosswalk into.
  * @returns {Boolean} true on success or false.
  */
-AndroidProject.prototype.importCrosswalkFromZip =
+AndroidPlatform.prototype.importCrosswalkFromZip =
 function(crosswalkPath, projectPath) {
 
     var output = this._application.getOutput();
@@ -224,7 +224,7 @@ function(crosswalkPath, projectPath) {
  * @param {String} projectPath Path to root dir of project.
  * @returns {Boolean} true on success.
  */
-AndroidProject.prototype.fillSkeletonProject =
+AndroidPlatform.prototype.fillSkeletonProject =
 function(packageId, apiTarget, projectPath, callback) {
 
     var output = this._application.getOutput();
@@ -285,9 +285,9 @@ function(packageId, apiTarget, projectPath, callback) {
 };
 
 /**
- * Implements {@link Project.generate}
+ * Implements {@link PlatformIface.generate}
  */
-AndroidProject.prototype.generate =
+AndroidPlatform.prototype.generate =
 function(packageId, callback) {
 
     var output = this._application.getOutput();
@@ -326,13 +326,13 @@ function(packageId, callback) {
     }.bind(this));
 };
 
-AndroidProject.prototype.update =
+AndroidPlatform.prototype.update =
 function() {
 
     // TODO implement
 };
 
-AndroidProject.prototype.refresh =
+AndroidPlatform.prototype.refresh =
 function() {
 
     // TODO implement
@@ -344,7 +344,7 @@ function() {
  *                       all ABIs are enabled.
  * @returns {Boolean} true on success or false.
  */
-AndroidProject.prototype.enableABI =
+AndroidPlatform.prototype.enableABI =
 function(abi) {
 
     var output = this._application.getOutput();
@@ -392,7 +392,7 @@ function(abi) {
  * @param {Boolean} release Whether we're building release or debug packages.
  * @returns {String} Filename on success, or null.
  */
-AndroidProject.prototype.abifyAPKName =
+AndroidPlatform.prototype.abifyAPKName =
 function(abi, release) {
 
     var output = this._application.getOutput();
@@ -434,7 +434,7 @@ function(abi, release) {
  * all ABIs are built.
  * @param {Object} closure Information to pass between ABI build runs.
  */
-AndroidProject.prototype.buildABI =
+AndroidPlatform.prototype.buildABI =
 function(closure) {
 
     var output = this._application.getOutput();
@@ -517,9 +517,9 @@ function(closure) {
 };
 
 /**
- * Implements {@link Project.build}
+ * Implements {@link PlatformIface.build}
  */
-AndroidProject.prototype.build =
+AndroidPlatform.prototype.build =
 function(abis, release, callback) {
 
     var output = this._application.getOutput();
@@ -544,4 +544,4 @@ function(abis, release, callback) {
     this.buildABI(closure);
 };
 
-module.exports = AndroidProject;
+module.exports = AndroidPlatform;
