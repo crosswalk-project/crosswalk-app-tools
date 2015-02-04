@@ -6,10 +6,11 @@ var FS = require("fs");
 var OS = require('os');
 var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
-// Run tests silently to avoid spew from tests failing on purpose.
-require("../src/Application").getConfig().setSilentConsole(true);
-var Console = require("../src/Application").getOutput();
 var TemplateFile = require("../src/util/TemplateFile");
+
+// Run tests silently to avoid spew from tests failing on purpose.
+var Console = require("../src/Main").getOutput();
+require("../src/Main").getConfig().setSilentConsole(true);
 
 
 exports.tests = {

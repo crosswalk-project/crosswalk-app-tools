@@ -3,24 +3,26 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var Config = require("./Config");
-var Output = require("./Application").getOutput();
 
 /**
  * Class that manages platform backends
  * @constructor
+ * @param {Application} application instance
  * @private
  */
 function PlatformsManager(application) {
 
+    this._application = application;
 }
 
 /**
  * Load default backend
  * @returns {Function} Constructor for {@link PlatformIface} subclass or null.
- * @static
  */
 PlatformsManager.prototype.loadDefault =
 function() {
+
+    var output = this._application.getOutput();
 
     var implementations = [
         "crosswalk-app-tools-backend-ios",
@@ -37,16 +39,16 @@ function() {
             PlatformImpl = require(implementations[i]);
 
             // If we get here there backend has been instantiated successfully.
-            Output.log("Using backend " + implementations[i]);
+            output.log("Using backend " + implementations[i]);
             break;
 
         } catch (e) {
 
-            Output.log("Loading backend " + implementations[i] + " failed (" + e + ")");
+            output.log("Loading backend " + implementations[i] + " failed (" + e + ")");
         }
     }
 
     return PlatformImpl;
 };
 
-module.exports = new PlatformsManager();
+module.exports = PlatformsManager;

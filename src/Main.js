@@ -7,16 +7,29 @@ var ShellJS = require("shelljs");
 var Application = require('./Application');
 var CommandParser = require("./CommandParser");
 var Config = require("./Config");
-var Output = Application.getOutput();
 var PlatformsManager = require("./PlatformsManager");
 
+// TODO
+var Output = require("./TerminalOutput");
 
 /**
- * Main script
- * @module main
+ * Main class
+ *
+ * For automated testing, every method of this class must be usable standlone,
+ * that is without depending on prior invocation of any other method. This
+ * is why they are labelled "static".
+ *
+ * @extends Application
+ * @constructor
+ * @private
  */
+function Main() {
+    // Chain up the constructor.
+    Application.call(this);
+}
+Main.prototype = Application.prototype;
 
-// TODO move to android project
+/* TODO move to android project
 function workingDirectoryIsProject() {
 
     if (ShellJS.test("-f", "AndroidManifest.xml") &&
@@ -27,25 +40,27 @@ function workingDirectoryIsProject() {
 
     return false;
 }
+*/
 
 /**
- * Instantiate project backend
- * @returns {Object} Implementation of {@link Project}
- * @private
+ * Instantiate platform backend
+ * @returns {Object} Implementation of {@link PlatformIface}
  * @static
  */
-function instantiateProject() {
+Main.prototype.instantiateProject =
+function() {
 
-    var Platform = PlatformsManager.loadDefault();
+    var mgr = new PlatformsManager(this);
+    var Platform = mgr.loadDefault();
     if (!Platform) {
-        Output.error("Failed to load project backend");
+        Output.error("Failed to load platform backend");
         return null;
     }
 
-    var project;
+    var platform;
 
     try {
-        project = new Platform(Application);
+        platform = new Platform(this);
     } catch (e) {
         Output.error("The Android SDK could not be found. " +
                       "Make sure the directory containing the 'android' " +
@@ -53,23 +68,23 @@ function instantiateProject() {
         return null;
     }
 
-    return project;
-}
+    return platform;
+};
 
 /**
  * Create skeleton project.
  * @param {String} packageId Identifier in the form of com.example.Foo
  * @param {Function} [callback] Callback returning true/false.
- * @private
  * @static
  */
-function create(packageId, callback) {
+Main.prototype.create =
+function(packageId, callback) {
 
     // Handle callback not passed.
     if (!callback)
         callback = function() {};
 
-    var project = instantiateProject();
+    var project = this.instantiateProject();
     if (!project) {
         callback(false);
         return;
@@ -86,16 +101,16 @@ function create(packageId, callback) {
             return;
         }
     });
-}
+};
 
 /**
  * Build application package.
  * @param {String} type "debug" or "release".
  * @param {Function} [callback] Callback returning true/false.
- * @private
  * @static
  */
-function build(type, callback) {
+Main.prototype.build =
+function(type, callback) {
 
     // Handle callback not passed.
     if (!callback)
@@ -110,7 +125,7 @@ function build(type, callback) {
     }
     */
 
-    var project = instantiateProject();
+    var project = this.instantiateProject();
     if (!project) {
         callback(false);
         return;
@@ -130,38 +145,39 @@ function build(type, callback) {
             return;
         }
     });
-}
+};
 
 /**
  * Display usage information.
  * @param {CommandParser} parser.
- * @private
  * @static
  */
-function printHelp(parser) {
+Main.prototype.printHelp =
+function(parser) {
 
     var buf = parser.help();
     console.log(buf);
-}
+};
 
 /**
  * Display version information.
- * @private
  * @static
  */
-function printVersion() {
+Main.prototype.printVersion =
+function() {
 
     var Package = require("../package.json");
 
+    // TODO use Output?
     console.log(Package.version);
-}
+};
 
 /**
  * Main entry point.
- * @public
  * @static
  */
-function main() {
+Main.prototype.run =
+function() {
 
     var parser = new CommandParser(process.argv);
     var cmd = parser.getCommand();
@@ -170,7 +186,7 @@ function main() {
         switch (cmd) {
         case "create":
             var packageId = parser.createGetPackageId();
-            create(packageId);
+            this.create(packageId);
             break;
         case "update":
             var version = parser.updateGetVersion();
@@ -178,13 +194,13 @@ function main() {
             break;
         case "build":
             var type = parser.buildGetType();
-            build(type);
+            this.build(type);
             break;
         case "help":
-            printHelp(parser);
+            this.printHelp(parser);
             break;
         case "version":
-            printVersion();
+            this.printVersion();
             break;
         default:
             // TODO
@@ -192,18 +208,8 @@ function main() {
 
     } else {
 
-        printHelp(parser);
-    }
-}
-
-module.exports = {
-
-    main: main,
-
-    test: {
-        create: create,
-        build: build,
-        printHelp: printHelp,
-        printVersion: printVersion
+        this.printHelp(parser);
     }
 };
+
+module.exports = new Main();

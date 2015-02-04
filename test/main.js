@@ -5,11 +5,12 @@
 var OS = require('os');
 var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
-// Run tests silently to avoid spew from tests failing on purpose.
-require("../src/Application").getConfig().setSilentConsole(true);
-var Console = require("../src/Application").getOutput();
+var Console = require("../src/Main").getOutput();
 var CommandParser = require("../src/CommandParser");
-var Main = require("../src/main.js");
+
+// Run tests silently to avoid spew from tests failing on purpose.
+var _application = require("../src/Main");
+_application.getConfig().setSilentConsole(true);
 
 exports.tests = {
 
@@ -19,7 +20,7 @@ exports.tests = {
 
         // Just call main without args, this should display help.
         // As long as no exception hits us we're good.
-        Main.main();
+        _application.run();
 
         test.done();
     },
@@ -36,7 +37,7 @@ exports.tests = {
         Console.log("Tempdir: " + tmpdir);
         ShellJS.pushd(tmpdir);
 
-        Main.test.create("com.example.Foo", function(success) {
+        _application.create("com.example.Foo", function(success) {
 
             test.equal(success, true);
 
@@ -61,7 +62,7 @@ exports.tests = {
         ShellJS.pushd(tmpdir);
 
         // Malformed name, fail.
-        Main.test.create("Foo", function(success) {
+        _application.create("Foo", function(success) {
 
             test.equal(success, false);
 
@@ -85,13 +86,13 @@ exports.tests = {
         Console.log("Tempdir: " + tmpdir);
         ShellJS.pushd(tmpdir);
 
-        Main.test.create("com.example.Foo", function(success) {
+        _application.create("com.example.Foo", function(success) {
 
             if (success) {
 
                 // Build
                 ShellJS.pushd("com.example.Foo");
-                Main.test.build("debug", function(success) {
+                _application.build("debug", function(success) {
 
                     test.equal(success, true);
                     test.done();
@@ -113,7 +114,7 @@ exports.tests = {
         test.expect(0);
 
         var parser = new CommandParser(process.argv);
-        Main.test.printHelp(parser);
+        _application.printHelp(parser);
 
         test.done();
     },
@@ -123,7 +124,7 @@ exports.tests = {
         // Prints to stdout, so just run the code to see if it breaks.
         test.expect(0);
 
-        Main.test.printVersion();
+        _application.printVersion();
 
         test.done();
     }

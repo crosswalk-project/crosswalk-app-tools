@@ -3,8 +3,8 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 // Test involves progress output, make it visible.
-require("../src/Application").getConfig().setSilentConsole(false);
-var Console = require("../src/Application").getOutput();
+require("../src/Main").getConfig().setSilentConsole(false);
+var Console = require("../src/Main").getOutput();
 
 exports.tests = {
 

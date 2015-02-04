@@ -4,12 +4,12 @@
 
 var OS = require('os');
 
-// Test involves progress output, make it visible.
-require("../src/Application").getConfig().setSilentConsole(false);
-var Console = require("../src/Application").getOutput();
+var Console = require("../src/Main").getOutput();
 var AndroidProjectDeps = require("../src/android/AndroidProjectDeps");
 
-var _application = require("../src/Application");
+// Test involves progress output, make it visible.
+var _application = require("../src/Main");
+_application.getConfig().setSilentConsole(false);
 
 exports.tests = {
 

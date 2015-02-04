@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var Config = require("./Config");
-var Output = require("./Application").getOutput();
+var Output = require("./TerminalOutput"); // TODO fix
 
 /**
  * Parsing and validation of command-line arguments.

@@ -5,12 +5,12 @@
 var OS = require('os');
 var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
-// Run tests silently to avoid spew from tests failing on purpose.
-require("../src/Application").getConfig().setSilentConsole(true);
-var Console = require("../src/Application").getOutput();
+var Console = require("../src/Main").getOutput();
 var AndroidSDK = require("../src/android/AndroidSDK");
 
-var _application = require("../src/Application");
+// Run tests silently to avoid spew from tests failing on purpose.
+var _application = require("../src/Main");
+_application.getConfig().setSilentConsole(true);
 
 exports.tests = {
 

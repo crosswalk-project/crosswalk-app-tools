@@ -8,7 +8,7 @@ var TerminalOutput = require("./TerminalOutput.js");
 /**
  * Create Application object.
  * @constructor
- * @private
+ * @protected
  */
 function Application() {
 
@@ -27,9 +27,9 @@ function() {
 };
 
 /**
- * Get singleton {@link Console} object.
+ * Get singleton {@link OutputIface} object.
  * @function getOutput
- * @returns {@link Console} object
+ * @returns {@link OutputIface} object
  * @memberOf Application
  */
 Application.prototype.getOutput =
@@ -38,4 +38,4 @@ function() {
     return TerminalOutput;
 };
 
-module.exports = new Application();
+module.exports = Application;
