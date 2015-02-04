@@ -7,7 +7,7 @@ var Config = require("./Config");
 /**
  * Progress indicator.
  * @constructor
- * @param {Object} output see {@link OutputIface}
+ * @param {OutputIface} output Output implementation
  * @param {String} label Label text
  */
 function InfiniteProgress(output, label) {

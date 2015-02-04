@@ -12,6 +12,18 @@ var PlatformsManager = require("./PlatformsManager");
 // TODO
 var Output = require("./TerminalOutput");
 
+
+
+/**
+ * Callback signature for toplevel operations
+ * @param {Boolean} success true on operation completion, otherwise false
+ * @inner
+ * @memberOf Main
+ */
+function mainOperationCb(success) {}
+
+
+
 /**
  * Main class
  *
@@ -44,7 +56,7 @@ function workingDirectoryIsProject() {
 
 /**
  * Instantiate platform backend
- * @returns {Object} Implementation of {@link PlatformIface}
+ * @returns {PlatformIface} Constructor for platform backend
  * @static
  */
 Main.prototype.instantiateProject =
@@ -73,8 +85,8 @@ function() {
 
 /**
  * Create skeleton project.
- * @param {String} packageId Identifier in the form of com.example.Foo
- * @param {Function} [callback] Callback returning true/false.
+ * @param {String} packageId Identifier in the form of com.example.foo
+ * @param {Main~mainOperationCb} [callback] callback function
  * @static
  */
 Main.prototype.create =
@@ -106,7 +118,7 @@ function(packageId, callback) {
 /**
  * Build application package.
  * @param {String} type "debug" or "release".
- * @param {Function} [callback] Callback returning true/false.
+ * @param {Main~mainOperationCb} [callback] callback function
  * @static
  */
 Main.prototype.build =

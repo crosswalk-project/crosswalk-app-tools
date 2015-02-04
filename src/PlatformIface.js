@@ -7,15 +7,15 @@ var Config = require("./Config.js");
 /**
  * Callback signature for {@link PlatformIface.generate}
  * @param {String} errormsg null on success, otherwise error message.
- * @memberOf PlatformIface
  * @inner
+ * @memberOf PlatformIface
  */
 function platformIfaceOperationCb(result) {}
 
 /**
  * Interface for platform implementations.
  * @constructor
- * @param {Object} application global {@link Application} instance
+ * @param {Application} application application instance
  * @protected
  */
 function PlatformIface(application) {}
@@ -23,7 +23,7 @@ function PlatformIface(application) {}
 /**
  * Generate platform project template.
  * @param {String} packageId Package name in com.example.Foo format.
- * @param {Function} callback see {@link PlatformIface~platformIfaceOperationCb}.
+ * @param {PlatformIface~platformIfaceOperationCb} callback callback function
  */
 PlatformIface.prototype.generate =
 function(packageId, callback) {
@@ -53,7 +53,7 @@ function() {
  * Build application package.
  * @param {String[]} abi Array of ABIs, supported armeabi-v7a, x86.
  * @param {Boolean} release Whether to build debug or release package.
- * @param {Function} callback see {@link PlatformIface~platformIfaceOperationCb}.
+ * @param {PlatformIface~platformIfaceOperationCb} callback callback function
  */
 PlatformIface.prototype.build =
 function(abis, release, callback) {

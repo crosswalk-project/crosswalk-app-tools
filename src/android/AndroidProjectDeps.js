@@ -25,12 +25,21 @@ var CHANNELS = ["beta", "canary", "stable"];
  */
 function fetchVersionsFinishedCb(versions, errormsg) {}
 
+/**
+ * Callback signature for {@link AndroidProjectDeps.download}
+ * @param {String} path Path to downloaded file, or null on error
+ * @param {String} errormsg null if success, otherwise error message.
+ * @inner
+ * @memberOf AndroidProjectDeps
+ */
+function downloadFinishedCb(path, errormsg) {}
+
 
 
 /**
  * Android project dependencies download and lookup.
  * @constructor
- * @param {Object} application global {@link Application} instance
+ * @param {Application} application application instance
  * @param {String} channel Crosswalk channel beta/canary/stable
  */
 function AndroidProjectDeps(application, channel) {
@@ -46,7 +55,7 @@ function AndroidProjectDeps(application, channel) {
 
 /**
  * Fetch available Crosswalk versions index.
- * @param {Function} callback see {@link AndroidProjectDeps~fetchVersionsFinishedCb}
+ * @param {AndroidProjectDeps~fetchVersionsFinishedCb} callback callback function
  */
 AndroidProjectDeps.prototype.fetchVersions =
 function(callback) {
@@ -118,7 +127,7 @@ function(version) {
  * Download crosswalk zip.
  * @param {String} version Crosswalk version string
  * @param {String} dir Directory to download to
- * @param {Function} callback Callback function.
+ * @param {AndroidProjectDeps~downloadFinishedCb} callback callback function.
  */
 AndroidProjectDeps.prototype.download =
 function(version, dir, callback) {

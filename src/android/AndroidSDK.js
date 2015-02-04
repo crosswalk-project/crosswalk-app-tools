@@ -40,7 +40,7 @@ function buildProjectCb(success) {}
 /**
  * Create AndroidSDK object, wrapping Android cmd-line tool interactions.
  * @constructor
- * @param {Object} application global {@link Application} instance
+ * @param {Application} application application instance
  * @throws {AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
  */
 function AndroidSDK(application) {
@@ -57,7 +57,7 @@ function AndroidSDK(application) {
 /**
  * Query for lowest API target that supports apiLevel.
  * @param {Number} apiLevel Minimum supported API level.
- * @param {Function} callback see {@link AndroidSDK~queryTargetCb}
+ * @param {AndroidSDK~queryTargetCb} callback callback function
  * @returns null
  */
 AndroidSDK.prototype.queryTarget =
@@ -93,8 +93,7 @@ function(apiLevel, callback) {
  * Create project template by running "android create project ..."
  * @param {String} packageId Package name in the com.example.Foo format.
  * @param {String} apiTarget Android API target android-xy as per "android list targets".
- * @param {Function} callback see {@link AndroidSDK~generateProjectSkeletonCb}
- * @returns null
+ * @param {AndroidSDK~generateProjectSkeletonCb} callback callback function
  */
 AndroidSDK.prototype.generateProjectSkeleton =
 function(packageId, apiTarget, callback) {
@@ -148,7 +147,7 @@ function() {
 /**
  * Build project by running "ant debug" or "ant release"
  * @param {Boolean} release Whether to build a release or debug package.
- * @param {Function} callback see {@link AndroidSDK~buildProjectCb}
+ * @param {AndroidSDK~buildProjectCb} callback callback function
  * @returns null
  */
 AndroidSDK.prototype.buildProject =

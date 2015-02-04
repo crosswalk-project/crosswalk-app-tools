@@ -17,7 +17,7 @@ function PlatformsManager(application) {
 
 /**
  * Load default backend
- * @returns {Function} Constructor for {@link PlatformIface} subclass or null.
+ * @returns {PlatformIface} Constructor for {@link PlatformIface} subclass or null.
  */
 PlatformsManager.prototype.loadDefault =
 function() {

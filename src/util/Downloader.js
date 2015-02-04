@@ -52,7 +52,7 @@ function Downloader(url, toPath) {
 
 /**
  * Download file.
- * @param {Function} callback see {@link Downloader~downloadFinishedCb}
+ * @param {Downloader~downloadFinishedCb} callback callback function
  */
 Downloader.prototype.get =
 function(callback) {
