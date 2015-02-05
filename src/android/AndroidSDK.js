@@ -11,27 +11,27 @@ var AndroidTargets = require("./AndroidTargets");
 
 
 /**
- * Callback signature for {@link AndroidSDK.queryTarget}
- * @param {String} apiTarget SDK API target identifier or null.
- * @param {String} errmsg Error message or null.
+ * Callback signature for {@link AndroidSDK.queryTarget}.
+ * @param {String} apiTarget SDK API target identifier or null
+ * @param {String} errmsg Error message or null
  * @inner
  * @memberOf AndroidSDK
  */
 function queryTargetCb(apiTarget, errmsg) {}
 
 /**
- * Callback signature for {@link AndroidSDK.generateProjectSkeleton}
- * @param {String} path Path of project template or null.
- * @param {String} logmsg Log message or null.
- * @param {String} errmsg Error message or null.
+ * Callback signature for {@link AndroidSDK.generateProjectSkeleton}.
+ * @param {String} path Path of project template or null
+ * @param {String} logmsg Log message or null
+ * @param {String} errmsg Error message or null
  * @inner
  * @memberOf AndroidSDK
  */
 function generateProjectSkeletonCb(path, logmsg, errmsg) {}
 
 /**
- * Callback signature for {@link AndroidSDK.buildProject}
- * @param {Boolean} success Whether build succeeded.
+ * Callback signature for {@link AndroidSDK.buildProject}.
+ * @param {Boolean} success Whether build succeeded
  * @inner
  * @memberOf AndroidSDK
  */
@@ -56,9 +56,8 @@ function AndroidSDK(application) {
 
 /**
  * Query for lowest API target that supports apiLevel.
- * @param {Number} apiLevel Minimum supported API level.
+ * @param {Number} apiLevel Minimum supported API level
  * @param {AndroidSDK~queryTargetCb} callback callback function
- * @returns null
  */
 AndroidSDK.prototype.queryTarget =
 function(apiLevel, callback) {
@@ -90,9 +89,9 @@ function(apiLevel, callback) {
 };
 
 /**
- * Create project template by running "android create project ..."
- * @param {String} packageId Package name in the com.example.Foo format.
- * @param {String} apiTarget Android API target android-xy as per "android list targets".
+ * Create project template by running "android create project".
+ * @param {String} packageId Package name in the com.example.Foo format
+ * @param {String} apiTarget Android API target android-xy as per "android list targets"
  * @param {AndroidSDK~generateProjectSkeletonCb} callback callback function
  */
 AndroidSDK.prototype.generateProjectSkeleton =
@@ -145,10 +144,9 @@ function() {
 };
 
 /**
- * Build project by running "ant debug" or "ant release"
- * @param {Boolean} release Whether to build a release or debug package.
+ * Build project by running "ant debug" or "ant release".
+ * @param {Boolean} release Whether to build a release or debug package
  * @param {AndroidSDK~buildProjectCb} callback callback function
- * @returns null
  */
 AndroidSDK.prototype.buildProject =
 function(release, callback) {
@@ -201,7 +199,7 @@ function() {
  * Creates a new SDKNotFoundError.
  * @extends Error
  * @constructor
- * @param {String} message Error message.
+ * @param {String} message Error message
  * @inner
  * @memberOf AndroidSDK
  */

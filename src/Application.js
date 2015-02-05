@@ -13,9 +13,7 @@ function Application() {
 
 /**
  * Get singleton {@link Config} object.
- * @function getConfig
- * @returns {@link Config} object
- * @memberOf Application
+ * @returns {Config} Config object.
  */
 Application.prototype.getConfig =
 function() {
@@ -25,9 +23,7 @@ function() {
 
 /**
  * Get singleton {@link OutputIface} object.
- * @function getOutput
- * @returns {@link OutputIface} object
- * @memberOf Application
+ * @returns {OutputIface} Output object.
  */
 Application.prototype.getOutput =
 function() {

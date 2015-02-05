@@ -26,9 +26,9 @@ var CHANNELS = ["beta", "canary", "stable"];
 function fetchVersionsFinishedCb(versions, errormsg) {}
 
 /**
- * Callback signature for {@link AndroidProjectDeps.download}
+ * Callback signature for {@link AndroidProjectDeps.download}.
  * @param {String} path Path to downloaded file, or null on error
- * @param {String} errormsg null if success, otherwise error message.
+ * @param {String} errormsg null if success, otherwise error message
  * @inner
  * @memberOf AndroidProjectDeps
  */
@@ -106,7 +106,7 @@ function(callback) {
 /**
  * Locate Crosswalk distribution zip.
  * @param {String} version Crosswalk version to look for
- * @returns {String} Relative path to zip file
+ * @returns {String} Relative path to zip file.
  */
 AndroidProjectDeps.prototype.findLocally =
 function(version) {
@@ -127,7 +127,7 @@ function(version) {
  * Download crosswalk zip.
  * @param {String} version Crosswalk version string
  * @param {String} dir Directory to download to
- * @param {AndroidProjectDeps~downloadFinishedCb} callback callback function.
+ * @param {AndroidProjectDeps~downloadFinishedCb} callback callback function
  */
 AndroidProjectDeps.prototype.download =
 function(version, dir, callback) {
@@ -169,7 +169,7 @@ function(version, dir, callback) {
  * Creates a new InvalidChannelError.
  * @extends Error
  * @constructor
- * @param {String} message Error message.
+ * @param {String} message Error message
  * @inner
  * @memberOf AndroidProjectDeps
  */

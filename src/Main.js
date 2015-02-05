@@ -9,7 +9,7 @@ var CommandParser = require("./CommandParser");
 var PlatformsManager = require("./PlatformsManager");
 
 /**
- * Callback signature for toplevel operations
+ * Callback signature for toplevel operations.
  * @param {Boolean} success true on operation completion, otherwise false
  * @inner
  * @memberOf Main
@@ -17,7 +17,7 @@ var PlatformsManager = require("./PlatformsManager");
 function mainOperationCb(success) {}
 
 /**
- * Main class
+ * Main class.
  *
  * For automated testing, every method of this class must be usable standlone,
  * that is without depending on prior invocation of any other method. This
@@ -79,7 +79,7 @@ function() {
 /**
  * Create skeleton project.
  * @param {String} packageId Identifier in the form of com.example.foo
- * @param {Main~mainOperationCb} [callback] callback function
+ * @param {Main~mainOperationCb} [callback] Callback function
  * @static
  */
 Main.prototype.create =
@@ -112,8 +112,8 @@ function(packageId, callback) {
 
 /**
  * Build application package.
- * @param {String} type "debug" or "release".
- * @param {Main~mainOperationCb} [callback] callback function
+ * @param {String} type Build "debug" or "release" configuration
+ * @param {Main~mainOperationCb} [callback] Callback function
  * @static
  */
 Main.prototype.build =
@@ -158,7 +158,7 @@ function(type, callback) {
 
 /**
  * Display usage information.
- * @param {CommandParser} parser.
+ * @param {CommandParser} parser Parser instance
  * @static
  */
 Main.prototype.printHelp =

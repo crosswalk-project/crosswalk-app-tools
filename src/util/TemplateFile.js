@@ -8,8 +8,8 @@ var Mustache = require("mustache");
 /**
  * Class to handle reading and writing template files.
  * @constructor
- * @param {String} path Path to template file.
- * @throws {Error} When file could not be read.
+ * @param {String} path Path to template file
+ * @throws {Error} If file could not be read.
  */
 function TemplateFile(path) {
 
@@ -21,9 +21,9 @@ function TemplateFile(path) {
 
 /**
  * Render template file to output file.
- * @param {Object} data Data according to Mustache docs.
- * @param {String} path Path to output file.
- * @returns {Error} when failed, null on success.
+ * @param {Object} data Data according to Mustache docs
+ * @param {String} path Path to output file
+ * @returns {Error} Error object when failed, null on success.
  */
 TemplateFile.prototype.render =
 function(data, path) {

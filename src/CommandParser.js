@@ -6,8 +6,8 @@
  * Parsing and validation of command-line arguments.
  * @constructor
  * @param {OutputIface} output Output implementation
- * @param {String[]} argv Command-line arguments.
- * @throws {TypeError} When argv is not an array.
+ * @param {String[]} argv Command-line arguments
+ * @throws {TypeError} If argv is not an array.
  */
 function CommandParser(output, argv) {
 

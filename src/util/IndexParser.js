@@ -8,7 +8,7 @@
  * Create an IndexParser object.
  * This is used to determine available versions from the Crosswalk download page.
  * @constructor
- * @param {String} data Index page data.
+ * @param {String} data Index page data
  */
 function IndexParser(data) {
 

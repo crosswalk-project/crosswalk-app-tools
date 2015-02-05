@@ -3,8 +3,8 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 /**
- * Callback signature for {@link PlatformIface.generate}
- * @param {String} errormsg null on success, otherwise error message.
+ * Callback signature for {@link PlatformIface.generate}.
+ * @param {String} errormsg null on success, otherwise error message
  * @inner
  * @memberOf PlatformIface
  */
@@ -20,7 +20,7 @@ function PlatformIface(application) {}
 
 /**
  * Generate platform project template.
- * @param {String} packageId Package name in com.example.Foo format.
+ * @param {String} packageId Package name in com.example.Foo format
  * @param {PlatformIface~platformIfaceOperationCb} callback callback function
  */
 PlatformIface.prototype.generate =
@@ -49,9 +49,9 @@ function() {
 
 /**
  * Build application package.
- * @param {String[]} abi Array of ABIs, supported armeabi-v7a, x86.
- * @param {Boolean} release Whether to build debug or release package.
- * @param {PlatformIface~platformIfaceOperationCb} callback callback function
+ * @param {String[]} abi Array of ABIs, supported armeabi-v7a, x86
+ * @param {Boolean} release Whether to build debug or release package
+ * @param {PlatformIface~platformIfaceOperationCb} callback Callback function.
  */
 PlatformIface.prototype.build =
 function(abis, release, callback) {

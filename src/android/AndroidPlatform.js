@@ -29,10 +29,10 @@ AndroidPlatform.prototype = PlatformIface;
 
 /**
  * Fill template files and put them into the project skeleton.
- * @param {String} packageId Qualified package name.
- * @param {String} apiTarget Android API target (greater android-14).
- * @param {String} projectPath Path to root dir of project.
- * @returns {Boolean} true on success.
+ * @param {String} packageId Qualified package name
+ * @param {String} apiTarget Android API target (greater android-14)
+ * @param {String} projectPath Path to root dir of project
+ * @returns {Boolean} True on success.
  */
 AndroidPlatform.prototype.fillTemplates =
 function(packageId, apiTarget, projectPath) {
@@ -88,9 +88,9 @@ function(packageId, apiTarget, projectPath) {
 
 /**
  * Import Crosswalk libraries and auxiliary files into the project.
- * @param {String} crosswalkPath Location of unpacked Crosswalk distribution.
- * @param {String} projectPath Location of project to import Crosswalk into.
- * @returns {Boolean} true on success or false.
+ * @param {String} crosswalkPath Location of unpacked Crosswalk distribution
+ * @param {String} projectPath Location of project to import Crosswalk into
+ * @returns {Boolean} True on success or false.
  */
 AndroidPlatform.prototype.importCrosswalkFromDir =
 function(crosswalkPath, projectPath) {
@@ -115,9 +115,9 @@ function(crosswalkPath, projectPath) {
 
 /**
  * Import Crosswalk libraries and auxiliary files into the project.
- * @param {String} crosswalkPath Location of unpacked Crosswalk distribution.
- * @param {String} projectPath Location of project to import Crosswalk into.
- * @returns {Boolean} true on success or false.
+ * @param {String} crosswalkPath Location of unpacked Crosswalk distribution
+ * @param {String} projectPath Location of project to import Crosswalk into
+ * @returns {Boolean} True on success or false.
  */
 AndroidPlatform.prototype.importCrosswalkFromZip =
 function(crosswalkPath, projectPath) {
@@ -219,10 +219,10 @@ function(crosswalkPath, projectPath) {
 
 /**
  * Turn a freshly created empty Android project into a Crosswalk project.
- * @param {String} packageId Qualified package name.
- * @param {String} apiTarget Android API target (greater android-14).
- * @param {String} projectPath Path to root dir of project.
- * @returns {Boolean} true on success.
+ * @param {String} packageId Qualified package name
+ * @param {String} apiTarget Android API target (greater android-14)
+ * @param {String} projectPath Path to root dir of project
+ * @returns {Boolean} True on success.
  */
 AndroidPlatform.prototype.fillSkeletonProject =
 function(packageId, apiTarget, projectPath, callback) {
@@ -341,8 +341,8 @@ function() {
 /**
  * Enable ABIs so they are built into the APK.
  * @param {String} [abi] ABI identifier "armeabi-v7a" / "x86". When not passed,
- *                       all ABIs are enabled.
- * @returns {Boolean} true on success or false.
+ *                       all ABIs are enabled
+ * @returns {Boolean} True on success or false.
  */
 AndroidPlatform.prototype.enableABI =
 function(abi) {
@@ -389,8 +389,8 @@ function(abi) {
  * so when building multiple ABIs one after another, the subsequent APKs
  * do not overwrite the previously built ones.
  * @param {String} abi ABI name
- * @param {Boolean} release Whether we're building release or debug packages.
- * @returns {String} Filename on success, or null.
+ * @param {Boolean} release Whether we're building release or debug packages
+ * @returns {String} Filename on success, otherwise null.
  */
 AndroidPlatform.prototype.abifyAPKName =
 function(abi, release) {
@@ -432,7 +432,7 @@ function(abi, release) {
 /**
  * Build APK for one ABI. This method is calling itself recursively, until
  * all ABIs are built.
- * @param {Object} closure Information to pass between ABI build runs.
+ * @param {Object} Closure Information to pass between ABI build runs
  */
 AndroidPlatform.prototype.buildABI =
 function(closure) {

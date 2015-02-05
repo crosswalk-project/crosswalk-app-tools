@@ -3,9 +3,9 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 /**
- * Class that manages platform backends
+ * Class that manages platform backends.
  * @constructor
- * @param {Application} application instance
+ * @param {Application} Application instance
  * @private
  */
 function PlatformsManager(application) {
@@ -14,8 +14,8 @@ function PlatformsManager(application) {
 }
 
 /**
- * Load default backend
- * @returns {PlatformIface} Constructor for {@link PlatformIface} subclass or null.
+ * Load default backend.
+ * @returns {PlatformIface} Constructor for {@link PlatformIface} subclass or null if failed
  */
 PlatformsManager.prototype.loadDefault =
 function() {

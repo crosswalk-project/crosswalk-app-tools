@@ -8,7 +8,7 @@
  * The AndroidTargets object wraps targets enumeration and selection.
  * @constructor
  * @param {String} buffer Output from "android list targets" for evaluation.
- * @throws {TypeError} When buffer is not a string.
+ * @throws {TypeError} If buffer is not a string.
  */
 function AndroidTargets(buffer) {
 
@@ -21,8 +21,8 @@ function AndroidTargets(buffer) {
 
 /**
  * Parse SDK targets buffer passed to the constructor.
- * @param {Boolean} [onlyABI] Optionally only return targets with ABI installed when true.
- * @returns Targets object in the form of \{ target : ABIs \}.
+ * @param {Boolean} [onlyABI] Optionally only return targets with ABI installed when true
+ * @returns {Object} Targets object in the form of \{ target : ABIs \}.
  */
 AndroidTargets.prototype.parse =
 function(onlyABI) {
@@ -72,7 +72,7 @@ function(onlyABI) {
 
 /**
  * Pick preferred target for creation of new projects.
- * @returns Target identifier string or null if no ABIs are installed.
+ * @returns {String} Target identifier string or null if no ABIs are installed.
  */
 AndroidTargets.prototype.pick =
 function() {
@@ -126,8 +126,8 @@ function() {
 
 /**
  * Pick lowest target above minAPILevel.
- * @param {Number} minAPILevel lowest permitted target API level.
- * @returns Target identifier string or null if no matching target found.
+ * @param {Number} minAPILevel Lowest permitted target API level
+ * @returns {String} Target identifier string or null if no matching target found.
  */
 AndroidTargets.prototype.pickLowest =
 function(minAPILevel) {

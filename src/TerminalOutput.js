@@ -9,7 +9,7 @@ var OutputIface = require("./OutputIface");
 var _config = require("./Config").getInstance();
 
 /**
- * Creates a logging output.
+ * Creates an output writing to stdout/stderr.
  * @extends OutputIface
  * @constructor
  * @private
@@ -64,8 +64,8 @@ function(message, stderr) {
 
 /**
  * Create progress indicator.
- * @param {String} [label] descriptive label
- * @returns {@link FiniteProgress}
+ * @param {String} [label] Descriptive label
+ * @returns {FiniteProgress} Progress object.
  */
 TerminalOutput.prototype.createFiniteProgress =
 function(label) {
@@ -79,8 +79,8 @@ function(label) {
 
 /**
  * Create progress indicator.
- * @param {String} [label] descriptive label
- * @returns {@link InfiniteProgress}
+ * @param {String} [label] Descriptive label
+ * @returns {InfiniteProgress} Progress object.
  */
 TerminalOutput.prototype.createInfiniteProgress =
 function(label) {
@@ -95,7 +95,7 @@ function(label) {
 /**
  * Retrieve singleton instance.
  * @function getInstance
- * @returns {TerminalOutput} singleton instance
+ * @returns {TerminalOutput} Singleton instance.
  * @memberOf TerminalOutput
  */
 function getInstance() {

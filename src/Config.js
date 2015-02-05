@@ -5,7 +5,7 @@
 var ShellJS = require('shelljs');
 
 /**
- * Construct a Config object.
+ * Construct a {Config} object.
  * @constructor
  * @private
  */
@@ -32,7 +32,7 @@ function() {
 
 /**
  * Whether to log or suppress output.
- * @param {Boolean} silent
+ * @param {Boolean} silent Do not print output
  */
 Config.prototype.setSilentConsole =
 function(silent) {
@@ -43,7 +43,7 @@ function(silent) {
 /**
  * Retrieve singleton instance.
  * @function getInstance
- * @returns {Config} singleton instance
+ * @returns {Config} Singleton instance.
  * @memberOf Config
  */
 function getInstance() {
