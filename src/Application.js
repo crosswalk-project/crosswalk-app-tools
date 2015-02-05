@@ -2,7 +2,6 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
-var Config = require("./Config.js");
 var TerminalOutput = require("./TerminalOutput.js");
 
 /**
@@ -23,7 +22,7 @@ function Application() {
 Application.prototype.getConfig =
 function() {
 
-    return Config;
+    return require("./Config").getInstance();
 };
 
 /**

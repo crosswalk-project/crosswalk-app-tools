@@ -9,8 +9,8 @@ var Console = require("../src/Main").getOutput();
 var CommandParser = require("../src/CommandParser");
 
 // Run tests silently to avoid spew from tests failing on purpose.
+require("../src/Config").getInstance().setSilentConsole(true);
 var _application = require("../src/Main");
-_application.getConfig().setSilentConsole(true);
 
 exports.tests = {
 

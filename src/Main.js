@@ -6,7 +6,6 @@ var ShellJS = require("shelljs");
 
 var Application = require('./Application');
 var CommandParser = require("./CommandParser");
-var Config = require("./Config");
 var PlatformsManager = require("./PlatformsManager");
 
 // TODO

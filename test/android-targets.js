@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 // Run tests silently to avoid spew from tests failing on purpose.
-require("../src/Main").getConfig().setSilentConsole(true);
+require("../src/Config").getInstance().setSilentConsole(false);
 var AndroidTargets = require("../src/android/AndroidTargets");
 
 var _androidTargets = "" +

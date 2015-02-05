@@ -11,15 +11,18 @@ var ShellJS = require('shelljs');
  */
 function Config() {
 
-    this._silentConsole = false;
-    ShellJS.config.silent = true;
+    if (!Config._instance) {
+        Config._instance = this;
+        this._silentConsole = false;
+        ShellJS.config.silent = true;
+    }
+
+    return Config._instance;
 }
 
 /**
  * Whether to log or suppress output.
- * @function getSilentConsole
  * @returns {Boolean} Whether output is suppressed
- * @memberOf Config
  */
 Config.prototype.getSilentConsole =
 function() {
@@ -29,9 +32,7 @@ function() {
 
 /**
  * Whether to log or suppress output.
- * @function setSilentConsole
  * @param {Boolean} silent
- * @memberOf Config
  */
 Config.prototype.setSilentConsole =
 function(silent) {
@@ -39,4 +40,17 @@ function(silent) {
     this._silentConsole = silent;
 };
 
-module.exports = new Config();
+/**
+ * Retrieve singleton instance.
+ * @function getInstance
+ * @returns {Config} singleton instance
+ * @memberOf Config
+ */
+function getInstance() {
+
+    return new Config();
+}
+
+module.exports = {
+    getInstance: getInstance
+};

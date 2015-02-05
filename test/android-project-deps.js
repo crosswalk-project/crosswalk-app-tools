@@ -8,8 +8,8 @@ var Console = require("../src/Main").getOutput();
 var AndroidProjectDeps = require("../src/android/AndroidProjectDeps");
 
 // Test involves progress output, make it visible.
+require("../src/Config").getInstance().setSilentConsole(false);
 var _application = require("../src/Main");
-_application.getConfig().setSilentConsole(false);
 
 exports.tests = {
 

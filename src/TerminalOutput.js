@@ -2,10 +2,11 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
-var Config = require("./Config");
 var FiniteProgress = require("./FiniteProgress");
 var InfiniteProgress = require("./InfiniteProgress");
 var OutputIface = require("./OutputIface");
+
+var _config = require("./Config").getInstance();
 
 /**
  * Creates a logging output.
@@ -19,21 +20,21 @@ TerminalOutput.prototype = OutputIface.prototype;
 TerminalOutput.prototype.error =
 function(message) {
 
-    if (!Config.getSilentConsole())
+    if (!_config.getSilentConsole())
         console.error("ERROR: " + message);
 };
 
 TerminalOutput.prototype.log =
 function(message) {
 
-    if (!Config.getSilentConsole())
+    if (!_config.getSilentConsole())
         console.log(message);
 };
 
 TerminalOutput.prototype.highlight =
 function(message) {
 
-    if (!Config.getSilentConsole())
+    if (!_config.getSilentConsole())
         console.log('\033[1m' + message + '\033[0m');
 };
 
@@ -44,7 +45,7 @@ function(message, stderr) {
     if (typeof stderr === "undefined")
         stderr = false;
 
-    if (!Config.getSilentConsole()) {
+    if (!_config.getSilentConsole()) {
         if (stderr) {
             process.stderr.write(message);
         } else {
