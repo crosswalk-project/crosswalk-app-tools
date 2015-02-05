@@ -12,8 +12,16 @@ var _config = require("./Config").getInstance();
  * Creates a logging output.
  * @extends OutputIface
  * @constructor
+ * @private
  */
-function TerminalOutput() {}
+function TerminalOutput() {
+
+    if (!TerminalOutput._instance) {
+        TerminalOutput._instance = this;
+    }
+
+    return TerminalOutput._instance;
+}
 
 TerminalOutput.prototype = OutputIface.prototype;
 
@@ -84,4 +92,17 @@ function(label) {
     return indicator;
 };
 
-module.exports = new TerminalOutput();
+/**
+ * Retrieve singleton instance.
+ * @function getInstance
+ * @returns {TerminalOutput} singleton instance
+ * @memberOf TerminalOutput
+ */
+function getInstance() {
+
+    return new TerminalOutput();
+}
+
+module.exports = {
+    getInstance: getInstance
+};

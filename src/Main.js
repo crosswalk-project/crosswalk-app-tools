@@ -8,11 +8,6 @@ var Application = require('./Application');
 var CommandParser = require("./CommandParser");
 var PlatformsManager = require("./PlatformsManager");
 
-// TODO
-var Output = require("./TerminalOutput");
-
-
-
 /**
  * Callback signature for toplevel operations
  * @param {Boolean} success true on operation completion, otherwise false
@@ -20,8 +15,6 @@ var Output = require("./TerminalOutput");
  * @memberOf Main
  */
 function mainOperationCb(success) {}
-
-
 
 /**
  * Main class
@@ -61,10 +54,11 @@ function workingDirectoryIsProject() {
 Main.prototype.instantiateProject =
 function() {
 
+    var output = this.getOutput();
     var mgr = new PlatformsManager(this);
     var Platform = mgr.loadDefault();
     if (!Platform) {
-        Output.error("Failed to load platform backend");
+        output.error("Failed to load platform backend");
         return null;
     }
 
@@ -73,7 +67,7 @@ function() {
     try {
         platform = new Platform(this);
     } catch (e) {
-        Output.error("The Android SDK could not be found. " +
+        output.error("The Android SDK could not be found. " +
                       "Make sure the directory containing the 'android' " +
                       "executable is mentioned in the PATH environment variable.");
         return null;
@@ -91,6 +85,8 @@ function() {
 Main.prototype.create =
 function(packageId, callback) {
 
+    var output = this.getOutput();
+
     // Handle callback not passed.
     if (!callback)
         callback = function() {};
@@ -104,7 +100,7 @@ function(packageId, callback) {
     project.generate(packageId, function(errormsg) {
 
         if (errormsg) {
-            Output.error(errormsg);
+            output.error(errormsg);
             callback(false);
             return;
         } else {
@@ -123,6 +119,8 @@ function(packageId, callback) {
 Main.prototype.build =
 function(type, callback) {
 
+    var output = this.getOutput();
+
     // Handle callback not passed.
     if (!callback)
         callback = function() {};
@@ -130,7 +128,7 @@ function(type, callback) {
     // Check we're inside a project
     /* TODO move this inside the AndroidProject
     if (!workingDirectoryIsProject()) {
-        Output.error("This does not appear to be a Crosswalk project.");
+        output.error("This does not appear to be a Crosswalk project.");
         callback(false);
         return;
     }
@@ -148,7 +146,7 @@ function(type, callback) {
     project.build(abis, release, function(errormsg) {
 
         if (errormsg) {
-            Output.error(errormsg);
+            output.error(errormsg);
             callback(false);
             return;
         } else {
@@ -190,7 +188,7 @@ function() {
 Main.prototype.run =
 function() {
 
-    var parser = new CommandParser(process.argv);
+    var parser = new CommandParser(this.getOutput(), process.argv);
     var cmd = parser.getCommand();
     if (cmd) {
 

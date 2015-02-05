@@ -7,40 +7,40 @@
 // This is a quick and dirty script for running nodeunit
 // tests standalone.
 
-var Config = require("../src/Config");
-var Output = require("../src/TerminalOutput");
+var _config = require("../src/Config").getInstance();
+var _output = require("../src/TerminalOutput").getInstance();
 
 function Driver() {}
 
 Driver.prototype.expect = function(asserts) {
 
-    Output.log("  Expect " + asserts);
+    _output.log("  Expect " + asserts);
 };
 
 Driver.prototype.equal = function(exp1, exp2) {
 
-    Output.log("  Equal " + exp1 + " == " + exp2);
+    _output.log("  Equal " + exp1 + " == " + exp2);
 };
 
 Driver.prototype.done = function() {
 
-    Output.log("Done.\n");
+    _output.log("Done.\n");
 };
 
 
 
 if (process.argv.length <= 2) {
 
-    Output.log("Usage: run.js <script>");
+    _output.log("Usage: run.js <script>");
 
 } else {
 
     var script = process.argv[2];
-    Output.log("Running " + script);
+    _output.log("Running " + script);
 
     var test = require(script);
     // Force verbose
-    Config.setSilentConsole(false);
+    _config.setSilentConsole(false);
 
     if (test.tests) {
 
@@ -53,7 +53,7 @@ if (process.argv.length <= 2) {
             if (key == "setUp" || key == "tearDown")
                 continue;
 
-            Output.log("Testing " + key);
+            _output.log("Testing " + key);
             test.tests[key](new Driver());
         }
 

@@ -5,12 +5,12 @@
 var OS = require('os');
 var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
-var Console = require("../src/Main").getOutput();
 var AndroidSDK = require("../src/android/AndroidSDK");
 
 // Run tests silently to avoid spew from tests failing on purpose.
 require("../src/Config").getInstance().setSilentConsole(true);
 var _application = require("../src/Main");
+var _output = _application.getOutput();
 
 exports.tests = {
 
@@ -37,7 +37,7 @@ exports.tests = {
         var sdk = new AndroidSDK(_application);
         sdk.queryTarget(14, function(target, error) {
 
-            Console.log("  " + target);
+            _output.log("  " + target);
             // Oh well this is quite hacky but we have no way of
             // knowing what targets actually are anywhere. So just
             // Demand one to be there, greater API level 14 as per
@@ -55,7 +55,7 @@ exports.tests = {
         var sdk = new AndroidSDK(_application);
         sdk.queryTarget(14, function(target, error) {
 
-            Console.log("  " + target);
+            _output.log("  " + target);
             test.equal(typeof target, "string");
 
             var path = null;
@@ -66,16 +66,16 @@ exports.tests = {
             ShellJS.pushd(OS.tmpdir());
 
             var tmpdir = MkTemp.createDirSync("XXXXXX.crosswalk-app-tools");
-            Console.log("Tempdir: " + tmpdir);
+            _output.log("Tempdir: " + tmpdir);
             ShellJS.pushd(tmpdir);
 
             sdk.generateProjectSkeleton("com.example.Foo", target,
                                         function(path, log, errormsg) {
 
                 if (errormsg) {
-                    Console.error(errormsg);
+                    _output.error(errormsg);
                 } else {
-                    Console.log(log);
+                    _output.log(log);
                     test.equal(true, true);
                     test.done();
                 }

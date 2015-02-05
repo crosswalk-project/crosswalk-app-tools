@@ -2,8 +2,6 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
-var TerminalOutput = require("./TerminalOutput.js");
-
 /**
  * Create Application object.
  * @constructor
@@ -34,7 +32,7 @@ function() {
 Application.prototype.getOutput =
 function() {
 
-    return TerminalOutput;
+    return require("./TerminalOutput").getInstance();
 };
 
 module.exports = Application;

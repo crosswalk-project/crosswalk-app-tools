@@ -2,15 +2,16 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
-var Output = require("./TerminalOutput"); // TODO fix
-
 /**
  * Parsing and validation of command-line arguments.
  * @constructor
+ * @param {OutputIface} output Output implementation
  * @param {String[]} argv Command-line arguments.
  * @throws {TypeError} When argv is not an array.
  */
-function CommandParser(argv) {
+function CommandParser(output, argv) {
+
+    this._output = output;
 
     if (!(argv instanceof Array)) {
         throw new TypeError("CommandParser(argv) must be of type Array.");
@@ -108,22 +109,22 @@ function() {
     var packageId = this._argv[3];
     var match = packageId.match("[A-Za-z0-9_\\.]*");
     if (match[0] != packageId) {
-        Output.error(errormsg);
+        this._output.error(errormsg);
         return null;
     }
 
     // Package name must not start or end with '.'
     if (packageId[0] == '.' || packageId[packageId.length - 1] == '.') {
-        Output.error(errormsg);
-        Output.error("Name must not start or end with '.'");
+        this._output.error(errormsg);
+        this._output.error("Name must not start or end with '.'");
         return null;
     }
 
     // Require 3 or more elements.
     var parts = packageId.split('.');
     if (parts.length < 3) {
-        Output.error(errormsg);
-        Output.error("Name needs to consist of 3+ elements");
+        this._output.error(errormsg);
+        this._output.error("Name needs to consist of 3+ elements");
         return null;
     }
 
@@ -147,13 +148,13 @@ function() {
     var version = this._argv[3];
     var match = version.match("[0-9\\.]*");
     if (match[0] != version) {
-        Output.error(errormsg);
+        this._output.error(errormsg);
         return null;
     }
 
     var parts = version.split('.');
     if (parts.length != 4) {
-        Output.error(errormsg);
+        this._output.error(errormsg);
         return null;
     }
 

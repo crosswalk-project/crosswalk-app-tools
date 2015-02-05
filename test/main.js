@@ -5,12 +5,12 @@
 var OS = require('os');
 var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
-var Console = require("../src/Main").getOutput();
 var CommandParser = require("../src/CommandParser");
 
 // Run tests silently to avoid spew from tests failing on purpose.
 require("../src/Config").getInstance().setSilentConsole(true);
 var _application = require("../src/Main");
+var _output = _application.getOutput();
 
 exports.tests = {
 
@@ -34,7 +34,7 @@ exports.tests = {
         ShellJS.pushd(OS.tmpdir());
 
         var tmpdir = MkTemp.createDirSync("XXXXXX.crosswalk-app-tools");
-        Console.log("Tempdir: " + tmpdir);
+        _output.log("Tempdir: " + tmpdir);
         ShellJS.pushd(tmpdir);
 
         _application.create("com.example.Foo", function(success) {
@@ -58,7 +58,7 @@ exports.tests = {
         ShellJS.pushd(OS.tmpdir());
 
         var tmpdir = MkTemp.createDirSync("XXXXXX.crosswalk-app-tools");
-        Console.log("Tempdir: " + tmpdir);
+        _output.log("Tempdir: " + tmpdir);
         ShellJS.pushd(tmpdir);
 
         // Malformed name, fail.
@@ -83,7 +83,7 @@ exports.tests = {
         ShellJS.pushd(OS.tmpdir());
 
         var tmpdir = MkTemp.createDirSync("XXXXXX.crosswalk-app-tools");
-        Console.log("Tempdir: " + tmpdir);
+        _output.log("Tempdir: " + tmpdir);
         ShellJS.pushd(tmpdir);
 
         _application.create("com.example.Foo", function(success) {
@@ -113,7 +113,7 @@ exports.tests = {
         // Prints to stdout, so just run the code to see if it breaks.
         test.expect(0);
 
-        var parser = new CommandParser(process.argv);
+        var parser = new CommandParser(_application.getOutput(), process.argv);
         _application.printHelp(parser);
 
         test.done();

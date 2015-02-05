@@ -4,7 +4,7 @@
 
 // Test involves progress output, make it visible.
 require("../src/Config").getInstance().setSilentConsole(false);
-var Console = require("../src/Main").getOutput();
+var _output = require("../src/Main").getOutput();
 
 exports.tests = {
 
@@ -13,7 +13,7 @@ exports.tests = {
         test.expect(10);
 
         var progress = 0;
-        var indicator = Console.createFiniteProgress("foo");
+        var indicator = _output.createFiniteProgress("foo");
         var interval = setInterval(callback, 200);
 
         function callback() {

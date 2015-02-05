@@ -6,6 +6,8 @@
 require("../src/Config").getInstance().setSilentConsole(true);
 var CommandParser = require("../src/CommandParser");
 
+var _output = require("../src/Main").getOutput();
+
 exports.tests = {
 
     ctor: function(test) {
@@ -14,13 +16,13 @@ exports.tests = {
 
         // Invalid instantiation without argv, throws TypeError.
         try {
-            var cp1 = new CommandParser();
+            var cp1 = new CommandParser(_output);
         } catch(e) {
             test.equal(e instanceof TypeError, true);
         }
 
         // Valid instantiation.
-        var cp2 = new CommandParser(["foo", "bar", "baz"]);
+        var cp2 = new CommandParser(_output, ["foo", "bar", "baz"]);
         test.equal(cp2 instanceof CommandParser, true);
 
         test.done();
@@ -39,13 +41,13 @@ exports.tests = {
         commands.forEach(function(item) {
 
             argv[2] = item;
-            cp1 = new CommandParser(argv);
+            cp1 = new CommandParser(_output, argv);
             cmd1 = cp1.peekCommand();
             test.equal(cmd1, item);
         });
 
         // Test invalid command "baz" not recognised.
-        var cp2 = new CommandParser(["foo", "bar", "baz"]);
+        var cp2 = new CommandParser(_output, ["foo", "bar", "baz"]);
         var cmd2 = cp2.getCommand();
         test.equal(commands.indexOf(cmd2), -1);
 
@@ -61,7 +63,7 @@ exports.tests = {
 
         // Good test
         var argv1 = ["node", "foo", "create", "com.example.Bar"];
-        var cp1 = new CommandParser(argv1);
+        var cp1 = new CommandParser(_output, argv1);
 
         test.equal(cp1.getCommand(), "create");
 
@@ -73,7 +75,7 @@ exports.tests = {
 
         // Bad test, invalid package name
         var argv2 = ["node", "foo", "create", "com.exam ple.Bar"];
-        var cp2 = new CommandParser(argv2);
+        var cp2 = new CommandParser(_output, argv2);
 
         test.equal(cp2.getCommand(), null);
 
@@ -89,7 +91,7 @@ exports.tests = {
 
         // Good test
         var argv1 = ["node", "foo", "update", "12.34.56.78"];
-        var cp1 = new CommandParser(argv1);
+        var cp1 = new CommandParser(_output, argv1);
 
         test.equal(cp1.getCommand(), "update");
 
@@ -101,7 +103,7 @@ exports.tests = {
 
         // Bad test, invalid version
         var argv2 = ["node", "foo", "update", "12.34.x6.78"];
-        var cp2 = new CommandParser(argv2);
+        var cp2 = new CommandParser(_output, argv2);
 
         test.equal(cp2.getCommand(), null);
 
@@ -117,7 +119,7 @@ exports.tests = {
 
         // Good test, default build "debug"
         var argv1 = ["node", "foo", "build"];
-        var cp1 = new CommandParser(argv1);
+        var cp1 = new CommandParser(_output, argv1);
 
         test.equal(cp1.getCommand(), "build");
 
@@ -129,7 +131,7 @@ exports.tests = {
 
         // Good test, build "debug"
         var argv2 = ["node", "foo", "build", "debug"];
-        var cp2 = new CommandParser(argv2);
+        var cp2 = new CommandParser(_output, argv2);
 
         test.equal(cp2.getCommand(), "build");
 
@@ -141,7 +143,7 @@ exports.tests = {
 
         // Good test, build "release"
         var argv3 = ["node", "foo", "build", "release"];
-        var cp3 = new CommandParser(argv3);
+        var cp3 = new CommandParser(_output, argv3);
 
         test.equal(cp3.getCommand(), "build");
 
@@ -153,7 +155,7 @@ exports.tests = {
 
         // Bad test, unknown type
         var argv4 = ["node", "foo", "build", "foo"];
-        var cp4 = new CommandParser(argv4);
+        var cp4 = new CommandParser(_output, argv4);
 
         test.equal(cp4.getCommand(), null);
 

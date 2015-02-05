@@ -9,8 +9,8 @@ var ShellJS = require("shelljs");
 var TemplateFile = require("../src/util/TemplateFile");
 
 // Run tests silently to avoid spew from tests failing on purpose.
-var Console = require("../src/Main").getOutput();
 require("../src/Config").getInstance().setSilentConsole(true);
+var _output = require("../src/Main").getOutput();
 
 
 exports.tests = {
@@ -23,7 +23,7 @@ exports.tests = {
             var tpl = new TemplateFile(__dirname + "/data/template-file.in");
             test.equal(true, true);
         } catch(e) {
-            Console.error(e.message);
+            _output.error(e.message);
             test.equal(true, false);
         }
 
@@ -41,7 +41,7 @@ exports.tests = {
             ShellJS.pushd(OS.tmpdir());
 
             var tmpfile = MkTemp.createFileSync("XXXXXX.crosswalk-app-tools.template-file.out");
-            Console.log("Tempfile: " + tmpfile);
+            _output.log("Tempfile: " + tmpfile);
 
             tpl.render({bar: "maman"}, tmpfile);
 
@@ -53,7 +53,7 @@ exports.tests = {
             ShellJS.popd();
 
         } catch(e) {
-            Console.error(e.message);
+            _output.error(e.message);
             test.equal(true, false);
         }
 
