@@ -12,7 +12,7 @@ var ShellJS = require("shelljs");
 
 
 /**
- * Callback signature for {@link Downloader.get}
+ * Callback signature for {@link Downloader.get}.
  * @param {String} errormsg Error or null upon success
  * @inner
  * @memberOf Downloader
@@ -138,7 +138,7 @@ function FileCreationFailedError(message) {
 }
 FileCreationFailedError.prototype = Error.prototype;
 
-Downloader.FileCreationFailedError = FileCreationFailedError;
+Downloader.prototype.FileCreationFailedError = FileCreationFailedError;
 
 
 

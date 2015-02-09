@@ -7,7 +7,7 @@
 /**
  * The AndroidTargets object wraps targets enumeration and selection.
  * @constructor
- * @param {String} buffer Output from "android list targets" for evaluation.
+ * @param {String} buffer Output from "android list targets" for evaluation
  * @throws {TypeError} If buffer is not a string.
  */
 function AndroidTargets(buffer) {

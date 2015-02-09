@@ -41,6 +41,7 @@ function downloadFinishedCb(path, errormsg) {}
  * @constructor
  * @param {Application} application application instance
  * @param {String} channel Crosswalk channel beta/canary/stable
+ * @throws {AndroidProjectDeps~InvalidChannelError} If no valid channel was specified.
  */
 function AndroidProjectDeps(application, channel) {
 
@@ -178,7 +179,7 @@ function InvalidChannelError(message) {
 }
 InvalidChannelError.prototype = Error.prototype;
 
-AndroidProjectDeps.InvalidChannelError = InvalidChannelError;
+AndroidProjectDeps.prototype.InvalidChannelError = InvalidChannelError;
 
 
 

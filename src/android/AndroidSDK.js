@@ -37,6 +37,8 @@ function generateProjectSkeletonCb(path, logmsg, errmsg) {}
  */
 function buildProjectCb(success) {}
 
+
+
 /**
  * Create AndroidSDK object, wrapping Android cmd-line tool interactions.
  * @constructor
@@ -208,7 +210,7 @@ function SDKNotFoundError(message) {
 }
 SDKNotFoundError.prototype = Error.prototype;
 
-AndroidSDK.SDKNotFoundError = SDKNotFoundError;
+AndroidSDK.prototype.SDKNotFoundError = SDKNotFoundError;
 
 
 
