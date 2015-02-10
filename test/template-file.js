@@ -41,7 +41,7 @@ exports.tests = {
             ShellJS.pushd(OS.tmpdir());
 
             var tmpfile = MkTemp.createFileSync("XXXXXX.crosswalk-app-tools.template-file.out");
-            _output.log("Tempfile: " + tmpfile);
+            _output.info("Tempfile: " + tmpfile);
 
             tpl.render({bar: "maman"}, tmpfile);
 

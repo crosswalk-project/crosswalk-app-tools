@@ -37,7 +37,7 @@ exports.tests = {
         var sdk = new AndroidSDK(_application);
         sdk.queryTarget(14, function(target, error) {
 
-            _output.log("  " + target);
+            _output.info("  " + target);
             // Oh well this is quite hacky but we have no way of
             // knowing what targets actually are anywhere. So just
             // Demand one to be there, greater API level 14 as per
@@ -55,7 +55,7 @@ exports.tests = {
         var sdk = new AndroidSDK(_application);
         sdk.queryTarget(14, function(target, error) {
 
-            _output.log("  " + target);
+            _output.info("  " + target);
             test.equal(typeof target, "string");
 
             var path = null;
@@ -66,7 +66,7 @@ exports.tests = {
             ShellJS.pushd(OS.tmpdir());
 
             var tmpdir = MkTemp.createDirSync("XXXXXX.crosswalk-app-tools");
-            _output.log("Tempdir: " + tmpdir);
+            _output.info("Tempdir: " + tmpdir);
             ShellJS.pushd(tmpdir);
 
             sdk.generateProjectSkeleton("com.example.Foo", target,
@@ -75,7 +75,7 @@ exports.tests = {
                 if (errormsg) {
                     _output.error(errormsg);
                 } else {
-                    _output.log(log);
+                    _output.info(log);
                     test.equal(true, true);
                     test.done();
                 }

@@ -32,6 +32,20 @@ function(message) {
         console.error("ERROR: " + message);
 };
 
+TerminalOutput.prototype.warning =
+function(message) {
+
+    if (!_config.getSilentConsole())
+        console.error("WARNING: " + message);
+};
+
+TerminalOutput.prototype.info =
+function(message) {
+
+    if (!_config.getSilentConsole())
+        console.log(message);
+};
+
 TerminalOutput.prototype.log =
 function(message) {
 

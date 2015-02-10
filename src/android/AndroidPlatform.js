@@ -147,7 +147,7 @@ function(crosswalkPath, projectPath) {
         output.error("Crosswalk version " + major + " not supported. Use 8+.");
         return false;
     } else if (major > 9) {
-        output.log("*** WARNING: This tool has not been tested with Crosswalk " + major + ".");
+        output.info("*** WARNING: This tool has not been tested with Crosswalk " + major + ".");
     }
 
     indicator.update(0.3);
@@ -251,7 +251,7 @@ function(packageId, apiTarget, projectPath, callback) {
         var version = versions[versions.length - 1];
         var filename = deps.findLocally(version);
         if (filename) {
-            output.log("Using local " + filename);
+            output.info("Using local " + filename);
             var ret = this.importCrosswalkFromZip(filename, projectPath);
             if (!ret) {
                 errormsg = "Failed to extract " + filename;
@@ -314,12 +314,12 @@ function(packageId, callback) {
                                      function(errormsg) {
 
                 if (errormsg) {
-                    output.log(errormsg);
+                    output.info(errormsg);
                     callback("Creating project template failed.");
                     return;
                 }
 
-                output.log("Project template created at '" + path + "'");
+                output.info("Project template created at '" + path + "'");
                 callback(null);
             });
         }.bind(this));

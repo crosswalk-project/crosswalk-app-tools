@@ -21,7 +21,7 @@ exports.tests = {
         deps.fetchVersions(function(versions, errormsg) {
 
             if (errormsg)
-                _output.log(errormsg);
+                _output.info(errormsg);
 
             test.equal(versions instanceof Array, true);
             test.equal(versions.length > 0, true);
@@ -37,7 +37,7 @@ exports.tests = {
         deps.download("9.38.208.10", OS.tmpDir(), function(filename, errormsg) {
 
             if (errormsg)
-                _output.log(errormsg);
+                _output.info(errormsg);
 
             test.equal(typeof filename === "string", true);
             test.equal(filename.length > 0, true);

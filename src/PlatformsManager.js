@@ -37,12 +37,12 @@ function() {
             PlatformImpl = require(implementations[i]);
 
             // If we get here there backend has been instantiated successfully.
-            output.log("Using backend " + implementations[i]);
+            output.info("Using backend " + implementations[i]);
             break;
 
         } catch (e) {
 
-            output.log("Loading backend " + implementations[i] + " failed (" + e + ")");
+            output.info("Loading backend " + implementations[i] + " failed (" + e + ")");
         }
     }
 

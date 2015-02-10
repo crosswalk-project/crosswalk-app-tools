@@ -34,7 +34,7 @@ exports.tests = {
         ShellJS.pushd(OS.tmpdir());
 
         var tmpdir = MkTemp.createDirSync("XXXXXX.crosswalk-app-tools");
-        _output.log("Tempdir: " + tmpdir);
+        _output.info("Tempdir: " + tmpdir);
         ShellJS.pushd(tmpdir);
 
         _application.create("com.example.Foo", function(success) {
@@ -58,7 +58,7 @@ exports.tests = {
         ShellJS.pushd(OS.tmpdir());
 
         var tmpdir = MkTemp.createDirSync("XXXXXX.crosswalk-app-tools");
-        _output.log("Tempdir: " + tmpdir);
+        _output.info("Tempdir: " + tmpdir);
         ShellJS.pushd(tmpdir);
 
         // Malformed name, fail.
@@ -83,7 +83,7 @@ exports.tests = {
         ShellJS.pushd(OS.tmpdir());
 
         var tmpdir = MkTemp.createDirSync("XXXXXX.crosswalk-app-tools");
-        _output.log("Tempdir: " + tmpdir);
+        _output.info("Tempdir: " + tmpdir);
         ShellJS.pushd(tmpdir);
 
         _application.create("com.example.Foo", function(success) {
