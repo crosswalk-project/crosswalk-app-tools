@@ -147,7 +147,7 @@ function(crosswalkPath, projectPath) {
         output.error("Crosswalk version " + major + " not supported. Use 8+.");
         return false;
     } else if (major > 9) {
-        output.info("*** WARNING: This tool has not been tested with Crosswalk " + major + ".");
+        output.warning("This tool has not been tested with Crosswalk " + major + ".");
     }
 
     indicator.update(0.3);
@@ -314,7 +314,7 @@ function(packageId, callback) {
                                      function(errormsg) {
 
                 if (errormsg) {
-                    output.info(errormsg);
+                    output.error(errormsg);
                     callback("Creating project template failed.");
                     return;
                 }

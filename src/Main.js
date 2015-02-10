@@ -197,7 +197,7 @@ function() {
             break;
         case "update":
             var version = parser.updateGetVersion();
-            console.info("TODO implement");
+            this.getOutput.warning("TODO implement");
             break;
         case "build":
             var type = parser.buildGetType();
