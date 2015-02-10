@@ -73,16 +73,5 @@ function(message) {
 };
 
 
-/**
- * Output string without trailing newline.
- * @param {String} message
- * @param {Boolean} [toStderr] Whether to write on stderr.
- *                             Default is stdout if applicable for the implementation
- */
-OutputIface.prototype.put =
-function(message, toStderr) {
-
-    throw new Error("OutputIface.put() not implemented.");
-};
 
 module.exports = OutputIface;

@@ -171,7 +171,7 @@ function(release, callback) {
     }.bind(this));
 
     child.stderr.on("data", function(data) {
-        output.put(data, true);
+        output.warning(data, true);
     });
 
     child.on("exit", function(code, signal) {

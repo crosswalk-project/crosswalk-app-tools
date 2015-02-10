@@ -60,6 +60,12 @@ function(message) {
         console.log('\033[1m' + message + '\033[0m');
 };
 
+/**
+ * Output raw string without adding a newline.
+ * @param {String} message
+ * @param {Boolean} [toStderr] Whether to write on stderr.
+ *                             Default is stdout if applicable for the implementation
+ */
 TerminalOutput.prototype.put =
 function(message, stderr) {
 
