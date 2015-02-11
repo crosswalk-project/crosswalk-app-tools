@@ -9,6 +9,8 @@ var Url = require("url");
 
 var ShellJS = require("shelljs");
 
+var FileCreationFailed = require("./exceptions").FileCreationFailed;
+
 
 
 /**
@@ -26,14 +28,14 @@ function downloadFinishedCb(errormsg) {}
  * @constructor
  * @param {String} url URL to download
  * @param {String} toPath Path do download to
- * @throws {Downloader~FileCreationFailedError} If file toPath could not be opened.
+ * @throws {exceptions.FileCreationFailed} If file toPath could not be opened for writing.
  */
 function Downloader(url, toPath) {
 
     this._url = url;
 
     if (ShellJS.test("-e", toPath)) {
-        throw new FileCreationFailedError("File already exists " + toPath);
+        throw new FileCreationFailed("File already exists " + toPath);
     }
 
     var options = {
@@ -43,7 +45,7 @@ function Downloader(url, toPath) {
     this._fp = FS.createWriteStream(toPath, options);
 
     if (!this._fp) {
-        throw new FileCreationFailedError("Could not open file " + toPath);
+        throw new FileCreationFailed("Could not open file " + toPath);
     }
 
     this._downloaded = 0;
@@ -122,23 +124,6 @@ Downloader.prototype.progress =
 function(progress) {
 
 };
-
-
-
-/**
- * Creates a new FileCreationFailedError.
- * @extends Error
- * @constructor
- * @param {String} message Error message
- * @inner
- * @memberOf Downloader
- */
-function FileCreationFailedError(message) {
-    Error.call(this, message);
-}
-FileCreationFailedError.prototype = Error.prototype;
-
-Downloader.prototype.FileCreationFailedError = FileCreationFailedError;
 
 
 
