@@ -58,7 +58,7 @@ function(message) {
         message = "";
 
     // Also prints \r\n so we're ready for the next output.
-    this._output.log(" " + message);
+    this._output.print(" " + message);
 };
 
 module.exports = FiniteProgress;

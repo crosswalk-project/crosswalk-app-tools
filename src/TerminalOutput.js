@@ -43,14 +43,7 @@ TerminalOutput.prototype.info =
 function(message) {
 
     if (!_config.getSilentConsole())
-        console.log(message);
-};
-
-TerminalOutput.prototype.log =
-function(message) {
-
-    if (!_config.getSilentConsole())
-        console.log(message);
+        console.log("* " + message);
 };
 
 TerminalOutput.prototype.highlight =
@@ -58,6 +51,13 @@ function(message) {
 
     if (!_config.getSilentConsole())
         console.log('\033[1m' + message + '\033[0m');
+};
+
+TerminalOutput.prototype.print =
+function(message) {
+
+    if (!_config.getSilentConsole())
+        console.log(message);
 };
 
 /**

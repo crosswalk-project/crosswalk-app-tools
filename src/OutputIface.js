@@ -35,28 +35,16 @@ function(message) {
 };
 
 /**
- * Log an information message.
- * Printing an info message is the way to inform about progress,
- * such as the completion of a step when creating a project or
- * building packages.
- * @param {String} message
- */
+* Log an information message.
+* Printing an info message is the way to inform about progress,
+* such as the completion of a step when creating a project or
+* building packages.
+* @param {String} message
+*/
 OutputIface.prototype.info =
 function(message) {
 
     throw new Error("OutputIface.info() not implemented.");
-};
-
-/**
- * Log a message.
- * Log messages always go to the logfile of the current operation,
- * and are not printed to the console.
- * @param {String} message
- */
-OutputIface.prototype.log =
-function(message) {
-
-    throw new Error("OutputIface.log() not implemented.");
 };
 
 /**
@@ -70,6 +58,19 @@ OutputIface.prototype.highlight =
 function(message) {
 
     throw new Error("OutputIface.highlight() not implemented.");
+};
+
+/**
+ * Print message.
+ * Printing an info message is the way to inform about progress,
+ * such as the completion of a step when creating a project or
+ * building packages.
+ * @param {String} message
+ */
+OutputIface.prototype.print =
+function(message) {
+
+    throw new Error("OutputIface.print() not implemented.");
 };
 
 

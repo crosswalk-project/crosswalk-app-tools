@@ -43,7 +43,7 @@ function() {
 
         } catch (e) {
 
-            output.info("Loading backend " + implementations[i] + " failed (" + e + ")");
+            output.warning("Loading backend " + implementations[i] + " failed (" + e + ")");
         }
     }
 

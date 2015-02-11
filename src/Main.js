@@ -165,7 +165,7 @@ Main.prototype.printHelp =
 function(parser) {
 
     var buf = parser.help();
-    this.getOutput().info(buf);
+    this.getOutput().print(buf);
 };
 
 /**
@@ -176,7 +176,7 @@ Main.prototype.printVersion =
 function() {
 
     var Package = require("../package.json");
-    this.getOutput().info(Package.version);
+    this.getOutput().print(Package.version);
 };
 
 /**
