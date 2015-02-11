@@ -24,6 +24,7 @@ function() {
 
     var implementations = [
         "crosswalk-app-tools-backend-ios",
+        "crosswalk-app-tools-backend-deb",
         "crosswalk-app-tools-backend-demo",
         "./android/AndroidPlatform"
     ];
