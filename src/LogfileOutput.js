@@ -40,31 +40,40 @@ function LogfileOutput(path) {
 LogfileOutput.prototype.error =
 function(message) {
 
-    FS.appendFileSync(this._path, "ERROR: " + message + "\n");
+    var output = "ERROR: " + message + "\n";
+    FS.appendFileSync(this._path, output);
+    return output;
 };
 
 LogfileOutput.prototype.warning =
 function(message) {
 
-    FS.appendFileSync(this._path, "WARNING: " + message + "\n");
+    var output = "WARNING: " + message + "\n";
+    FS.appendFileSync(this._path, output);
+    return output;    
 };
 
 LogfileOutput.prototype.info =
 function(message) {
 
-    FS.appendFileSync(this._path, "* " + message + "\n");
+    var output = "* " + message + "\n";
+    FS.appendFileSync(this._path, output);
+    return output;
 };
 
 LogfileOutput.prototype.highlight =
 function(message) {
 
+    var output = "*** " + message + "\n";
     FS.appendFileSync(this._path, "*** " + message + "\n");
+    return output;
 };
 
 LogfileOutput.prototype.print =
 function(message) {
 
     FS.appendFileSync(this._path, message);
+    return message;
 };
 
 
