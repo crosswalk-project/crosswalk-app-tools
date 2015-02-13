@@ -52,5 +52,6 @@ function getInstance() {
 }
 
 module.exports = {
+    class: Config,
     getInstance: getInstance
 };

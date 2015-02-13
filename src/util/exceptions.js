@@ -18,8 +18,21 @@ function FileCreationFailed(message) {
 }
 FileCreationFailed.prototype = Error.prototype;
 
+/**
+ * Creates a new IllegalAccessException.
+ * @extends Error
+ * @constructor
+ * @param {String} message Error message
+ * @memberOf exceptions
+ */
+function IllegalAccessException(message) {
+    Error.call(this, message);
+}
+FileCreationFailed.prototype = Error.prototype;
+
 
 
 module.exports = {
-    FileCreationFailed: FileCreationFailed
+    FileCreationFailed: FileCreationFailed,
+    IllegalAccessException: IllegalAccessException
 };
