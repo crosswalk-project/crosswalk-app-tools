@@ -122,7 +122,7 @@ function(crosswalkPath, projectPath) {
 AndroidPlatform.prototype.importCrosswalkFromZip =
 function(crosswalkPath, projectPath) {
 
-    var output = this._application.getOutput();
+    var output = this._application.output;
     var indicator = output.createFiniteProgress("Extracting " + crosswalkPath);
 
     var zip = new AdmZip(crosswalkPath);
@@ -227,7 +227,7 @@ function(crosswalkPath, projectPath) {
 AndroidPlatform.prototype.fillSkeletonProject =
 function(packageId, apiTarget, projectPath, callback) {
 
-    var output = this._application.getOutput();
+    var output = this._application.output;
 
     if (!this.fillTemplates(packageId, apiTarget, projectPath)) {
         callback("Failed to initialise project templates");
@@ -290,7 +290,7 @@ function(packageId, apiTarget, projectPath, callback) {
 AndroidPlatform.prototype.generate =
 function(packageId, callback) {
 
-    var output = this._application.getOutput();
+    var output = this._application.output;
 
     var minApiLevel = 19;
     var apiTarget;
@@ -347,7 +347,7 @@ function() {
 AndroidPlatform.prototype.enableABI =
 function(abi) {
 
-    var output = this._application.getOutput();
+    var output = this._application.output;
 
     if (!ShellJS.test("-d", "xwalk_core_library/libs")) {
         output.error("This does not appear to be the root of a Crosswalk project.");
@@ -395,7 +395,7 @@ function(abi) {
 AndroidPlatform.prototype.abifyAPKName =
 function(abi, release) {
 
-    var output = this._application.getOutput();
+    var output = this._application.output;
 
     var apkInPattern;
     if (release) {
@@ -437,7 +437,7 @@ function(abi, release) {
 AndroidPlatform.prototype.buildABI =
 function(closure) {
 
-    var output = this._application.getOutput();
+    var output = this._application.output;
 
     // If done with all the ABIs, terminate successfully.
     if (closure.abiIndex >= closure.abis.length) {
@@ -522,7 +522,7 @@ function(closure) {
 AndroidPlatform.prototype.build =
 function(abis, release, callback) {
 
-    var output = this._application.getOutput();
+    var output = this._application.output;
 
     var closure = {
         abis: abis,

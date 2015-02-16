@@ -9,7 +9,7 @@ var AndroidProjectDeps = require("../src/android/AndroidProjectDeps");
 // Test involves progress output, make it visible.
 require("../src/Config").getInstance().setSilentConsole(false);
 var _application = require("../src/Main");
-var _output = _application.getOutput();
+var _output = _application.output;
 
 exports.tests = {
 

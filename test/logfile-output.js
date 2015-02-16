@@ -13,7 +13,7 @@ var LogfileOutput = require("../src/LogfileOutput");
 
 // Test involves output, make it visible.
 require("../src/Config").getInstance().setSilentConsole(false);
-var _output = require("../src/Main").getOutput();
+var _output = require("../src/Main").output;
 
 
 

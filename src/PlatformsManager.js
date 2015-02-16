@@ -20,7 +20,7 @@ function PlatformsManager(application) {
 PlatformsManager.prototype.loadDefault =
 function() {
 
-    var output = this._application.getOutput();
+    var output = this._application.output;
 
     var implementations = [
         "crosswalk-app-tools-backend-ios",

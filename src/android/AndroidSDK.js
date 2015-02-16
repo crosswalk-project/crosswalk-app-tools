@@ -99,7 +99,7 @@ function(apiLevel, callback) {
 AndroidSDK.prototype.generateProjectSkeleton =
 function(packageId, apiTarget, callback) {
 
-    var output = this._application.getOutput();
+    var output = this._application.output;
     var errmsg = null;
 
     // Construct path and fail if exists.

@@ -61,7 +61,7 @@ function AndroidProjectDeps(application, channel) {
 AndroidProjectDeps.prototype.fetchVersions =
 function(callback) {
 
-    var output = this._application.getOutput();
+    var output = this._application.output;
     var url = BASE_URL + this._channel + "/";
     // TODO use memory stream instead of tmpfile
     var indexFile = MkTemp.createFileSync('index.html.XXXXXX');
@@ -133,7 +133,7 @@ function(version) {
 AndroidProjectDeps.prototype.download =
 function(version, dir, callback) {
 
-    var output = this._application.getOutput();
+    var output = this._application.output;
     var filename = "crosswalk-" + version + ".zip";
     var url = BASE_URL +
               this._channel + "/" +

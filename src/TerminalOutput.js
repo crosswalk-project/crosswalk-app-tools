@@ -124,5 +124,6 @@ function getInstance() {
 }
 
 module.exports = {
+    class: TerminalOutput,
     getInstance: getInstance
 };

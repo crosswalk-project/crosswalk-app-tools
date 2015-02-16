@@ -73,7 +73,7 @@ function Frontend(application, baseDir, packageId, platformId) {
  */
 Object.defineProperty(Frontend.prototype, "output", {
                       get: function() {
-                                return this._application.getOutput();
+                                return this._application.output;
                            }
                       });
 

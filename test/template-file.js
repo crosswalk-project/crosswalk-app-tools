@@ -10,7 +10,7 @@ var TemplateFile = require("../src/util/TemplateFile");
 
 // Run tests silently to avoid spew from tests failing on purpose.
 require("../src/Config").getInstance().setSilentConsole(true);
-var _output = require("../src/Main").getOutput();
+var _output = require("../src/Main").output;
 
 
 exports.tests = {

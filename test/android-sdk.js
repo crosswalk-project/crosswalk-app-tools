@@ -10,7 +10,7 @@ var AndroidSDK = require("../src/android/AndroidSDK");
 // Run tests silently to avoid spew from tests failing on purpose.
 require("../src/Config").getInstance().setSilentConsole(true);
 var _application = require("../src/Main");
-var _output = _application.getOutput();
+var _output = _application.output;
 
 exports.tests = {
 

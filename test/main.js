@@ -10,7 +10,7 @@ var CommandParser = require("../src/CommandParser");
 // Run tests silently to avoid spew from tests failing on purpose.
 require("../src/Config").getInstance().setSilentConsole(true);
 var _application = require("../src/Main");
-var _output = _application.getOutput();
+var _output = _application.output;
 
 exports.tests = {
 
@@ -113,7 +113,7 @@ exports.tests = {
         // Prints to stdout, so just run the code to see if it breaks.
         test.expect(0);
 
-        var parser = new CommandParser(_application.getOutput(), process.argv);
+        var parser = new CommandParser(_application.output, process.argv);
         _application.printHelp(parser);
 
         test.done();

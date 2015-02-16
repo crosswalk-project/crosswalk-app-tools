@@ -30,13 +30,19 @@ Object.defineProperty(Application.prototype, "config", {
                       });
 
 /**
- * Get singleton {@link OutputIface} object.
- * @returns {OutputIface} Output object.
+ * Read-only {@link TerminalOutput} object.
+ * @member {TerminalOutput} output
+ * @throws {IllegalAccessException} If writing this property is attempted.
+ * @instance
+ * @memberOf Application
  */
-Application.prototype.getOutput =
-function() {
-
-    return require("./TerminalOutput").getInstance();
-};
+Object.defineProperty(Application.prototype, "output", {
+                      get: function() {
+                                return require("./TerminalOutput").getInstance();
+                           },
+                      set: function(output) {
+                                throw new IllegalAccessException("Attempting to write read-only property Application.output");
+                           }
+                      });
 
 module.exports = Application;

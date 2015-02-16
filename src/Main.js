@@ -54,7 +54,7 @@ function workingDirectoryIsProject() {
 Main.prototype.instantiateProject =
 function() {
 
-    var output = this.getOutput();
+    var output = this.output;
     var mgr = new PlatformsManager(this);
     var Platform = mgr.loadDefault();
     if (!Platform) {
@@ -85,7 +85,7 @@ function() {
 Main.prototype.create =
 function(packageId, callback) {
 
-    var output = this.getOutput();
+    var output = this.output;
 
     // Handle callback not passed.
     if (!callback)
@@ -119,7 +119,7 @@ function(packageId, callback) {
 Main.prototype.build =
 function(type, callback) {
 
-    var output = this.getOutput();
+    var output = this.output;
 
     // Handle callback not passed.
     if (!callback)
@@ -165,7 +165,7 @@ Main.prototype.printHelp =
 function(parser) {
 
     var buf = parser.help();
-    this.getOutput().print(buf);
+    this.output.print(buf);
 };
 
 /**
@@ -176,7 +176,7 @@ Main.prototype.printVersion =
 function() {
 
     var Package = require("../package.json");
-    this.getOutput().print(Package.version);
+    this.output.print(Package.version);
 };
 
 /**
@@ -186,7 +186,7 @@ function() {
 Main.prototype.run =
 function() {
 
-    var parser = new CommandParser(this.getOutput(), process.argv);
+    var parser = new CommandParser(this.output, process.argv);
     var cmd = parser.getCommand();
     if (cmd) {
 
@@ -197,7 +197,7 @@ function() {
             break;
         case "update":
             var version = parser.updateGetVersion();
-            this.getOutput.warning("TODO implement");
+            this.output.warning("TODO implement");
             break;
         case "build":
             var type = parser.buildGetType();
