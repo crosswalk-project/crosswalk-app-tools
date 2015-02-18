@@ -28,11 +28,24 @@ FileCreationFailed.prototype = Error.prototype;
 function IllegalAccessException(message) {
     Error.call(this, message);
 }
-FileCreationFailed.prototype = Error.prototype;
+IllegalAccessException.prototype = Error.prototype;
+
+/**
+ * Creates a new InvalidPathException.
+ * @extends Error
+ * @constructor
+ * @param {String} message Error message
+ * @memberOf exceptions
+ */
+function InvalidPathException(message) {
+    Error.call(this, message);
+}
+InvalidPathException.prototype = Error.prototype;
 
 
 
 module.exports = {
     FileCreationFailed: FileCreationFailed,
-    IllegalAccessException: IllegalAccessException
+    IllegalAccessException: IllegalAccessException,
+    InvalidPathException: InvalidPathException
 };
