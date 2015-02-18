@@ -21,10 +21,11 @@ function PlatformIface(application) {}
 /**
  * Generate platform project template.
  * @param {String} packageId Package name in com.example.Foo format
+ * @param {Object} options Extra options for the command
  * @param {PlatformIface~platformIfaceOperationCb} callback callback function
  */
 PlatformIface.prototype.generate =
-function(packageId, callback) {
+function(packageId, options, callback) {
 
     throw new Error("PlatformIface.generate() not implemented.");
 };

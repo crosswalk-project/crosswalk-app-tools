@@ -98,7 +98,7 @@ function(packageId, options, callback) {
         return;
     }
 
-    project.generate(packageId, function(errormsg) {
+    project.generate(packageId, options, function(errormsg) {
 
         if (errormsg) {
             output.error(errormsg);

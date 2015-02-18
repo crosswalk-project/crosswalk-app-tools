@@ -220,12 +220,13 @@ function(crosswalkPath, projectPath) {
 /**
  * Turn a freshly created empty Android project into a Crosswalk project.
  * @param {String} packageId Qualified package name
+ * @param {String} releaseOrChannel Path to local Crosswalk release to use, or channel (stable, beta, ...), or null
  * @param {String} apiTarget Android API target (greater android-14)
  * @param {String} projectPath Path to root dir of project
  * @returns {Boolean} True on success.
  */
 AndroidPlatform.prototype.fillSkeletonProject =
-function(packageId, apiTarget, projectPath, callback) {
+function(packageId, releaseOrChannel, apiTarget, projectPath, callback) {
 
     var output = this._application.output;
 
@@ -234,6 +235,23 @@ function(packageId, apiTarget, projectPath, callback) {
         return;
     }
 
+    // Use local Crosswalk if path given.
+    if (releaseOrChannel) {
+        output.info("Attempting to use local Crosswalk " + releaseOrChannel);
+        if (ShellJS.test("-f", releaseOrChannel) ||
+            ShellJS.test("-L", releaseOrChannel)) {
+
+            var ret = this.importCrosswalkFromZip(releaseOrChannel, projectPath);
+            if (ret) {
+                callback(null);
+                return;
+            } else {
+                output.warning("Import of local Crosswalk failed, attempting download ...");
+            }
+        }
+    }
+
+    // Download latest Crosswalk
     var deps = new AndroidProjectDeps(this._application, this._channel);
     deps.fetchVersions(function(versions, errormsg) {
 
@@ -289,7 +307,7 @@ function(packageId, apiTarget, projectPath, callback) {
  * Implements {@link PlatformIface.generate}
  */
 AndroidPlatform.prototype.generate =
-function(packageId, callback) {
+function(packageId, options, callback) {
 
     var output = this._application.output;
 
@@ -311,7 +329,11 @@ function(packageId, callback) {
                 return;
             }
 
-            this.fillSkeletonProject(packageId, apiTarget, path,
+            var releaseOrChannel = null;
+            if (options)
+                releaseOrChannel = options.crosswalk;
+
+            this.fillSkeletonProject(packageId, releaseOrChannel, apiTarget, path,
                                      function(errormsg) {
 
                 if (errormsg) {
