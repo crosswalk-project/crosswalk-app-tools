@@ -220,13 +220,14 @@ function(crosswalkPath, projectPath) {
 /**
  * Turn a freshly created empty Android project into a Crosswalk project.
  * @param {String} packageId Qualified package name
- * @param {String} releaseOrChannel Path to local Crosswalk release to use, or channel (stable, beta, ...), or null
+ * @param {String} localCrosswalk Local Crosswalk download or null
+ * @param {String} channel Crosswalk channel (stable, beta, canary) or null
  * @param {String} apiTarget Android API target (greater android-14)
  * @param {String} projectPath Path to root dir of project
  * @returns {Boolean} True on success.
  */
 AndroidPlatform.prototype.fillSkeletonProject =
-function(packageId, releaseOrChannel, apiTarget, projectPath, callback) {
+function(packageId, localCrosswalk, channel, apiTarget, projectPath, callback) {
 
     var output = this._application.output;
 
@@ -235,13 +236,14 @@ function(packageId, releaseOrChannel, apiTarget, projectPath, callback) {
         return;
     }
 
-    // Use local Crosswalk if path given.
-    if (releaseOrChannel) {
-        output.info("Attempting to use local Crosswalk " + releaseOrChannel);
-        if (ShellJS.test("-f", releaseOrChannel) ||
-            ShellJS.test("-L", releaseOrChannel)) {
+    // Use local Crosswalk if path given, and not a channel identifier.
+    if (localCrosswalk) {
 
-            var ret = this.importCrosswalkFromZip(releaseOrChannel, projectPath);
+        output.info("Attempting to use local Crosswalk " + localCrosswalk);
+        if (ShellJS.test("-f", localCrosswalk) ||
+            ShellJS.test("-L", localCrosswalk)) {
+
+            var ret = this.importCrosswalkFromZip(localCrosswalk, projectPath);
             if (ret) {
                 callback(null);
                 return;
@@ -252,7 +254,7 @@ function(packageId, releaseOrChannel, apiTarget, projectPath, callback) {
     }
 
     // Download latest Crosswalk
-    var deps = new AndroidProjectDeps(this._application, this._channel);
+    var deps = new AndroidProjectDeps(this._application, channel);
     deps.fetchVersions(function(versions, errormsg) {
 
         if (errormsg) {
@@ -261,7 +263,7 @@ function(packageId, releaseOrChannel, apiTarget, projectPath, callback) {
         }
 
         if (versions.length === 0) {
-            callback("Failed to load available Crosswalk versions for channel " + this._channel);
+            callback("Failed to load available Crosswalk versions for channel " + channel);
             return;
         }
 
@@ -329,11 +331,17 @@ function(packageId, options, callback) {
                 return;
             }
 
-            var releaseOrChannel = null;
-            if (options)
-                releaseOrChannel = options.crosswalk;
+            var localCrosswalk = options ? options.crosswalk : null;
+            var channel = "stable";
+            if (options &&
+                options.channel &&
+                AndroidProjectDeps.CHANNELS.indexOf(options.channel) >= 0) {
+                channel = options.channel;
+            } else {
+                output.info("Defaulting to download channel " + channel);
+            }
 
-            this.fillSkeletonProject(packageId, releaseOrChannel, apiTarget, path,
+            this.fillSkeletonProject(packageId, localCrosswalk, channel, apiTarget, path,
                                      function(errormsg) {
 
                 if (errormsg) {

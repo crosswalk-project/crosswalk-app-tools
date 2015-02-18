@@ -55,6 +55,21 @@ function AndroidProjectDeps(application, channel) {
 }
 
 /**
+ * Read-only array of valid release channels (stable, beta, canary).
+ * @member {String[]} CHANNELS
+ * @static
+ * @memberOf AndroidProjectDeps
+ */
+Object.defineProperty(AndroidProjectDeps, "CHANNELS", {
+                      get: function() {
+                                return CHANNELS;
+                           },
+                      set: function(config) {
+                                // Empty because read-only
+                           }
+                      });
+
+/**
  * Fetch available Crosswalk versions index.
  * @param {AndroidProjectDeps~fetchVersionsFinishedCb} callback callback function
  */

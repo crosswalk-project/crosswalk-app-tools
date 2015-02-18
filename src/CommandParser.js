@@ -33,6 +33,7 @@ function() {
         "Crosswalk Application Project and Packaging Tool\n" +
         "    crosswalk-app create <package-id>\t\tCreate project <package-id>\n" +
         "                         --crosswalk=<path>\tOptional path to downloaded Crosswalk\n" +
+        "                         --channel=<name>\tRelease channel: stable|beta|canary\n" +
         "    crosswalk-app help\t\t\t\tDisplay usage information\n" +
         "    crosswalk-app version\t\t\tDisplay version information\n";
 };
@@ -149,7 +150,7 @@ function() {
 
     if (this._createOptions) {
         // Validate
-        var keys = [ "crosswalk" ];
+        var keys = [ "crosswalk", "channel" ];
         this._createOptions = this.discardUnknownOptions(this._createOptions, keys);
     }
 
