@@ -248,7 +248,8 @@ function(packageId, apiTarget, projectPath, callback) {
         }
 
         // Look for existing download
-        var version = versions[versions.length - 1];
+        var version = deps.pickLatest(versions);
+        output.info("Latest version is " + version);
         var filename = deps.findLocally(version);
         if (filename) {
             output.info("Using local " + filename);

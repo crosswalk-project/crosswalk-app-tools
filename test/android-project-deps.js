@@ -13,6 +13,51 @@ var _output = _application.output;
 
 exports.tests = {
 
+    pickLatest1: function(test) {
+
+        test.expect(1);
+
+        var deps = new AndroidProjectDeps(_application, "stable");
+        var versions = [
+            "1.2.3.4",
+            "5.9.7.8",
+            "7.6.5.4"
+        ];
+        var version = deps.pickLatest(versions);
+        test.equal(version, "7.6.5.4");
+        test.done();
+    },
+
+    pickLatest2: function(test) {
+
+        test.expect(1);
+
+        // Bad test, suppress error output
+        _application.config.setSilentConsole(true);
+
+        var deps = new AndroidProjectDeps(_application, "stable");
+        var version = deps.pickLatest(null);
+        test.equal(version, null);
+        test.done();
+
+        _application.config.setSilentConsole(false);
+    },
+
+    pickLatest3: function(test) {
+
+        test.expect(1);
+
+        // Bad test, suppress error output
+        _application.config.setSilentConsole(true);
+
+        var deps = new AndroidProjectDeps(_application, "stable");
+        var version = deps.pickLatest([]);
+        test.equal(version, null);
+        test.done();
+
+        _application.config.setSilentConsole(false);
+    },
+
     fetchVersions: function(test) {
 
         test.expect(2);
