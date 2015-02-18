@@ -79,11 +79,12 @@ function() {
 /**
  * Create skeleton project.
  * @param {String} packageId Identifier in the form of com.example.foo
+ * @param {Object} options Extra options for the command
  * @param {Main~mainOperationCb} [callback] Callback function
  * @static
  */
 Main.prototype.create =
-function(packageId, callback) {
+function(packageId, options, callback) {
 
     var output = this.output;
 
@@ -188,12 +189,14 @@ function() {
 
     var parser = new CommandParser(this.output, process.argv);
     var cmd = parser.getCommand();
+    var options = null;
     if (cmd) {
 
         switch (cmd) {
         case "create":
             var packageId = parser.createGetPackageId();
-            this.create(packageId);
+            options = parser.createGetOptions();
+            this.create(packageId, options);
             break;
         case "update":
             var version = parser.updateGetVersion();

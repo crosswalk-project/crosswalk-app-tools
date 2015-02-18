@@ -2,6 +2,8 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var Minimist = require("minimist");
+
 /**
  * Parsing and validation of command-line arguments.
  * @constructor
@@ -18,6 +20,7 @@ function CommandParser(output, argv) {
     }
 
     this._argv = argv;
+    this._createOptions = null;
 }
 
 /**
@@ -28,9 +31,10 @@ CommandParser.prototype.help =
 function() {
     return "" +
         "Crosswalk Application Project and Packaging Tool\n" +
-        "    crosswalk-app create <package-id>\tCreate project\n" +
-        "    crosswalk-app help\t\t\tDisplay usage information\n" +
-        "    crosswalk-app version\t\tDisplay version information\n";
+        "    crosswalk-app create <package-id>\t\tCreate project <package-id>\n" +
+        "                         --crosswalk=<path>\tOptional path to downloaded Crosswalk\n" +
+        "    crosswalk-app help\t\t\t\tDisplay usage information\n" +
+        "    crosswalk-app version\t\t\tDisplay version information\n";
 };
 
 /**
@@ -128,7 +132,28 @@ function() {
         return null;
     }
 
+    if (this._argv.length > 4) {
+        var options = this._argv.slice(4);
+        this._createOptions = Minimist(options);
+    }
+
     return packageId;
+};
+
+/**
+ * Get extra options for the create command.
+ * @returns {Object} Options in name/value form, or null if there are none.
+ */
+CommandParser.prototype.createGetOptions =
+function() {
+
+    if (this._createOptions) {
+        // Validate
+        var keys = [ "crosswalk" ];
+        this._createOptions = this.discardUnknownOptions(this._createOptions, keys);
+    }
+
+    return this._createOptions;
 };
 
 /**
@@ -185,5 +210,25 @@ function() {
 
     return null;
 };
+
+/**
+ * Filter out unknown options from the options object.
+ * @param {Object} options Options object holding name/value pairs
+ * @param {String[]} knownKeys Known options to keep
+ */
+CommandParser.prototype.discardUnknownOptions =
+function(options, knownKeys) {
+
+    var own = Object.getOwnPropertyNames(options);
+    for (var i = 0; i < own.length; i++) {
+        var prop = own[i];
+        if (knownKeys.indexOf(prop) < 0) {
+            // Property not among knownKeys, discard.
+            delete options[prop];
+        }
+    }
+
+    return options;
+}
 
 module.exports = CommandParser;

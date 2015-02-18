@@ -37,7 +37,7 @@ exports.tests = {
         _output.info("Tempdir: " + tmpdir);
         ShellJS.pushd(tmpdir);
 
-        _application.create("com.example.Foo", function(success) {
+        _application.create("com.example.Foo", null, function(success) {
 
             test.equal(success, true);
 
@@ -62,7 +62,7 @@ exports.tests = {
         ShellJS.pushd(tmpdir);
 
         // Malformed name, fail.
-        _application.create("Foo", function(success) {
+        _application.create("Foo", null, function(success) {
 
             test.equal(success, false);
 
@@ -86,7 +86,7 @@ exports.tests = {
         _output.info("Tempdir: " + tmpdir);
         ShellJS.pushd(tmpdir);
 
-        _application.create("com.example.Foo", function(success) {
+        _application.create("com.example.Foo", null, function(success) {
 
             if (success) {
 
