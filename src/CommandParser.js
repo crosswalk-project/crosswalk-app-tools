@@ -230,6 +230,6 @@ function(options, knownKeys) {
     }
 
     return options;
-}
+};
 
 module.exports = CommandParser;
