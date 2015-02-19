@@ -89,7 +89,8 @@ function(callback) {
             return;
         }
 
-        this._contentLength = res.headers["content-length"];
+        this._contentLength = res.headers["content-length"] ?
+                                    res.headers["content-length"] : -1;
 
         res.on("error", function(e) {
 
@@ -104,11 +105,22 @@ function(callback) {
 
             this._fp.write(data);
             this._downloaded += data.length;
-            this.progress(this._downloaded / this._contentLength);
+
+            if (this._contentLength < 0) {
+                // Unknown content length, just fire progress 0.5 for good measure.
+                this.progress(0.5);
+            } else {
+                this.progress(this._downloaded / this._contentLength);
+            }
 
         }.bind(this));
 
         res.on('end', function() {
+
+            if (this._contentLength < 0) {
+                // Unknown content length, just fire progress 1.0 (done) for good measure.
+                this.progress(1.0);
+            }
 
             this._fp.end();
             this._fp = null;
