@@ -56,11 +56,12 @@ exports.tests = {
 
     http: function(test) {
 
-        testDownload(test, "http://www.intel.com");
+        testDownload(test, "http://www.linuxfoundation.org/");
     },
-
+/*
     https: function(test) {
 
         testDownload(test, "https://01.org");
     }
+*/
 };

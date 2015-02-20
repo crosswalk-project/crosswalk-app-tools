@@ -71,8 +71,46 @@ function(callback) {
         return;
     }
 
-    var getFunc;
     var urlInfo = Url.parse(this._url);
+    if (!urlInfo) {
+        callback("Invalid URL " + this._url);
+        return;
+    }
+
+    if (urlInfo.protocol == "http:" &&
+        process.env.http_proxy) {
+
+        // This is a bit of a hack to get the proxy name:port into a
+        // format that the url parser can digest.
+        var proxyInfo = Url.parse("http://" + process.env.http_proxy);
+
+        urlInfo.host = proxyInfo.hostname;
+        delete urlInfo.href;
+        delete urlInfo.pathname;
+        urlInfo.port = proxyInfo.port;
+        urlInfo.path = this._url;
+        urlInfo.headers = { Host: urlInfo.hostname };
+        delete urlInfo.hostname;
+
+        this.getDefaultImpl(urlInfo, callback);
+
+    } else if (urlInfo.protocol == "https:" &&
+               process.env.https_proxy) {
+
+        // this.getHttpsProxyImpl(urlInfo, callback);
+        callback("HTTPS proxy not implemented");
+        return;
+
+    } else {
+
+        this.getDefaultImpl(urlInfo, callback);
+    }
+};
+
+Downloader.prototype.getDefaultImpl =
+function(urlInfo, callback) {
+
+    var getFunc;
     if (urlInfo.protocol == "http:") {
         getFunc = Http.get;
     } else if (urlInfo.protocol == "https:") {
@@ -130,6 +168,11 @@ function(callback) {
         }.bind(this));
 
     }.bind(this));
+};
+
+Downloader.prototype.getHttpsProxyImpl =
+function(callback) {
+
 };
 
 Downloader.prototype.progress =
