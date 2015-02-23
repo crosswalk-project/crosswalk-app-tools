@@ -3,9 +3,10 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var OS = require('os');
-var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
+
 var CommandParser = require("../src/CommandParser");
+var Util = require("../test-util/Util");
 
 // Run tests silently to avoid spew from tests failing on purpose.
 require("../src/Config").getInstance().setSilentConsole(true);
@@ -30,10 +31,7 @@ exports.tests = {
         test.expect(1);
 
         // Good test.
-        // MkTemp creates temp dir in working dir, so cd tmp first.
-        ShellJS.pushd(OS.tmpdir());
-
-        var tmpdir = MkTemp.createDirSync("XXXXXX.crosswalk-app-tools");
+        var tmpdir = Util.createTmpDir();
         _output.info("Tempdir: " + tmpdir);
         ShellJS.pushd(tmpdir);
 
@@ -41,7 +39,6 @@ exports.tests = {
 
             test.equal(success, true);
 
-            ShellJS.popd();
             ShellJS.popd();
             ShellJS.rm("-rf", tmpdir);
 
@@ -54,10 +51,7 @@ exports.tests = {
         test.expect(1);
 
         // Bad test.
-        // MkTemp creates temp dir in working dir, so cd tmp first.
-        ShellJS.pushd(OS.tmpdir());
-
-        var tmpdir = MkTemp.createDirSync("XXXXXX.crosswalk-app-tools");
+        var tmpdir = Util.createTmpDir();
         _output.info("Tempdir: " + tmpdir);
         ShellJS.pushd(tmpdir);
 
@@ -66,7 +60,6 @@ exports.tests = {
 
             test.equal(success, false);
 
-            ShellJS.popd();
             ShellJS.popd();
             ShellJS.rm("-rf", tmpdir);
 
@@ -79,10 +72,7 @@ exports.tests = {
         test.expect(1);
 
         // Create
-        // MkTemp creates temp dir in working dir, so cd tmp first.
-        ShellJS.pushd(OS.tmpdir());
-
-        var tmpdir = MkTemp.createDirSync("XXXXXX.crosswalk-app-tools");
+        var tmpdir = Util.createTmpDir();
         _output.info("Tempdir: " + tmpdir);
         ShellJS.pushd(tmpdir);
 
@@ -97,7 +87,6 @@ exports.tests = {
                     test.equal(success, true);
                     test.done();
 
-                    ShellJS.popd();
                     ShellJS.popd();
                     ShellJS.popd();
                     ShellJS.rm("-rf", tmpdir);

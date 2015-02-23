@@ -4,9 +4,10 @@
 
 var FS = require("fs");
 var OS = require('os');
-var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
+
 var TemplateFile = require("../src/util/TemplateFile");
+var Util = require("../test-util/Util");
 
 // Run tests silently to avoid spew from tests failing on purpose.
 require("../src/Config").getInstance().setSilentConsole(true);
@@ -37,10 +38,7 @@ exports.tests = {
         try {
             var tpl = new TemplateFile(__dirname + "/data/template-file.in");
 
-            // MkTemp creates temp dir in working dir, so cd tmp first.
-            ShellJS.pushd(OS.tmpdir());
-
-            var tmpfile = MkTemp.createFileSync("XXXXXX.crosswalk-app-tools.template-file.out");
+            var tmpfile = Util.createTmpFile();
             _output.info("Tempfile: " + tmpfile);
 
             tpl.render({bar: "maman"}, tmpfile);
@@ -50,7 +48,6 @@ exports.tests = {
             test.equal(output, "foo maman baz");
 
             ShellJS.rm("-f", tmpfile);
-            ShellJS.popd();
 
         } catch(e) {
             _output.error(e.message);

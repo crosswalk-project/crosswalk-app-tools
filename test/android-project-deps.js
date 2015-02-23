@@ -4,7 +4,10 @@
 
 var OS = require('os');
 
+var ShellJS = require("shelljs");
+
 var AndroidProjectDeps = require("../src/android/AndroidProjectDeps");
+var Util = require("../test-util/Util");
 
 // Test involves progress output, make it visible.
 require("../src/Config").getInstance().setSilentConsole(false);
@@ -79,13 +82,15 @@ exports.tests = {
         test.expect(2);
 
         var deps = new AndroidProjectDeps(_application, "stable");
-        deps.download("9.38.208.10", OS.tmpDir(), function(filename, errormsg) {
+        var tmpDir = Util.createTmpDir();
+        deps.download("9.38.208.10", tmpDir, function(filename, errormsg) {
 
             if (errormsg)
                 _output.info(errormsg);
 
             test.equal(typeof filename === "string", true);
             test.equal(filename.length > 0, true);
+            ShellJS.rm("-rf", tmpDir);
             test.done();
         });
     }

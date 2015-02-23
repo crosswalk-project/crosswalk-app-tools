@@ -25,7 +25,7 @@ function() {
     return null;
 };
 
-Util.prototype.makeTmpDir =
+Util.prototype.createTmpDir =
 function() {
 
     var tmpDir = null;
@@ -44,7 +44,7 @@ function() {
     return tmpDir;
 };
 
-Util.prototype.makeTmpFile =
+Util.prototype.createTmpFile =
 function() {
 
     var tmpFile = null;

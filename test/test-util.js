@@ -27,11 +27,11 @@ exports.tests = {
         test.done();
     },
 
-    makeTmpDir: function(test) {
+    createTmpDir: function(test) {
 
         test.expect(3);
 
-        var tmpDir = Util.makeTmpDir();
+        var tmpDir = Util.createTmpDir();
         test.equal(ShellJS.test("-d", tmpDir), true);
 
         var commonRoot = tmpDir.substring(0, _projectRoot.length);
@@ -43,11 +43,11 @@ exports.tests = {
         test.done();
     },
 
-    makeTmpFile: function(test) {
+    createTmpFile: function(test) {
 
         test.expect(3);
 
-        var tmpFile = Util.makeTmpFile();
+        var tmpFile = Util.createTmpFile();
         test.equal(ShellJS.test("-f", tmpFile), true);
 
         var commonRoot = tmpFile.substring(0, _projectRoot.length);

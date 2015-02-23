@@ -6,10 +6,10 @@ var FS = require("fs");
 var OS = require('os');
 var Path = require("path");
 
-var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
 
 var LogfileOutput = require("../src/LogfileOutput");
+var Util = require("../test-util/Util");
 
 // Test involves output, make it visible.
 require("../src/Config").getInstance().setSilentConsole(false);
@@ -20,11 +20,8 @@ var _output = require("../src/Main").output;
 function testMethod(func, message) {
     
     // Setup
-    // MkTemp creates temp dir in working dir, so cd tmp first.
-    ShellJS.pushd(OS.tmpdir());
-
-    var tmpfile = MkTemp.createFileSync("crosswalk-app-tools.test.logfile-output.XXXXXX");
-    var log = new LogfileOutput(OS.tmpdir() + Path.sep + tmpfile);
+    var tmpfile = Util.createTmpFile();
+    var log = new LogfileOutput(tmpfile);
     
     // Test
     var output = func.call(log, message);
@@ -33,7 +30,6 @@ function testMethod(func, message) {
     var input = FS.readFileSync(tmpfile, {"encoding": "utf8"});
     
     ShellJS.rm("-f", tmpfile);
-    ShellJS.popd();
 
     return output == input;
 }

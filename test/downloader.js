@@ -4,10 +4,10 @@
 
 var FS = require("fs");
 var OS = require('os');
-var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
 
 var Downloader = require("../src/util/Downloader");
+var Util = require("../test-util/Util");
 
 // Test involves progress output, make it visible.
 require("../src/Config").getInstance().setSilentConsole(false);
@@ -17,11 +17,8 @@ function testDownload(test, url) {
 
     test.expect(1);
 
-    // MkTemp creates temp dir in working dir, so cd tmp first.
-    ShellJS.pushd(OS.tmpdir());
-
     // HACK create and remove tmpfile just to allocate a name.
-    var tmpfile = MkTemp.createFileSync("crosswalk-app-tools.test.downloader.XXXXXX");
+    var tmpfile = Util.createTmpFile();
     _output.info("Tempfile: " + tmpfile);
     ShellJS.rm(tmpfile);
 
