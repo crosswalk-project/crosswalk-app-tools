@@ -1,0 +1,61 @@
+// Copyright © 2014 Intel Corporation. All rights reserved.
+// Use  of this  source  code is  governed by  an Apache v2
+// license that can be found in the LICENSE-APACHE-V2 file.
+
+var OS = require('os');
+var Path = require('path');
+
+var MkTemp = require('mktemp');
+var ShellJS = require("shelljs");
+
+var Util = require("../test-util/Util.js");
+
+var _projectRoot = Path.normalize(__dirname + Path.sep + "..");
+
+exports.tests = {
+
+    ensureTestRoot: function(test) {
+
+        test.expect(2);
+
+        var testRoot = Util.ensureTestRoot();
+        test.equal(ShellJS.test("-d", testRoot), true);
+
+        var commonRoot = testRoot.substring(0, _projectRoot.length);
+        test.equal(commonRoot, _projectRoot);
+
+        test.done();
+    },
+
+    makeTmpDir: function(test) {
+
+        test.expect(3);
+
+        var tmpDir = Util.makeTmpDir();
+        test.equal(ShellJS.test("-d", tmpDir), true);
+
+        var commonRoot = tmpDir.substring(0, _projectRoot.length);
+        test.equal(commonRoot, _projectRoot);
+
+        ShellJS.rm("-rf", tmpDir);
+        test.equal(ShellJS.test("-d", tmpDir), false);
+
+        test.done();
+    },
+
+    makeTmpFile: function(test) {
+
+        test.expect(3);
+
+        var tmpFile = Util.makeTmpFile();
+        test.equal(ShellJS.test("-f", tmpFile), true);
+
+        var commonRoot = tmpFile.substring(0, _projectRoot.length);
+        test.equal(commonRoot, _projectRoot);
+
+        ShellJS.rm("-rf", tmpFile);
+        test.equal(ShellJS.test("-d", tmpFile), false);
+
+        test.done();
+    }
+};
