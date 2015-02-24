@@ -30,6 +30,7 @@ function() {
     ];
 
     var PlatformImpl = null;
+    var warnings = [];
 
     for (var i = 0; i < implementations.length; i++) {
 
@@ -43,7 +44,14 @@ function() {
 
         } catch (e) {
 
-            output.warning("Loading backend " + implementations[i] + " failed (" + e + ")");
+            // Accumulate warnings, only emit them if no backend was found.
+            warnings.push("Loading backend " + implementations[i] + " failed (" + e + ")");
+        }
+    }
+
+    if (!PlatformImpl) {
+        for (var j = 0; j < warnings.length; j++) {
+            output.warning(warnings[j]);
         }
     }
 
