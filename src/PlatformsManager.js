@@ -14,8 +14,16 @@ function PlatformsManager(application) {
 }
 
 /**
+ * @typedef PlatformInfo
+ * @type {Object}
+ * @property {Function} Ctor Constructor for the associated {@link PlatformIface}
+ * @property {String} name Name for backend (android, ios, ...)
+ * @memberOf PlatformsManager
+ */
+
+/**
  * Load default backend.
- * @returns {PlatformIface} Constructor for {@link PlatformIface} subclass or null if failed
+ * @returns {PlatformInfo} Metadata object for loaded platform.
  */
 PlatformsManager.prototype.loadDefault =
 function() {
@@ -29,17 +37,32 @@ function() {
         "./android/AndroidPlatform"
     ];
 
-    var PlatformImpl = null;
+    var platformInfo = null;
     var warnings = [];
 
     for (var i = 0; i < implementations.length; i++) {
 
         try {
 
-            PlatformImpl = require(implementations[i]);
+            var Ctor = require(implementations[i]);
+            var prefix = "crosswalk-app-tools-backend-";
+            var name = null;
+            if (implementations[i].substring(0, prefix.length) == prefix) {
+                // Extract last part after common prefix.
+                name = implementations[i].substring(prefix.length);
+            } else if (implementations[i] == "./android/AndroidPlatform") {
+                // Special case built-in android backend, so we get a conforming name.
+                name = "android";
+            } else {
+                throw new Error("Unhandled platform name " + implementations[i]);
+            }
+            platformInfo = {
+                Ctor: Ctor,
+                name: name
+            };
 
             // If we get here there backend has been instantiated successfully.
-            output.info("Using backend " + implementations[i]);
+            output.info("Using backend '" + name + "'");
             break;
 
         } catch (e) {
@@ -49,13 +72,13 @@ function() {
         }
     }
 
-    if (!PlatformImpl) {
+    if (!platformInfo) {
         for (var j = 0; j < warnings.length; j++) {
             output.warning(warnings[j]);
         }
     }
 
-    return PlatformImpl;
+    return platformInfo;
 };
 
 module.exports = PlatformsManager;

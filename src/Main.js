@@ -48,7 +48,7 @@ function workingDirectoryIsProject() {
 
 /**
  * Instantiate platform backend
- * @returns {PlatformIface} Constructor for platform backend
+ * @returns {PlatformIface} Platform implementation instance or null on error.
  * @static
  */
 Main.prototype.instantiateProject =
@@ -56,8 +56,8 @@ function() {
 
     var output = this.output;
     var mgr = new PlatformsManager(this);
-    var Platform = mgr.loadDefault();
-    if (!Platform) {
+    var platformInfo = mgr.loadDefault();
+    if (!platformInfo) {
         output.error("Failed to load platform backend");
         return null;
     }
@@ -65,7 +65,7 @@ function() {
     var platform;
 
     try {
-        platform = new Platform(this);
+        platform = new platformInfo.Ctor(this);
     } catch (e) {
         output.error("The Android SDK could not be found. " +
                       "Make sure the directory containing the 'android' " +
