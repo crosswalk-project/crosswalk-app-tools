@@ -149,6 +149,18 @@ Object.defineProperty(Frontend.prototype, "logfileOutput", {
                             }
                       });
 
+/**
+ * Path where downloads are cached. Might be null when not used.
+ * @member {String} downloadsCachePath
+ * @instance
+ * @memberOf Frontend
+ */
+Object.defineProperty(Frontend.prototype, "downloadsCachePath", {
+                      get: function() {
+                                return process.env.CROSSWALK_APP_TOOLS_DOWNLOAD_DIR;
+                            }
+                      });
+
 
 
 /**
