@@ -25,7 +25,7 @@ function Frontend(application, baseDir, packageId, platformId) {
     this._platformId = platformId;
 
     if (!ShellJS.test("-d", baseDir) ||
-        !Path.isAbsolute(baseDir)) {
+        Path.resolve(baseDir) != baseDir) {
         throw new BackendInstantiationException("Invalid base dir " + baseDir);
     }
 
