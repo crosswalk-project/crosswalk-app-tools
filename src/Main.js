@@ -2,9 +2,11 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var Path = require("path");
+
 var ShellJS = require("shelljs");
 
-var Application = require('./Application');
+var Application = require("./Application");
 var CommandParser = require("./CommandParser");
 var PlatformsManager = require("./PlatformsManager");
 
@@ -52,15 +54,27 @@ function workingDirectoryIsProject() {
  * @static
  */
 Main.prototype.instantiateProject =
-function() {
+function(packageId) {
 
     var output = this.output;
+
+    if (!packageId) {
+        // Name of current directory must be packageId, otherwise we can not continue.
+        var basename = Path.basename(process.cwd());
+        packageId = CommandParser.validatePackageId(basename, output);
+        if (!packageId) {
+            return null;
+        }
+    }
+
     var mgr = new PlatformsManager(this);
     var platformInfo = mgr.loadDefault();
     if (!platformInfo) {
         output.error("Failed to load platform backend");
         return null;
     }
+
+    //function Frontend(application, baseDir, packageId, platformId) {
 
     var platform;
 
@@ -92,7 +106,7 @@ function(packageId, options, callback) {
     if (!callback)
         callback = function() {};
 
-    var project = this.instantiateProject();
+    var project = this.instantiateProject(packageId);
     if (!project) {
         callback(false);
         return;
@@ -135,7 +149,7 @@ function(type, callback) {
     }
     */
 
-    var project = this.instantiateProject();
+    var project = this.instantiateProject(null);
     if (!project) {
         callback(false);
         return;

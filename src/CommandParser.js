@@ -103,35 +103,11 @@ function() {
 CommandParser.prototype.createGetPackageId =
 function() {
 
-    var errormsg = "Invalid package name, see http://developer.android.com/guide/topics/manifest/manifest-element.html#package";
-
     if (this._argv.length < 4) {
         return null;
     }
 
-    // Check for invalid characters as per
-    // http://developer.android.com/guide/topics/manifest/manifest-element.html#package
-    var packageId = this._argv[3];
-    var match = packageId.match("[A-Za-z0-9_\\.]*");
-    if (match[0] != packageId) {
-        this._output.error(errormsg);
-        return null;
-    }
-
-    // Package name must not start or end with '.'
-    if (packageId[0] == '.' || packageId[packageId.length - 1] == '.') {
-        this._output.error(errormsg);
-        this._output.error("Name must not start or end with '.'");
-        return null;
-    }
-
-    // Require 3 or more elements.
-    var parts = packageId.split('.');
-    if (parts.length < 3) {
-        this._output.error(errormsg);
-        this._output.error("Name needs to consist of 3+ elements");
-        return null;
-    }
+    var packageId = CommandParser.validatePackageId(this._argv[3], this._output);
 
     if (this._argv.length > 4) {
         var options = this._argv.slice(4);
@@ -230,6 +206,43 @@ function(options, knownKeys) {
     }
 
     return options;
+};
+
+/**
+ * Check whether packageId conforms to the naming scheme.
+ * @param {String} packageId Package ID to check
+ * @param {OutputIface} output Output to write errors to
+ * @returns {String} Package name as per Android conventions or null.
+ * @see {@link http://developer.android.com/guide/topics/manifest/manifest-element.html#package}
+ * @static
+ */
+CommandParser.validatePackageId =
+function(packageId, output) {
+
+    var errormsg = "Invalid package name, see http://developer.android.com/guide/topics/manifest/manifest-element.html#package";
+
+    var match = packageId.match("[A-Za-z0-9_\\.]*");
+    if (match[0] != packageId) {
+        output.error(errormsg);
+        return null;
+    }
+
+    // Package name must not start or end with '.'
+    if (packageId[0] == '.' || packageId[packageId.length - 1] == '.') {
+        output.error(errormsg);
+        output.error("Name must not start or end with '.'");
+        return null;
+    }
+
+    // Require 3 or more elements.
+    var parts = packageId.split('.');
+    if (parts.length < 3) {
+        output.error(errormsg);
+        output.error("Name needs to consist of 3+ elements");
+        return null;
+    }
+
+    return packageId;
 };
 
 module.exports = CommandParser;
