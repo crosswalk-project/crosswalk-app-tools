@@ -50,7 +50,7 @@ function workingDirectoryIsProject() {
 
 /**
  * Instantiate platform backend
- * @returns {PlatformIface} Platform implementation instance or null on error.
+ * @returns {PlatformBase} Platform implementation instance or null on error.
  * @static
  */
 Main.prototype.instantiateProject =

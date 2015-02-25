@@ -16,7 +16,7 @@ function PlatformsManager(application) {
 /**
  * @typedef PlatformInfo
  * @type {Object}
- * @property {Function} Ctor Constructor for the associated {@link PlatformIface}
+ * @property {Function} Ctor Constructor for the associated {@link PlatformBase} subclass
  * @property {String} name Name for backend (android, ios, ...)
  * @memberOf PlatformsManager
  */

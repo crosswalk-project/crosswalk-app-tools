@@ -8,24 +8,27 @@ var ShellJS = require("shelljs");
 
 var AndroidProjectDeps = require("./AndroidProjectDeps");
 var AndroidSDK = require("./AndroidSDK");
-var PlatformIface = require("../PlatformIface");
+var PlatformBase = require("../PlatformBase");
 
 var TemplateFile = require("../util/TemplateFile");
 
 /**
  * Android project class.
- * @extends PlatformIface
+ * @extends PlatformBase
  * @constructor
- * @param {Object} application {@link Application} instance
+ * @param {PlatformData} platformData Init data passed to the platform
  * @throws {@link AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
  */
-function AndroidPlatform(application) {
+function AndroidPlatform(platformData) {
+
+    // Chain up
+    PlatformBase.call(this, platformData);
 
     this._application = application;
     this._sdk = new AndroidSDK(this._application);
     this._channel = "stable";
 }
-AndroidPlatform.prototype = PlatformIface;
+AndroidPlatform.prototype = PlatformBase.prototype;
 
 /**
  * Fill template files and put them into the project skeleton.
@@ -306,7 +309,7 @@ function(packageId, localCrosswalk, channel, apiTarget, projectPath, callback) {
 };
 
 /**
- * Implements {@link PlatformIface.generate}
+ * Implements {@link PlatformBase.generate}
  */
 AndroidPlatform.prototype.generate =
 function(packageId, options, callback) {
@@ -548,7 +551,7 @@ function(closure) {
 };
 
 /**
- * Implements {@link PlatformIface.build}
+ * Implements {@link PlatformBase.build}
  */
 AndroidPlatform.prototype.build =
 function(abis, release, callback) {
