@@ -31,7 +31,7 @@ function mainOperationCb(success) {}
  */
 function Main() {
     // Chain up the constructor.
-    Application.call(this);
+    // Application.call(this);
 }
 Main.prototype = Application.prototype;
 
