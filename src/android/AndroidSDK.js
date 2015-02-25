@@ -92,19 +92,18 @@ function(apiLevel, callback) {
 
 /**
  * Create project template by running "android create project".
+ * @param {String} path Path where to create the project
  * @param {String} packageId Package name in the com.example.Foo format
  * @param {String} apiTarget Android API target android-xy as per "android list targets"
  * @param {AndroidSDK~generateProjectSkeletonCb} callback callback function
  */
 AndroidSDK.prototype.generateProjectSkeleton =
-function(packageId, apiTarget, callback) {
+function(path, packageId, apiTarget, callback) {
 
     var output = this._application.output;
     var errmsg = null;
 
-    // Construct path and fail if exists.
-    var wd = ShellJS.pwd();
-    var path = wd + Path.sep + packageId;
+    // Fail if path exists.
     if (ShellJS.test("-e", path)) {
         errmsg = "Error: project dir '" + path + "' already exists";
         output.error(errmsg);

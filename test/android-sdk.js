@@ -67,7 +67,7 @@ exports.tests = {
             _output.info("Tempdir: " + tmpdir);
             ShellJS.pushd(tmpdir);
 
-            sdk.generateProjectSkeleton("com.example.Foo", target,
+            sdk.generateProjectSkeleton(tmpdir + "/com.example.foo", "com.example.foo", target,
                                         function(path, log, errormsg) {
 
                 if (errormsg) {

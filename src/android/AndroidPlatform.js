@@ -24,26 +24,24 @@ function AndroidPlatform(platformData) {
     // Chain up
     PlatformBase.call(this, platformData);
 
-    this._application = application;
-    this._sdk = new AndroidSDK(this._application);
+    this._sdk = new AndroidSDK(this.application);
     this._channel = "stable";
 }
 AndroidPlatform.prototype = PlatformBase.prototype;
 
 /**
  * Fill template files and put them into the project skeleton.
- * @param {String} packageId Qualified package name
  * @param {String} apiTarget Android API target (greater android-14)
  * @param {String} projectPath Path to root dir of project
  * @returns {Boolean} True on success.
  */
 AndroidPlatform.prototype.fillTemplates =
-function(packageId, apiTarget, projectPath) {
+function(apiTarget, projectPath) {
 
-    var parts = packageId.split('.');
+    var parts = this.packageId.split('.');
     var packageName = parts[parts.length - 1];
     var data = {
-        "packageId" : packageId,
+        "packageId" : this.packageId,
         "packageName" : packageName,
         "apiTarget" : apiTarget
     };
@@ -125,7 +123,7 @@ function(crosswalkPath, projectPath) {
 AndroidPlatform.prototype.importCrosswalkFromZip =
 function(crosswalkPath, projectPath) {
 
-    var output = this._application.output;
+    var output = this.application.output;
     var indicator = output.createFiniteProgress("Extracting " + crosswalkPath);
 
     var zip = new AdmZip(crosswalkPath);
@@ -222,7 +220,6 @@ function(crosswalkPath, projectPath) {
 
 /**
  * Turn a freshly created empty Android project into a Crosswalk project.
- * @param {String} packageId Qualified package name
  * @param {String} localCrosswalk Local Crosswalk download or null
  * @param {String} channel Crosswalk channel (stable, beta, canary) or null
  * @param {String} apiTarget Android API target (greater android-14)
@@ -230,11 +227,11 @@ function(crosswalkPath, projectPath) {
  * @returns {Boolean} True on success.
  */
 AndroidPlatform.prototype.fillSkeletonProject =
-function(packageId, localCrosswalk, channel, apiTarget, projectPath, callback) {
+function(localCrosswalk, channel, apiTarget, projectPath, callback) {
 
-    var output = this._application.output;
+    var output = this.application.output;
 
-    if (!this.fillTemplates(packageId, apiTarget, projectPath)) {
+    if (!this.fillTemplates(apiTarget, projectPath)) {
         callback("Failed to initialise project templates");
         return;
     }
@@ -257,7 +254,7 @@ function(packageId, localCrosswalk, channel, apiTarget, projectPath, callback) {
     }
 
     // Download latest Crosswalk
-    var deps = new AndroidProjectDeps(this._application, channel);
+    var deps = new AndroidProjectDeps(this.application, channel);
     deps.fetchVersions(function(versions, errormsg) {
 
         if (errormsg) {
@@ -312,9 +309,9 @@ function(packageId, localCrosswalk, channel, apiTarget, projectPath, callback) {
  * Implements {@link PlatformBase.generate}
  */
 AndroidPlatform.prototype.generate =
-function(packageId, options, callback) {
+function(options, callback) {
 
-    var output = this._application.output;
+    var output = this.application.output;
 
     var minApiLevel = 19;
     var apiTarget;
@@ -326,7 +323,7 @@ function(packageId, options, callback) {
             return;
         }
 
-        this._sdk.generateProjectSkeleton(packageId, apiTarget,
+        this._sdk.generateProjectSkeleton(this.platformPath, this.packageId, apiTarget,
                                           function(path, logmsg, errormsg) {
 
             if (!path || errormsg) {
@@ -344,7 +341,7 @@ function(packageId, options, callback) {
                 output.info("Defaulting to download channel " + channel);
             }
 
-            this.fillSkeletonProject(packageId, localCrosswalk, channel, apiTarget, path,
+            this.fillSkeletonProject(localCrosswalk, channel, apiTarget, path,
                                      function(errormsg) {
 
                 if (errormsg) {
@@ -381,7 +378,7 @@ function() {
 AndroidPlatform.prototype.enableABI =
 function(abi) {
 
-    var output = this._application.output;
+    var output = this.application.output;
 
     if (!ShellJS.test("-d", "xwalk_core_library/libs")) {
         output.error("This does not appear to be the root of a Crosswalk project.");
@@ -429,7 +426,7 @@ function(abi) {
 AndroidPlatform.prototype.abifyAPKName =
 function(abi, release) {
 
-    var output = this._application.output;
+    var output = this.application.output;
 
     var apkInPattern;
     if (release) {
@@ -471,7 +468,7 @@ function(abi, release) {
 AndroidPlatform.prototype.buildABI =
 function(closure) {
 
-    var output = this._application.output;
+    var output = this.application.output;
 
     // If done with all the ABIs, terminate successfully.
     if (closure.abiIndex >= closure.abis.length) {
@@ -556,8 +553,11 @@ function(closure) {
 AndroidPlatform.prototype.build =
 function(abis, release, callback) {
 
-    var output = this._application.output;
+    var output = this.application.output;
 
+    // TODO should we cd back afterwards?
+    process.chdir(this.platformPath);
+    
     var closure = {
         abis: abis,
         abiIndex : 0,

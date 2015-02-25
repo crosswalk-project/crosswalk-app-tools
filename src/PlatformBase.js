@@ -61,6 +61,66 @@ Object.defineProperty(PlatformBase.prototype, "application", {
                       });
 
 /**
+ * Absolute path to directory where the html application is located.
+ * @member {String} appPath
+ * @instance
+ * @memberOf PlatformBase
+ */
+Object.defineProperty(PlatformBase.prototype, "appPath", {
+                      get: function() {
+                                return this._application.appPath;
+                            }
+                      });
+
+/**
+ * Application instance.
+ * @member {String} packageId
+ * @instance
+ * @memberOf PlatformBase
+ */
+Object.defineProperty(PlatformBase.prototype, "packageId", {
+                      get: function() {
+                                return this._application.packageId;
+                           }
+                      });
+
+/**
+ * Absolute path to directory where the platform-specific code is located (inside the project).
+ * @member {String} platformPath
+ * @instance
+ * @memberOf PlatformBase
+ */
+Object.defineProperty(PlatformBase.prototype, "platformPath", {
+                      get: function() {
+                                return Path.join(this._application.prjPath, this.platformId);
+                           }
+                      });
+
+/**
+ * Absolute path to directory where the platform-specific project is located.
+ * @member {String} prjPath
+ * @instance
+ * @memberOf PlatformBase
+ */
+Object.defineProperty(PlatformBase.prototype, "prjPath", {
+                      get: function() {
+                                return this._application.prjPath;
+                            }
+                      });
+
+/**
+ * Absolute path to directory where the built packaged need to be placed.
+ * @member {String} pkgPath
+ * @instance
+ * @memberOf PlatformBase
+ */
+Object.defineProperty(PlatformBase.prototype, "pkgPath", {
+                      get: function() {
+                                return this._application.pkgPath;
+                            }
+                      });
+
+/**
  * Platform identifier (android, ios, ...).
  * @member {String} platformId
  * @instance
@@ -86,12 +146,11 @@ Object.defineProperty(PlatformBase.prototype, "logOutput", {
 
 /**
  * Generate platform project template.
- * @param {String} packageId Package name in com.example.Foo format
  * @param {Object} options Extra options for the command
  * @param {PlatformBase~platformBaseOperationCb} callback callback function
  */
 PlatformBase.prototype.generate =
-function(packageId, options, callback) {
+function(options, callback) {
 
     throw new Error("PlatformBase.generate() not implemented.");
 };

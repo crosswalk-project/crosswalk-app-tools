@@ -35,7 +35,8 @@ exports.tests = {
         test.equal(platform.application instanceof Application, true);
         test.equal(platform.platformId, _platformId);
         test.equal(platform.logOutput instanceof LogfileOutput, true);
-
+        // TODO test for the other properties as well
+        
         ShellJS.rm("-rf", basePath);
 
         test.done();

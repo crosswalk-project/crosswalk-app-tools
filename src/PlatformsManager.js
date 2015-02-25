@@ -17,7 +17,7 @@ function PlatformsManager(application) {
  * @typedef PlatformInfo
  * @type {Object}
  * @property {Function} Ctor Constructor for the associated {@link PlatformBase} subclass
- * @property {String} name Name for backend (android, ios, ...)
+ * @property {String} platformId Name for backend (android, ios, ...)
  * @memberOf PlatformsManager
  */
 
@@ -46,23 +46,23 @@ function() {
 
             var Ctor = require(implementations[i]);
             var prefix = "crosswalk-app-tools-backend-";
-            var name = null;
+            var platformId = null;
             if (implementations[i].substring(0, prefix.length) == prefix) {
                 // Extract last part after common prefix.
-                name = implementations[i].substring(prefix.length);
+                platformId = implementations[i].substring(prefix.length);
             } else if (implementations[i] == "./android/AndroidPlatform") {
                 // Special case built-in android backend, so we get a conforming name.
-                name = "android";
+                platformId = "android";
             } else {
                 throw new Error("Unhandled platform name " + implementations[i]);
             }
             platformInfo = {
                 Ctor: Ctor,
-                name: name
+                platformId: platformId
             };
 
             // If we get here there backend has been instantiated successfully.
-            output.info("Using backend '" + name + "'");
+            output.info("Using backend '" + platformId + "'");
             break;
 
         } catch (e) {

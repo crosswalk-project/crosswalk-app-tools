@@ -30,8 +30,7 @@ function mainOperationCb(success) {}
  * @private
  */
 function Main() {
-    // Chain up the constructor.
-    // Application.call(this);
+
 }
 Main.prototype = Application.prototype;
 
@@ -54,18 +53,9 @@ function workingDirectoryIsProject() {
  * @static
  */
 Main.prototype.instantiateProject =
-function(packageId) {
+function() {
 
     var output = this.output;
-
-    if (!packageId) {
-        // Name of current directory must be packageId, otherwise we can not continue.
-        var basename = Path.basename(process.cwd());
-        packageId = CommandParser.validatePackageId(basename, output);
-        if (!packageId) {
-            return null;
-        }
-    }
 
     var mgr = new PlatformsManager(this);
     var platformInfo = mgr.loadDefault();
@@ -74,12 +64,14 @@ function(packageId) {
         return null;
     }
 
-    //function Frontend(application, baseDir, packageId, platformId) {
-
-    var platform;
+    var platformData = {
+        application: this,
+        platformId: platformInfo.platformId
+    };
+    var platform = null;
 
     try {
-        platform = new platformInfo.Ctor(this);
+        platform = new platformInfo.Ctor(platformData);
     } catch (e) {
         output.error("The Android SDK could not be found. " +
                       "Make sure the directory containing the 'android' " +
@@ -92,13 +84,12 @@ function(packageId) {
 
 /**
  * Create skeleton project.
- * @param {String} packageId Identifier in the form of com.example.foo
  * @param {Object} options Extra options for the command
  * @param {Main~mainOperationCb} [callback] Callback function
  * @static
  */
 Main.prototype.create =
-function(packageId, options, callback) {
+function(options, callback) {
 
     var output = this.output;
 
@@ -106,13 +97,13 @@ function(packageId, options, callback) {
     if (!callback)
         callback = function() {};
 
-    var project = this.instantiateProject(packageId);
+    var project = this.instantiateProject();
     if (!project) {
         callback(false);
         return;
     }
 
-    project.generate(packageId, options, function(errormsg) {
+    project.generate(options, function(errormsg) {
 
         if (errormsg) {
             output.error(errormsg);
@@ -210,22 +201,35 @@ function() {
         case "create":
             var packageId = parser.createGetPackageId();
             options = parser.createGetOptions();
-            this.create(packageId, options);
+            
+            // Chain up the constructor.
+            Application.call(this, packageId);
+            
+            this.create(options);
             break;
+
         case "update":
             var version = parser.updateGetVersion();
             this.output.warning("TODO implement");
             break;
+        
         case "build":
             var type = parser.buildGetType();
+
+            // Chain up the constructor.
+            Application.call(this, null);
+
             this.build(type);
             break;
+
         case "help":
             this.printHelp(parser);
             break;
+
         case "version":
             this.printVersion();
             break;
+
         default:
             // TODO
         }
