@@ -73,6 +73,18 @@ Object.defineProperty(PlatformBase.prototype, "appPath", {
                       });
 
 /**
+* Logfile output object.
+* @member {OutputIface} logOutput
+* @instance
+* @memberOf PlatformBase
+*/
+Object.defineProperty(PlatformBase.prototype, "logOutput", {
+                      get: function() {
+                                return this._logOutput;
+                      }
+});
+
+/**
  * Application instance.
  * @member {String} packageId
  * @instance
@@ -82,30 +94,6 @@ Object.defineProperty(PlatformBase.prototype, "packageId", {
                       get: function() {
                                 return this._application.packageId;
                            }
-                      });
-
-/**
- * Absolute path to directory where the platform-specific code is located (inside the project).
- * @member {String} platformPath
- * @instance
- * @memberOf PlatformBase
- */
-Object.defineProperty(PlatformBase.prototype, "platformPath", {
-                      get: function() {
-                                return Path.join(this._application.prjPath, this.platformId);
-                           }
-                      });
-
-/**
- * Absolute path to directory where the platform-specific project is located.
- * @member {String} prjPath
- * @instance
- * @memberOf PlatformBase
- */
-Object.defineProperty(PlatformBase.prototype, "prjPath", {
-                      get: function() {
-                                return this._application.prjPath;
-                            }
                       });
 
 /**
@@ -133,16 +121,28 @@ Object.defineProperty(PlatformBase.prototype, "platformId", {
                       });
 
 /**
-* Logfile output object.
-* @member {OutputIface} logOutput
-* @instance
-* @memberOf PlatformBase
-*/
-Object.defineProperty(PlatformBase.prototype, "logOutput", {
+ * Absolute path to directory where the platform-specific code is located (inside the project).
+ * @member {String} platformPath
+ * @instance
+ * @memberOf PlatformBase
+ */
+Object.defineProperty(PlatformBase.prototype, "platformPath", {
                       get: function() {
-                                return this._logOutput;
-                      }
-});
+                                return Path.join(this._application.prjPath, this.platformId);
+                           }
+                      });
+
+/**
+ * Absolute path to directory where the platform-specific project is located.
+ * @member {String} prjPath
+ * @instance
+ * @memberOf PlatformBase
+ */
+Object.defineProperty(PlatformBase.prototype, "prjPath", {
+                      get: function() {
+                                return this._application.prjPath;
+                            }
+                      });
 
 /**
  * Generate platform project template.

@@ -2,6 +2,8 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var Path = require("path");
+
 var ShellJS = require("shelljs");
 
 var Application = require("../src/Application");
@@ -21,7 +23,7 @@ exports.tests = {
 
     ctor: function(test) {
 
-        test.expect(3);
+        test.expect(8);
 
         var basePath = Util.createTmpDir();
         var application = new Application(basePath, _packageId);
@@ -33,9 +35,13 @@ exports.tests = {
         var platform = new TestPlatform(platformData);
 
         test.equal(platform.application instanceof Application, true);
-        test.equal(platform.platformId, _platformId);
+        test.equal(platform.appPath, Path.join(basePath, _packageId, "app"));
         test.equal(platform.logOutput instanceof LogfileOutput, true);
-        // TODO test for the other properties as well
+        test.equal(platform.packageId, _packageId);
+        test.equal(platform.pkgPath, Path.join(basePath, _packageId, "pkg"));
+        test.equal(platform.platformId, _platformId);
+        test.equal(platform.platformPath, Path.join(basePath, _packageId, "prj", _platformId));
+        test.equal(platform.prjPath, Path.join(basePath, _packageId, "prj"));
         
         ShellJS.rm("-rf", basePath);
 
