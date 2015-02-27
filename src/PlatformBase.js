@@ -2,10 +2,14 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
-var Path = require('path');
+var Path = require("path");
+
+var ShellJS = require("shelljs");
 
 var Application = require("./Application");
 var LogfileOutput = require("./LogfileOutput");
+
+var InvalidPathException = require("./util/exceptions").InvalidPathException;
 
 /**
  * Callback signature for {@link PlatformBase.generate}.
@@ -143,6 +147,25 @@ Object.defineProperty(PlatformBase.prototype, "prjPath", {
                                 return this._application.prjPath;
                             }
                       });
+
+/**
+ * Export a built package to the common packages folder.
+ * @param {String} packagePath Path where the built package is located
+ * @throws {InvalidPathException} If package file or package folder do not exist.
+ */
+PlatformBase.prototype.exportPackage =
+function(packagePath) {
+
+    if (!ShellJS.test("-f", packagePath)) {
+        throw new InvalidPathException("Package could not be found " + packagePath);
+    }
+
+    if (!ShellJS.test("-d", this.pkgPath)) {
+        throw new InvalidPathException("Package could not be found " + this.pkgPath);
+    }
+
+    ShellJS.mv(packagePath, this.pkgPath);
+};
 
 /**
  * Generate platform project template.
