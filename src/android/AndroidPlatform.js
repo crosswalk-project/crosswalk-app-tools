@@ -78,10 +78,10 @@ function(apiTarget, projectPath) {
     tpl.render(data, activityPath + Path.sep + "MainActivity.java");
 
     // Make html5 app dir and copy sample content
-    ShellJS.mkdir("-p", projectPath + Path.sep + "assets");
-    ShellJS.cp("-r",
-               __dirname + Path.sep + ".."+ Path.sep + "data" + Path.sep + "www",
-               projectPath + Path.sep + "assets");
+    var assetsPath = Path.join(projectPath, "assets");
+    ShellJS.mkdir("-p", assetsPath);
+    var wwwPath = Path.join(assetsPath, "www");
+    ShellJS.ln("-s", this.appPath, wwwPath);
 
     // TODO check for errors
     return true;
@@ -147,7 +147,7 @@ function(crosswalkPath, projectPath) {
     if (major < 8) {
         output.error("Crosswalk version " + major + " not supported. Use 8+.");
         return false;
-    } else if (major > 9) {
+    } else if (major > 10) {
         output.warning("This tool has not been tested with Crosswalk " + major + ".");
     }
 

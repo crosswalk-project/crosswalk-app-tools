@@ -97,6 +97,11 @@ function(options, callback) {
     if (!callback)
         callback = function() {};
 
+    // Copy sample web app content
+    ShellJS.cp("-r",
+               Path.join(__dirname, "..", "data", "www", "*"),
+               this.appPath);
+
     var project = this.instantiateProject();
     if (!project) {
         callback(false);
@@ -201,10 +206,10 @@ function() {
         case "create":
             var packageId = parser.createGetPackageId();
             options = parser.createGetOptions();
-            
+
             // Chain up the constructor.
-            Application.call(this, packageId);
-            
+            Application.call(this, process.cwd(), packageId);
+
             this.create(options);
             break;
 
@@ -212,12 +217,12 @@ function() {
             var version = parser.updateGetVersion();
             this.output.warning("TODO implement");
             break;
-        
+
         case "build":
             var type = parser.buildGetType();
 
             // Chain up the constructor.
-            Application.call(this, null);
+            Application.call(this, process.cwd(), null);
 
             this.build(type);
             break;
