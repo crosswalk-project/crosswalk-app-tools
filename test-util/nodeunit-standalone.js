@@ -48,13 +48,24 @@ if (process.argv.length <= 2) {
             test.tests.setUp(function() {});
         }
 
-        for (var key in test.tests) {
+        var testCase = process.argv[3];
+        if (testCase) {
 
-            if (key == "setUp" || key == "tearDown")
-                continue;
+            // Run named test.
+            _output.print("Testing " + testCase);
+            test.tests[testCase](new Driver());
 
-            _output.print("Testing " + key);
-            test.tests[key](new Driver());
+        } else {
+
+            // Run all tests
+            for (var key in test.tests) {
+
+                if (key == "setUp" || key == "tearDown")
+                    continue;
+
+                _output.print("Testing " + key);
+                test.tests[key](new Driver());
+            }
         }
 
         if (test.tests.tearDown) {
