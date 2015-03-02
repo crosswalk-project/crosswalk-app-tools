@@ -43,7 +43,7 @@ TerminalOutput.prototype.info =
 function(message) {
 
     if (!_config.getSilentConsole())
-        console.log("   * " + message);
+        console.log("  * " + message);
 };
 
 TerminalOutput.prototype.highlight =

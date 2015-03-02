@@ -27,7 +27,7 @@ function(tag) {
     // Go to column 0
     this._output.put('\033[0G');
 
-    var line = "   * " + this._label + " [" + tag + "...]";
+    var line = "  * " + this._label + " [" + tag + "...]";
     this._output.put(line);
 };
 
@@ -47,7 +47,7 @@ function(message) {
     // Go to column 0
     this._output.put('\033[0G');
 
-    var line = "   * " + this._label + " [done] " + message;
+    var line = "  * " + this._label + " [done] " + message;
     this._output.print(line);
 };
 

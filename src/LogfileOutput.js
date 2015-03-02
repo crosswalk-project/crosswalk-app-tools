@@ -56,7 +56,7 @@ function(message) {
 LogfileOutput.prototype.info =
 function(message) {
 
-    var output = "   * " + message + "\n";
+    var output = "  * " + message + "\n";
     FS.appendFileSync(this._path, output);
     return output;
 };

@@ -30,7 +30,7 @@ function(progress) {
     this._output.put('\033[0G');
 
     // Label
-    this._output.put("   * " + this._label);
+    this._output.put("  * " + this._label);
 
     // Progress
     this._output.put(" [");
