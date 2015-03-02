@@ -10,7 +10,7 @@ var Application = require("../src/Application");
 var Config = require("../src/Config");
 var IllegalAccessException = require("../src/util/exceptions").IllegalAccessException;
 var TerminalOutput = require("../src/TerminalOutput");
-var Util = require("../test-util/Util");
+var Util = require("./util/Util.js");
 
 var _basePath = null;
 var _packageId = "com.example.foo";

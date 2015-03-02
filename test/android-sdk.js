@@ -6,7 +6,7 @@ var OS = require('os');
 var ShellJS = require("shelljs");
 
 var AndroidSDK = require("../src/android/AndroidSDK");
-var Util = require("../test-util/Util");
+var Util = require("./util/Util.js");
 
 // Run tests silently to avoid spew from tests failing on purpose.
 require("../src/Config").getInstance().setSilentConsole(true);

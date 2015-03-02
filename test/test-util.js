@@ -8,7 +8,7 @@ var Path = require('path');
 var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
 
-var Util = require("../test-util/Util.js");
+var Util = require("./util/Util.js");
 
 var _projectRoot = Path.normalize(__dirname + Path.sep + "..");
 

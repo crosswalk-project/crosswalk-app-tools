@@ -7,7 +7,7 @@ var OS = require('os');
 var ShellJS = require("shelljs");
 
 var Downloader = require("../src/util/Downloader");
-var Util = require("../test-util/Util");
+var Util = require("./util/Util.js");
 
 // Test involves progress output, make it visible.
 require("../src/Config").getInstance().setSilentConsole(false);

@@ -8,46 +8,11 @@ var ShellJS = require("shelljs");
 
 var Application = require("../src/Application");
 var LogfileOutput = require("../src/LogfileOutput");
-var Util = require("../test-util/Util");
+var TestPlatformScope = require("./util/TestPlatform");
+var Util = require("./util/Util.js");
 
 var _packageId = "com.example.foo";
 var _platformId = "test";
-
-
-
-function TestPlatformScope(PlatformBase, baseData) {
-
-    function TestPlatform(PlatformBase, baseData) {
-        // Chain up constructor.
-        PlatformBase.call(this, baseData);
-    }
-    TestPlatform.prototype = PlatformBase.prototype;
-
-    TestPlatform.prototype.generate =
-    function(options, callback) {
-        // Null means success, error string means failure.
-        callback(null);
-    };
-    TestPlatform.prototype.update =
-    function(callback) {
-        // Null means success, error string means failure.
-        callback(null);
-    };
-    TestPlatform.prototype.refresh =
-    function(callback) {
-        // Null means success, error string means failure.
-        callback(null);
-    };
-    TestPlatform.prototype.build =
-    function(abis, release, callback) {
-        // Null means success, error string means failure.
-        callback(null);
-    };
-
-    return new TestPlatform(PlatformBase, baseData);
-}
-
-
 
 exports.tests = {
 
