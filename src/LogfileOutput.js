@@ -40,7 +40,7 @@ function LogfileOutput(path) {
 LogfileOutput.prototype.error =
 function(message) {
 
-    var output = "ERROR: " + message + "\n";
+    var output = "*** ERROR: " + message + "\n";
     FS.appendFileSync(this._path, output);
     return output;
 };
@@ -48,7 +48,7 @@ function(message) {
 LogfileOutput.prototype.warning =
 function(message) {
 
-    var output = "WARNING: " + message + "\n";
+    var output = " ** WARNING: " + message + "\n";
     FS.appendFileSync(this._path, output);
     return output;    
 };
@@ -56,7 +56,7 @@ function(message) {
 LogfileOutput.prototype.info =
 function(message) {
 
-    var output = "* " + message + "\n";
+    var output = "   * " + message + "\n";
     FS.appendFileSync(this._path, output);
     return output;
 };

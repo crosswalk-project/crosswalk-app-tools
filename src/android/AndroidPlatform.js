@@ -339,6 +339,8 @@ function(options, callback) {
         this._sdk.generateProjectSkeleton(this.platformPath, this.packageId, apiTarget,
                                           function(path, logmsg, errormsg) {
 
+            this.logOutput.print(logmsg);
+
             if (!path || errormsg) {
                 callback(errormsg);
                 return;
@@ -505,6 +507,8 @@ function(closure) {
     var indicator = output.createInfiniteProgress("Building " + abi);
     this._sdk.onData = function(data) {
 
+        this.logOutput.print(data);
+
         // Scan first 7 chars if data starts with a [tag]
         var tag = null;
         for (var i = 0; i < 7 && i < data.length; i++) {
@@ -522,7 +526,7 @@ function(closure) {
                 break;
             }
         }
-    };
+    }.bind(this);
 
     // Build for ABI.
     this._sdk.buildProject(closure.release, function(success) {
@@ -570,7 +574,7 @@ function(abis, release, callback) {
 
     // TODO should we cd back afterwards?
     process.chdir(this.platformPath);
-    
+
     var closure = {
         abis: abis,
         abiIndex : 0,
