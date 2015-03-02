@@ -8,7 +8,6 @@ var ShellJS = require("shelljs");
 
 var AndroidProjectDeps = require("./AndroidProjectDeps");
 var AndroidSDK = require("./AndroidSDK");
-var PlatformBase = require("../PlatformBase");
 
 var TemplateFile = require("../util/TemplateFile");
 
@@ -16,18 +15,30 @@ var TemplateFile = require("../util/TemplateFile");
  * Android project class.
  * @extends PlatformBase
  * @constructor
+ * @param {Function} PlatformBase Base class constructor {@link PlatformBase}
  * @param {PlatformData} platformData Init data passed to the platform
  * @throws {@link AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
  */
-function AndroidPlatform(platformData) {
+function AndroidPlatform(PlatformBase, baseData) {
 
-    // Chain up
-    PlatformBase.call(this, platformData);
+    // Create base instance.
+    var instance = new PlatformBase(baseData);
+    var o = instance.output;
 
-    this._sdk = new AndroidSDK(this.application);
-    this._channel = "stable";
+    // Override manually, because Object.extend() is not yet available on node.
+    var names = Object.getOwnPropertyNames(AndroidPlatform.prototype);
+    for (var i = 0; i < names.length; i++) {
+        var key = names[i];
+        if (key != "constructor") {
+            instance[key] = AndroidPlatform.prototype[key];
+        }
+    }
+
+    instance._sdk = new AndroidSDK(instance.application);
+    instance._channel = "stable";
+
+    return instance;
 }
-AndroidPlatform.prototype = PlatformBase.prototype;
 
 /**
  * Fill template files and put them into the project skeleton.

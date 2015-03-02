@@ -152,6 +152,8 @@ function() {
 AndroidSDK.prototype.buildProject =
 function(release, callback) {
 
+    var output = this._application.output;
+
     var ant = ShellJS.which("ant");
     if (!ant) {
         callback(null, "Executable 'ant' not found in path");

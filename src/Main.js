@@ -8,6 +8,7 @@ var ShellJS = require("shelljs");
 
 var Application = require("./Application");
 var CommandParser = require("./CommandParser");
+var PlatformBase = require("./PlatformBase");
 var PlatformsManager = require("./PlatformsManager");
 
 /**
@@ -71,7 +72,7 @@ function() {
     var platform = null;
 
     try {
-        platform = new platformInfo.Ctor(platformData);
+        platform = new platformInfo.Ctor(PlatformBase, platformData);
     } catch (e) {
         output.error("The Android SDK could not be found. " +
                       "Make sure the directory containing the 'android' " +

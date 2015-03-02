@@ -73,7 +73,7 @@ Object.defineProperty(PlatformBase.prototype, "application", {
 Object.defineProperty(PlatformBase.prototype, "appPath", {
                       get: function() {
                                 return this._application.appPath;
-                            }
+                           }
                       });
 
 /**
@@ -85,8 +85,20 @@ Object.defineProperty(PlatformBase.prototype, "appPath", {
 Object.defineProperty(PlatformBase.prototype, "logOutput", {
                       get: function() {
                                 return this._logOutput;
-                      }
-});
+                           }
+                      });
+
+/**
+ * Read-only {@link TerminalOutput} object.
+ * @member {TerminalOutput} output
+ * @instance
+ * @memberOf PlatformBase
+ */
+Object.defineProperty(PlatformBase.prototype, "output", {
+                      get: function() {
+                                return this._application.output;
+                           }
+                      });
 
 /**
  * Application instance.
@@ -109,7 +121,7 @@ Object.defineProperty(PlatformBase.prototype, "packageId", {
 Object.defineProperty(PlatformBase.prototype, "pkgPath", {
                       get: function() {
                                 return this._application.pkgPath;
-                            }
+                           }
                       });
 
 /**
@@ -145,7 +157,7 @@ Object.defineProperty(PlatformBase.prototype, "platformPath", {
 Object.defineProperty(PlatformBase.prototype, "prjPath", {
                       get: function() {
                                 return this._application.prjPath;
-                            }
+                           }
                       });
 
 /**
