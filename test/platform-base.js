@@ -8,16 +8,46 @@ var ShellJS = require("shelljs");
 
 var Application = require("../src/Application");
 var LogfileOutput = require("../src/LogfileOutput");
-var PlatformBase = require("../src/PlatformBase");
 var Util = require("../test-util/Util");
 
 var _packageId = "com.example.foo";
 var _platformId = "test";
 
-function TestPlatform(data) {
-    PlatformBase.call(this, data);
+
+
+function TestPlatformScope(PlatformBase, baseData) {
+
+    function TestPlatform(PlatformBase, baseData) {
+        // Chain up constructor.
+        PlatformBase.call(this, baseData);
+    }
+    TestPlatform.prototype = PlatformBase.prototype;
+
+    TestPlatform.prototype.generate =
+    function(options, callback) {
+        // Null means success, error string means failure.
+        callback(null);
+    };
+    TestPlatform.prototype.update =
+    function(callback) {
+        // Null means success, error string means failure.
+        callback(null);
+    };
+    TestPlatform.prototype.refresh =
+    function(callback) {
+        // Null means success, error string means failure.
+        callback(null);
+    };
+    TestPlatform.prototype.build =
+    function(abis, release, callback) {
+        // Null means success, error string means failure.
+        callback(null);
+    };
+
+    return new TestPlatform(PlatformBase, baseData);
 }
-TestPlatform.prototype = PlatformBase.prototype;
+
+
 
 exports.tests = {
 
@@ -32,7 +62,8 @@ exports.tests = {
             application: application,
             platformId: _platformId
         };
-        var platform = new TestPlatform(platformData);
+        var PlatformBase = require("../src/PlatformBase");
+        var platform = new TestPlatformScope(PlatformBase, platformData);
 
         test.equal(platform.application instanceof Application, true);
         test.equal(platform.appPath, Path.join(basePath, _packageId, "app"));
@@ -42,7 +73,42 @@ exports.tests = {
         test.equal(platform.platformId, _platformId);
         test.equal(platform.platformPath, Path.join(basePath, _packageId, "prj", _platformId));
         test.equal(platform.prjPath, Path.join(basePath, _packageId, "prj"));
-        
+
+        ShellJS.rm("-rf", basePath);
+
+        test.done();
+    },
+
+    subclass: function(test) {
+
+        test.expect(4);
+
+        var basePath = Util.createTmpDir();
+        var application = new Application(basePath, _packageId);
+
+        var platformData = {
+            application: application,
+            platformId: _platformId
+        };
+        var PlatformBase = require("../src/PlatformBase");
+        var platform = new TestPlatformScope(PlatformBase, platformData);
+
+        platform.generate(null, function(errormsg) {
+            test.equal(errormsg, null);
+        });
+
+        platform.update(function(errormsg) {
+            test.equal(errormsg, null);
+        });
+
+        platform.refresh(function(errormsg) {
+            test.equal(errormsg, null);
+        });
+
+        platform.build(["foo"], false, function(errormsg) {
+            test.equal(errormsg, null);
+        });
+
         ShellJS.rm("-rf", basePath);
 
         test.done();
