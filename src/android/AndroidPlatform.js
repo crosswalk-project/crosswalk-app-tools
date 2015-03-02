@@ -158,7 +158,7 @@ function(crosswalkPath, projectPath) {
     if (major < 8) {
         output.error("Crosswalk version " + major + " not supported. Use 8+.");
         return false;
-    } else if (major > 10) {
+    } else if (major > 11) {
         output.warning("This tool has not been tested with Crosswalk " + major + ".");
     }
 
@@ -324,7 +324,7 @@ function(options, callback) {
 
     var output = this.application.output;
 
-    var minApiLevel = 19;
+    var minApiLevel = 21;
     var apiTarget;
     this._sdk.queryTarget(minApiLevel,
                           function(apiTarget, errormsg) {
@@ -333,6 +333,8 @@ function(options, callback) {
             callback(errormsg);
             return;
         }
+
+        output.info("Building against API level " + apiTarget);
 
         this._sdk.generateProjectSkeleton(this.platformPath, this.packageId, apiTarget,
                                           function(path, logmsg, errormsg) {
