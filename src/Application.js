@@ -167,18 +167,6 @@ Object.defineProperty(Application.prototype, "rootPath", {
                       });
 
 /**
- * Path where downloads are cached. Might be null when not used.
- * @member {String} downloadsCachePath
- * @instance
- * @memberOf Application
- */
-Object.defineProperty(Application.prototype, "downloadsCachePath", {
-                      get: function() {
-                                return process.env.CROSSWALK_APP_TOOLS_DOWNLOAD_DIR;
-                            }
-                      });
-
-/**
  * Read-only {@link Config} object.
  * @member {Config} config
  * @throws {IllegalAccessException} If writing this property is attempted.

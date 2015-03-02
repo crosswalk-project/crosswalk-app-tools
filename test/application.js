@@ -52,18 +52,6 @@ exports.tests = {
         test.done();
     },
 
-    downloadsCachePath: function(test) {
-
-        test.expect(1);
-
-        var downloadsCachePath = process.env.CROSSWALK_APP_TOOLS_DOWNLOAD_DIR ?
-                                    process.env.CROSSWALK_APP_TOOLS_DOWNLOAD_DIR :
-                                    null;
-        test.equal(ShellJS.test("-d", _application.downloadsCachePath), downloadsCachePath);
-
-        test.done();
-    },
-
     getConfig: function(test) {
 
         test.expect(1);
