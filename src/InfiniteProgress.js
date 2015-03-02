@@ -27,7 +27,7 @@ function(tag) {
     // Go to column 0
     this._output.put('\033[0G');
 
-    var line = this._label + " [" + tag + ']';
+    var line = "   * " + this._label + " [" + tag + "...]";
     this._output.put(line);
 };
 
@@ -41,8 +41,14 @@ function(message) {
     if (typeof message == "undefined")
         message = "";
 
-    // Also prints \r\n so we're ready for the next output.
-    this._output.print(" " + message);
+    // Clear line
+    this._output.put('\033[2K');
+
+    // Go to column 0
+    this._output.put('\033[0G');
+
+    var line = "   * " + this._label + " [done] " + message;
+    this._output.print(line);
 };
 
 module.exports = InfiniteProgress;

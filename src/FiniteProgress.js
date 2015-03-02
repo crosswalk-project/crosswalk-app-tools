@@ -26,12 +26,11 @@ function(progress) {
                progress > 1 ? 1 :
                progress;
 
-
     // Go to column 0
     this._output.put('\033[0G');
 
     // Label
-    this._output.put(this._label);
+    this._output.put("   * " + this._label);
 
     // Progress
     this._output.put(" [");

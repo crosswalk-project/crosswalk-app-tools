@@ -111,7 +111,7 @@ function(path, packageId, apiTarget, callback) {
         return;
     }
 
-    var indicator = output.createInfiniteProgress("Creating " + packageId + " ");
+    var indicator = output.createInfiniteProgress("Creating " + packageId);
 
     // Create project
     // "android create project -t android-18 -p $(pwd)/Foo -k com.example.Foo -a MainActivity"

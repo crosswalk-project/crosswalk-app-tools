@@ -29,21 +29,21 @@ TerminalOutput.prototype.error =
 function(message) {
 
     if (!_config.getSilentConsole())
-        console.error("ERROR: " + message);
+        console.error("*** ERROR: " + message);
 };
 
 TerminalOutput.prototype.warning =
 function(message) {
 
     if (!_config.getSilentConsole())
-        console.error("WARNING: " + message);
+        console.error(" ** WARNING: " + message);
 };
 
 TerminalOutput.prototype.info =
 function(message) {
 
     if (!_config.getSilentConsole())
-        console.log("* " + message);
+        console.log("   * " + message);
 };
 
 TerminalOutput.prototype.highlight =
@@ -93,6 +93,11 @@ function(label) {
     if (typeof label === "undefined")
         label = "";
 
+    // TODO remember the indicator as current context,
+    // and when a message (particularly warning or error)
+    // is printed while having current context, insert
+    // extra newline, so the message is in the correct place.
+
     var indicator = new FiniteProgress(this, label);
     return indicator;
 };
@@ -107,6 +112,11 @@ function(label) {
 
     if (typeof label === "undefined")
         label = "";
+
+    // TODO remember the indicator as current context,
+    // and when a message (particularly warning or error)
+    // is printed while having current context, insert
+    // extra newline, so the message is in the correct place.
 
     var indicator = new InfiniteProgress(this, label);
     return indicator;
