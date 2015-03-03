@@ -73,7 +73,7 @@ exports.tests = {
     print: function(test) {
         
         test.expect(1);
-        var ret = testMethod(LogfileOutput.prototype.print, "print message");
+        var ret = testMethod(LogfileOutput.prototype.write, "print message");
         test.equal(ret, true);
         test.done();
     }

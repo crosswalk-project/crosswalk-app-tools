@@ -24,7 +24,7 @@ function LogfileOutput(path) {
         flags: "w",
         mode: 0600
     };
-    
+
     FS.writeFileSync(this._path, "");
 
 /* TODO    
@@ -64,12 +64,12 @@ function(message) {
 LogfileOutput.prototype.highlight =
 function(message) {
 
-    var output = "*** " + message + "\n";
-    FS.appendFileSync(this._path, "*** " + message + "\n");
+    var output = "    >> " + message + " <<\n";
+    FS.appendFileSync(this._path, output);
     return output;
 };
 
-LogfileOutput.prototype.print =
+LogfileOutput.prototype.write =
 function(message) {
 
     FS.appendFileSync(this._path, message);

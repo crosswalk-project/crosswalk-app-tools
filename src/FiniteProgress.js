@@ -27,23 +27,23 @@ function(progress) {
                progress;
 
     // Go to column 0
-    this._output.put('\033[0G');
+    this._output.write('\033[0G');
 
     // Label
-    this._output.put("  * " + this._label);
+    this._output.write("  * " + this._label);
 
     // Progress
-    this._output.put(" [");
+    this._output.write(" [");
     var percentageInTens = Math.round(progress * 10);
     for (var i = 0; i < percentageInTens; i++) {
-        this._output.put('#');
+        this._output.write('#');
     }
 
     // Remaining
     for (i = percentageInTens; i < 10; i++) {
-        this._output.put(' ');
+        this._output.write(' ');
     }
-    this._output.put(']');
+    this._output.write(']');
 };
 
 /**
@@ -57,7 +57,7 @@ function(message) {
         message = "";
 
     // Also prints \r\n so we're ready for the next output.
-    this._output.print(" " + message);
+    this._output.write(" " + message);
 };
 
 module.exports = FiniteProgress;

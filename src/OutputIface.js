@@ -61,16 +61,14 @@ function(message) {
 };
 
 /**
- * Print message.
- * Printing an info message is the way to inform about progress,
- * such as the completion of a step when creating a project or
- * building packages.
+ * Write message.
+ * Write raw message to the output.
  * @param {String} message
  */
-OutputIface.prototype.print =
+OutputIface.prototype.write =
 function(message) {
 
-    throw new Error("OutputIface.print() not implemented.");
+    throw new Error("OutputIface.write() not implemented.");
 };
 
 

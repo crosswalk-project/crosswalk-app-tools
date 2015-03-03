@@ -339,7 +339,7 @@ function(options, callback) {
         this._sdk.generateProjectSkeleton(this.platformPath, this.packageId, apiTarget,
                                           function(path, logmsg, errormsg) {
 
-            this.logOutput.print(logmsg);
+            this.logOutput.write(logmsg);
 
             if (!path || errormsg) {
                 callback(errormsg);
@@ -507,7 +507,7 @@ function(closure) {
     var indicator = output.createInfiniteProgress("Building " + abi);
     this._sdk.onData = function(data) {
 
-        this.logOutput.print(data);
+        this.logOutput.write(data);
 
         // Scan first 7 chars if data starts with a [tag]
         var tag = null;

@@ -177,7 +177,7 @@ Main.prototype.printHelp =
 function(parser) {
 
     var buf = parser.help();
-    this.output.print(buf);
+    this.output.write(buf + "\n");
 };
 
 /**
@@ -188,7 +188,7 @@ Main.prototype.printVersion =
 function() {
 
     var Package = require("../package.json");
-    this.output.print(Package.version);
+    this.output.write(Package.version + "\n");
 };
 
 /**

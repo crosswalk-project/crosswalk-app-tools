@@ -22,13 +22,13 @@ InfiniteProgress.prototype.update =
 function(tag) {
 
     // Clear line
-    this._output.put('\033[2K');
+    this._output.write('\033[2K');
 
     // Go to column 0
-    this._output.put('\033[0G');
+    this._output.write('\033[0G');
 
     var line = "  * " + this._label + " [" + tag + "...]";
-    this._output.put(line);
+    this._output.write(line);
 };
 
 /**
@@ -42,13 +42,13 @@ function(message) {
         message = "";
 
     // Clear line
-    this._output.put('\033[2K');
+    this._output.write('\033[2K');
 
     // Go to column 0
-    this._output.put('\033[0G');
+    this._output.write('\033[0G');
 
     var line = "  * " + this._label + " [done] " + message;
-    this._output.print(line);
+    this._output.write(line);
 };
 
 module.exports = InfiniteProgress;

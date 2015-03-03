@@ -53,32 +53,11 @@ function(message) {
         console.log('\033[1m' + message + '\033[0m');
 };
 
-TerminalOutput.prototype.print =
+TerminalOutput.prototype.write =
 function(message) {
 
-    if (!_config.getSilentConsole())
-        console.log(message);
-};
-
-/**
- * Output raw string without adding a newline.
- * @param {String} message
- * @param {Boolean} [toStderr] Whether to write on stderr.
- *                             Default is stdout if applicable for the implementation
- */
-TerminalOutput.prototype.put =
-function(message, stderr) {
-
-    // Default to stdout.
-    if (typeof stderr === "undefined")
-        stderr = false;
-
     if (!_config.getSilentConsole()) {
-        if (stderr) {
-            process.stderr.write(message);
-        } else {
-            process.stdout.write(message);
-        }
+        process.stdout.write(message);
     }
 };
 
