@@ -9,8 +9,6 @@ var Url = require("url");
 
 var ShellJS = require("shelljs");
 
-var FileCreationFailed = require("./exceptions").FileCreationFailed;
-
 
 
 /**
@@ -27,26 +25,12 @@ function downloadFinishedCb(errormsg) {}
  * Create Downloader object.
  * @constructor
  * @param {String} url URL to download
- * @param {String} toPath Path do download to
- * @throws {exceptions.FileCreationFailed} If file toPath could not be opened for writing.
+ * @param {Stream} stream Stream to write data to
  */
-function Downloader(url, toPath) {
+function Downloader(url, stream) {
 
     this._url = url;
-
-    if (ShellJS.test("-e", toPath)) {
-        throw new FileCreationFailed("File already exists " + toPath);
-    }
-
-    var options = {
-        flags: "w",
-        mode: 0600
-    };
-    this._fp = FS.createWriteStream(toPath, options);
-
-    if (!this._fp) {
-        throw new FileCreationFailed("Could not open file " + toPath);
-    }
+    this._stream = stream;
 
     this._downloaded = 0;
     this._contentLength = 0;
@@ -66,7 +50,7 @@ function(callback) {
     }
 
     // Object can only be used once.
-    if (!this._fp) {
+    if (!this._stream) {
         callback("Downloader object can only be used once");
         return;
     }
@@ -132,8 +116,8 @@ function(urlInfo, callback) {
 
         res.on("error", function(e) {
 
-            this._fp.end();
-            this._fp = null;
+            this._stream.end();
+            this._stream = null;
             this._url = null;
             callback("Download failed: " + e.message);
 
@@ -141,7 +125,7 @@ function(urlInfo, callback) {
 
         res.on('data', function(data) {
 
-            this._fp.write(data);
+            this._stream.write(data);
             this._downloaded += data.length;
 
             if (this._contentLength < 0) {
@@ -160,8 +144,8 @@ function(urlInfo, callback) {
                 this.progress(1.0);
             }
 
-            this._fp.end();
-            this._fp = null;
+            this._stream.end();
+            this._stream = null;
             this._url = null;
             callback(null);
 

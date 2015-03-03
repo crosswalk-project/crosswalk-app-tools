@@ -5,10 +5,11 @@
 var FS = require("fs");
 var Path = require("path");
 
-var MkTemp = require("mktemp");
+var MemoryStream = require("memorystream");
 var ShellJS = require("shelljs");
 
-var Downloader = require("../util//Downloader");
+var Downloader = require("../util/Downloader");
+var FileCreationFailed = require("../util/exceptions").FileCreationFailed;
 var IndexParser = require("../util/IndexParser");
 
 var BASE_URL = "https://download.01.org/crosswalk/releases/crosswalk/android/";
@@ -78,45 +79,38 @@ function(callback) {
 
     var output = this._application.output;
     var url = BASE_URL + this._channel + "/";
-    // TODO use memory stream instead of tmpfile
-    var indexFile = MkTemp.createFileSync('index.html.XXXXXX');
-    if (indexFile) {
 
-        // TODO fix this hack by creating and opening tmpfiles atomically somehow
-        ShellJS.rm(indexFile);
+    // Download
+    var stream = new MemoryStream();
+    var buffer = "";
+    stream.on("data", function(data) {
+        buffer += data.toString();
+    });
 
-        // Download
-        var label = "Fetching '" + this._channel + "' versions index";
-        var indicator = output.createFiniteProgress(label);
-        var downloader = new Downloader(url, indexFile);
-        downloader.progress = function(progress) {
-            indicator.update(progress);
-        };
-        downloader.get(function(errormsg) {
+    var downloader = new Downloader(url, stream);
 
-            indicator.done("");
+    var label = "Fetching '" + this._channel + "' versions index";
+    var indicator = output.createFiniteProgress(label);
+    downloader.progress = function(progress) {
+        indicator.update(progress);
+    };
 
-            if (errormsg) {
+    downloader.get(function(errormsg) {
 
-                callback(null, errormsg);
+        indicator.done("");
 
-            } else {
+        if (errormsg) {
 
-                // Parse
-                var buffer = FS.readFileSync(indexFile, {"encoding": "utf8"});
-                var parser = new IndexParser(buffer);
-                var versions = parser.parse();
-                callback(versions);
-            }
+            callback(null, errormsg);
 
-            ShellJS.rm(indexFile);
-        });
-    } else {
+        } else {
 
-        callback(null, "Failed to download package index.");
-        ShellJS.rm(indexFile);
-        return;
-    }
+            // Parse
+            var parser = new IndexParser(buffer);
+            var versions = parser.parse();
+            callback(versions);
+        }
+    });
 };
 
 /**
@@ -187,6 +181,7 @@ function(version) {
  * @param {String} version Crosswalk version string
  * @param {String} dir Directory to download to
  * @param {AndroidProjectDeps~downloadFinishedCb} callback callback function
+ * @throws {FileCreationFailed} If download file could not be written.
  */
 AndroidProjectDeps.prototype.download =
 function(version, dir, callback) {
@@ -202,8 +197,18 @@ function(version, dir, callback) {
     // At the moment we unconditionally download, overwriting the existing copy.
     var label = "Downloading '" + this._channel + "' " + version;
     var indicator = output.createFiniteProgress(label);
+
     var path = Path.join(dir, filename);
-    var downloader = new Downloader(url, path);
+    var options = {
+        flags: "w",
+        mode: 0600
+    };
+    var stream = FS.createWriteStream(path, options);
+    if (!stream) {
+        throw new FileCreationFailed("Could not open file " + path);
+    }
+
+    var downloader = new Downloader(url, stream);
     downloader.progress = function(progress) {
         indicator.update(progress);
     };
