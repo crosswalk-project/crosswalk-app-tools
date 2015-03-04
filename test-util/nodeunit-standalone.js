@@ -14,29 +14,29 @@ function Driver() {}
 
 Driver.prototype.expect = function(asserts) {
 
-    _output.print("  Expect " + asserts);
+    _output.write("  Expect " + asserts + "\n");
 };
 
 Driver.prototype.equal = function(exp1, exp2) {
 
-    _output.print("  Equal " + exp1 + " == " + exp2);
+    _output.write("  Equal " + exp1 + " == " + exp2 + "\n");
 };
 
 Driver.prototype.done = function() {
 
-    _output.print("Done.\n");
+    _output.write("Done.\n\n");
 };
 
 
 
 if (process.argv.length <= 2) {
 
-    _output.print("Usage: run.js <script>");
+    _output.write("Usage: run.js <script>\n");
 
 } else {
 
     var script = process.argv[2];
-    _output.print("Running " + script);
+    _output.write("Running " + script + "\n");
 
     var test = require(script);
     // Force verbose
@@ -52,7 +52,7 @@ if (process.argv.length <= 2) {
         if (testCase) {
 
             // Run named test.
-            _output.print("Testing " + testCase);
+            _output.write("Testing " + testCase + "\n");
             test.tests[testCase](new Driver());
 
         } else {
@@ -63,7 +63,7 @@ if (process.argv.length <= 2) {
                 if (key == "setUp" || key == "tearDown")
                     continue;
 
-                _output.print("Testing " + key);
+                _output.write("Testing " + key + "\n");
                 test.tests[key](new Driver());
             }
         }
