@@ -177,7 +177,9 @@ Main.prototype.printHelp =
 function(parser) {
 
     var buf = parser.help();
-    this.output.write(buf + "\n");
+    // Do not use output infrastructure because this is
+    // a static method, so the parent is not initialised.
+    console.log(buf + "\n");
 };
 
 /**
@@ -188,7 +190,9 @@ Main.prototype.printVersion =
 function() {
 
     var Package = require("../package.json");
-    this.output.write(Package.version + "\n");
+    // Do not use output infrastructure because this is
+    // a static method, so the parent is not initialised.
+    console.log(Package.version + "\n");
 };
 
 /**

@@ -8,35 +8,34 @@
 // tests standalone.
 
 var _config = require("../src/Config").getInstance();
-var _output = require("../src/TerminalOutput").getInstance();
 
 function Driver() {}
 
 Driver.prototype.expect = function(asserts) {
 
-    _output.write("  Expect " + asserts + "\n");
+    console.log("  Expect " + asserts);
 };
 
 Driver.prototype.equal = function(exp1, exp2) {
 
-    _output.write("  Equal " + exp1 + " == " + exp2 + "\n");
+    console.log("  Equal " + exp1 + " == " + exp2);
 };
 
 Driver.prototype.done = function() {
 
-    _output.write("Done.\n\n");
+    console.log("Done.\n\n");
 };
 
 
 
 if (process.argv.length <= 2) {
 
-    _output.write("Usage: run.js <script>\n");
+    console.log("Usage: run.js <script>\n");
 
 } else {
 
     var script = process.argv[2];
-    _output.write("Running " + script + "\n");
+    console.log("Running " + script);
 
     var test = require(script);
     // Force verbose
@@ -52,7 +51,7 @@ if (process.argv.length <= 2) {
         if (testCase) {
 
             // Run named test.
-            _output.write("Testing " + testCase + "\n");
+            console.log("Testing " + testCase);
             test.tests[testCase](new Driver());
 
         } else {
@@ -63,7 +62,7 @@ if (process.argv.length <= 2) {
                 if (key == "setUp" || key == "tearDown")
                     continue;
 
-                _output.write("Testing " + key + "\n");
+                console.log("Testing " + key);
                 test.tests[key](new Driver());
             }
         }

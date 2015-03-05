@@ -9,6 +9,9 @@ var ShellJS = require("shelljs");
 var CommandParser = require("./CommandParser");
 var IllegalAccessException = require("./util/exceptions").IllegalAccessException;
 var InvalidPathException = require("./util/exceptions").InvalidPathException;
+var LogfileOutput = require("./LogfileOutput");
+var OutputTee = require("./OutputTee");
+var TerminalOutput = require("./TerminalOutput");
 
 /**
  * Create Application object.
@@ -79,6 +82,15 @@ function Application(cwd, packageId) {
     if (!ShellJS.test("-d", this._prjPath)) {
         throw new InvalidPathException("Failed to load, invalid path: " + this._prjPath);        
     }
+
+    // Set up logging, always start a new file for each time the app is run.
+    var logfilePath = Path.join(this._logPath, "common.log");
+    ShellJS.rm("-f", logfilePath);
+    this._logfileOutput = new LogfileOutput(logfilePath);
+
+    this._platformLogfileOutput = null;
+
+    this._output = new OutputTee(this._logfileOutput, TerminalOutput.getInstance());
 }
 
 function initMembers(basePath) {
@@ -183,15 +195,49 @@ Object.defineProperty(Application.prototype, "config", {
                       });
 
 /**
+ * Read-only {@link LogfileOutput} object.
+ * Setting this property to null will revert output to the default logfile.
+ * @member {OutputIface} platformLogfileOutput
+ * @throws {IllegalAccessException} If writing this property is attempted with anything else
+ *                                  than a {@link LogfileOutput} or null.
+ * @instance
+ * @memberOf Application
+ */
+Object.defineProperty(Application.prototype, "platformLogfileOutput", {
+                      get: function() {
+                                return this._platformLogfileOutput;
+                           },
+                      set: function(platformLogfileOutput) {
+                        
+                                if (platformLogfileOutput instanceof LogfileOutput) {
+
+                                    // Route output to platform logfile.
+                                    this._platformLogfileOutput = platformLogfileOutput;
+                                    this.output.logfileOutput = platformLogfileOutput;
+                                
+                                } else if (platformLogfileOutput === null) {
+                                
+                                    // Reset output to common logfile.
+                                    this._platformLogfileOutput = null;
+                                    this.output.logfileOutput = this._logfileOutput;
+                                
+                                } else {
+                                    
+                                    throw new IllegalAccessException("Attempting invalid write to property Application.platformLogfileOutput");
+                                }
+                           }
+                      });
+
+/**
  * Read-only {@link TerminalOutput} object.
- * @member {TerminalOutput} output
+ * @member {OutputIface} output
  * @throws {IllegalAccessException} If writing this property is attempted.
  * @instance
  * @memberOf Application
  */
 Object.defineProperty(Application.prototype, "output", {
                       get: function() {
-                                return require("./TerminalOutput").getInstance();
+                                return this._output;
                            },
                       set: function(output) {
                                 throw new IllegalAccessException("Attempting to write read-only property Application.output");

@@ -2,6 +2,7 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var FS = require("fs");
 var Path = require('path');
 
 var ShellJS = require("shelljs");
@@ -9,7 +10,8 @@ var ShellJS = require("shelljs");
 var Application = require("../src/Application");
 var Config = require("../src/Config");
 var IllegalAccessException = require("../src/util/exceptions").IllegalAccessException;
-var TerminalOutput = require("../src/TerminalOutput");
+var LogfileOutput = require("../src/LogfileOutput");
+var OutputTee = require("../src/OutputTee");
 var Util = require("./util/Util.js");
 
 
@@ -83,7 +85,7 @@ exports.tests = {
         test.expect(1);
         var application = Util.createTmpApplication("com.example.foo");
         var output = application.output;
-        test.equal(output instanceof TerminalOutput.class, true);
+        test.equal(output instanceof OutputTee, true);
         Util.deleteTmpApplication(application);
         test.done();
     },
@@ -98,6 +100,41 @@ exports.tests = {
             test.equal(e instanceof IllegalAccessException, true);
         }
         Util.deleteTmpApplication(application);
+        test.done();
+    },
+
+    logging: function(test) {
+
+        test.expect(5);
+
+        var application = Util.createTmpApplication("com.example.foo");
+        
+        test.equal(application.platformLogfileOutput === null, true);
+        application.output.write("foo");
+
+        // Set platform logfile.
+        var platformLogfilePath = Util.createTmpFile();
+        var platformLogfileOutput = new LogfileOutput(platformLogfilePath);
+        application.platformLogfileOutput = platformLogfileOutput;
+        test.equal(application.platformLogfileOutput == platformLogfileOutput, true);
+
+        application.output.write("bar");
+
+        application.platformLogfileOutput = null;
+        test.equal(application.platformLogfileOutput === null, true);
+
+        application.output.write("baz");
+
+        var commonLogPath = Path.join(application.logPath, "common.log");
+        var commonLog = FS.readFileSync(commonLogPath, {"encoding": "utf8"});
+        test.equal(commonLog, "foobaz");
+
+        var platformLog = FS.readFileSync(platformLogfilePath, {"encoding": "utf8"});
+        test.equal(platformLog, "bar");
+
+        Util.deleteTmpApplication(application);
+        ShellJS.rm("-rf", platformLogfilePath);
+
         test.done();
     }
 };

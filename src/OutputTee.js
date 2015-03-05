@@ -2,8 +2,10 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
-var _LOGFILE = 0;
-var _TERMINAL = 1;
+var OutputIface = require("./OutputIface");
+
+var _OUTPUT_TEE_LOGFILE = 0;
+var _OUTPUT_TEE_TERMINAL = 1;
 
 /**
  * Console output interface.
@@ -14,9 +16,10 @@ var _TERMINAL = 1;
 function OutputTee(logfileOutput, terminalOutput) {
 
     this._outputs = [];
-    this._outputs[_LOGFILE] = logfileOutput;
-    this._outputs[_TERMINAL] = terminalOutput;
+    this._outputs[_OUTPUT_TEE_LOGFILE] = logfileOutput;
+    this._outputs[_OUTPUT_TEE_TERMINAL] = terminalOutput;
 }
+// OutputTee.prototype = OutputIface.prototype;
 
 /**
  * Logfile output.
@@ -26,10 +29,10 @@ function OutputTee(logfileOutput, terminalOutput) {
  */
 Object.defineProperty(OutputTee.prototype, "logfileOutput", {
                       get: function() {
-                                return this._outputs[_LOGFILE];
+                                return this._outputs[_OUTPUT_TEE_LOGFILE];
                            },
                       set: function(logfileOutput) {
-                                this._outputs[_LOGFILE] = logfileOutput;
+                                this._outputs[_OUTPUT_TEE_LOGFILE] = logfileOutput;
                            }
                       });
 
@@ -41,10 +44,10 @@ Object.defineProperty(OutputTee.prototype, "logfileOutput", {
  */
 Object.defineProperty(OutputTee.prototype, "terminalOutput", {
                       get: function() {
-                                return this._outputs[_TERMINAL];
+                                return this._outputs[_OUTPUT_TEE_TERMINAL];
                            },
                       set: function(terminalOutput) {
-                                this._outputs[_TERMINAL] = terminalOutput;
+                                this._outputs[_OUTPUT_TEE_TERMINAL] = terminalOutput;
                            }
                       });
 
@@ -98,6 +101,20 @@ function(message) {
     });
 };
 
+// TODO implement for logfile output also.
+OutputTee.prototype.createFiniteProgress =
+function(label) {
 
+    var terminalOutput = this._outputs[_OUTPUT_TEE_TERMINAL];
+    return terminalOutput.createFiniteProgress.call(terminalOutput, label);
+};
+
+// TODO implement for logfile output also.
+OutputTee.prototype.createInfiniteProgress =
+function(label) {
+
+    var terminalOutput = this._outputs[_OUTPUT_TEE_TERMINAL];
+    return terminalOutput.createInfiniteProgress.call(terminalOutput, label);
+};
 
 module.exports = OutputTee;
