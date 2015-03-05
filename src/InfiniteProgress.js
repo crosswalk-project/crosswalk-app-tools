@@ -47,7 +47,7 @@ function(message) {
     // Go to column 0
     this._output.write('\033[0G');
 
-    var line = "  * " + this._label + " [done] " + message;
+    var line = "  * " + this._label + " [done] " + message + "\n";
     this._output.write(line);
 };
 

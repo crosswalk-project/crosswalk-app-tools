@@ -13,7 +13,8 @@ var Util = require("./util/Util.js");
 
 // Test involves progress output, make it visible.
 require("../src/Config").getInstance().setSilentConsole(false);
-var _output = require("../src/Main").output;
+var _output = require("../src/TerminalOutput").getInstance();
+
 
 function testStream(url, stream, callback) {
 
@@ -60,6 +61,7 @@ function testFile(url, callback) {
         callback(buffer.length);
     });
 }
+
 
 exports.tests = {
 

@@ -10,7 +10,7 @@ var ShellJS = require("shelljs");
 
 var Util = require("./util/Util.js");
 
-var _projectRoot = Path.normalize(__dirname + Path.sep + "..");
+var _test_util_projectRoot = Path.normalize(__dirname + Path.sep + "..");
 
 exports.tests = {
 
@@ -21,8 +21,8 @@ exports.tests = {
         var testRoot = Util.ensureTestRoot();
         test.equal(ShellJS.test("-d", testRoot), true);
 
-        var commonRoot = testRoot.substring(0, _projectRoot.length);
-        test.equal(commonRoot, _projectRoot);
+        var commonRoot = testRoot.substring(0, _test_util_projectRoot.length);
+        test.equal(commonRoot, _test_util_projectRoot);
 
         test.done();
     },
@@ -34,8 +34,8 @@ exports.tests = {
         var tmpDir = Util.createTmpDir();
         test.equal(ShellJS.test("-d", tmpDir), true);
 
-        var commonRoot = tmpDir.substring(0, _projectRoot.length);
-        test.equal(commonRoot, _projectRoot);
+        var commonRoot = tmpDir.substring(0, _test_util_projectRoot.length);
+        test.equal(commonRoot, _test_util_projectRoot);
 
         ShellJS.rm("-rf", tmpDir);
         test.equal(ShellJS.test("-d", tmpDir), false);
@@ -50,8 +50,8 @@ exports.tests = {
         var tmpFile = Util.createTmpFile();
         test.equal(ShellJS.test("-f", tmpFile), true);
 
-        var commonRoot = tmpFile.substring(0, _projectRoot.length);
-        test.equal(commonRoot, _projectRoot);
+        var commonRoot = tmpFile.substring(0, _test_util_projectRoot.length);
+        test.equal(commonRoot, _test_util_projectRoot);
 
         ShellJS.rm("-rf", tmpFile);
         test.equal(ShellJS.test("-d", tmpFile), false);

@@ -12,9 +12,6 @@ var IllegalAccessException = require("../src/util/exceptions").IllegalAccessExce
 var TerminalOutput = require("../src/TerminalOutput");
 var Util = require("./util/Util.js");
 
-var _basePath = null;
-var _packageId = "com.example.foo";
-var _application = null;
 
 exports.tests = {
 
@@ -22,15 +19,16 @@ exports.tests = {
 
         test.expect(6);
 
-        _basePath = Util.createTmpDir();
-        _application = new Application(_basePath, _packageId);
+        var application = Util.createTmpApplication("com.example.foo");
 
-        test.equal(_application.packageId, _packageId);
-        test.equal(ShellJS.test("-d", _application.appPath), true);
-        test.equal(ShellJS.test("-d", _application.logPath), true);
-        test.equal(ShellJS.test("-d", _application.pkgPath), true);
-        test.equal(ShellJS.test("-d", _application.prjPath), true);
-        test.equal(ShellJS.test("-d", _application.rootPath), true);
+        test.equal(application.packageId, "com.example.foo");
+        test.equal(ShellJS.test("-d", application.appPath), true);
+        test.equal(ShellJS.test("-d", application.logPath), true);
+        test.equal(ShellJS.test("-d", application.pkgPath), true);
+        test.equal(ShellJS.test("-d", application.prjPath), true);
+        test.equal(ShellJS.test("-d", application.rootPath), true);
+
+        Util.deleteTmpApplication(application);
 
         test.done();
     },
@@ -39,15 +37,20 @@ exports.tests = {
 
         test.expect(6);
 
-        var rootPath = _basePath + Path.sep + _packageId;
-        _application = new Application(rootPath, null);
+        var application = Util.createTmpApplication("com.example.foo");
 
-        test.equal(_application.packageId, _packageId);
-        test.equal(ShellJS.test("-d", _application.appPath), true);
-        test.equal(ShellJS.test("-d", _application.logPath), true);
-        test.equal(ShellJS.test("-d", _application.pkgPath), true);
-        test.equal(ShellJS.test("-d", _application.prjPath), true);
-        test.equal(ShellJS.test("-d", _application.rootPath), true);
+        // reload
+        var rootPath = application.rootPath;
+        application = new Application(rootPath, null);
+
+        test.equal(application.packageId, "com.example.foo");
+        test.equal(ShellJS.test("-d", application.appPath), true);
+        test.equal(ShellJS.test("-d", application.logPath), true);
+        test.equal(ShellJS.test("-d", application.pkgPath), true);
+        test.equal(ShellJS.test("-d", application.prjPath), true);
+        test.equal(ShellJS.test("-d", application.rootPath), true);
+
+        Util.deleteTmpApplication(application);
 
         test.done();
     },
@@ -55,52 +58,46 @@ exports.tests = {
     getConfig: function(test) {
 
         test.expect(1);
-        var config = _application.config;
+        var application = Util.createTmpApplication("com.example.foo");
+        var config = application.config;
         test.equal(config instanceof Config.class, true);
+        Util.deleteTmpApplication(application);
         test.done();
     },
 
     setConfig: function(test) {
 
         test.expect(1);
+        var application = Util.createTmpApplication("com.example.foo");
         try {
-            _application.config = null;
+            application.config = null;
         } catch (e) {
             test.equal(e instanceof IllegalAccessException, true);
         }
+        Util.deleteTmpApplication(application);
         test.done();
     },
 
     getOutput: function(test) {
 
         test.expect(1);
-        var output = _application.output;
+        var application = Util.createTmpApplication("com.example.foo");
+        var output = application.output;
         test.equal(output instanceof TerminalOutput.class, true);
+        Util.deleteTmpApplication(application);
         test.done();
     },
 
     setOutput: function(test) {
 
         test.expect(1);
+        var application = Util.createTmpApplication("com.example.foo");
         try {
-            _application.output = null;
+            application.output = null;
         } catch (e) {
             test.equal(e instanceof IllegalAccessException, true);
         }
-        test.done();
-    },
-
-    // Why does tearDown break?
-    cleanup: function(test) {
-
-        test.expect(2);
-
-        test.equal(ShellJS.test("-d", _basePath), true);
-
-        ShellJS.rm("-rf", _basePath);
-
-        test.equal(ShellJS.test("-d", _basePath), false);
-
+        Util.deleteTmpApplication(application);
         test.done();
     }
 };

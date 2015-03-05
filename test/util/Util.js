@@ -8,12 +8,17 @@ var Path = require('path');
 var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
 
+var Application = require("../../src/Application");
+
+
+
 function Util() {}
 
 Util.prototype.ensureTestRoot =
 function() {
 
-    var rootPath = Path.normalize(__dirname + Path.sep + ".." + Path.sep + "test-tmp");
+    var rootPath = Path.join(__dirname, "..", "..", "test-tmp");
+    rootPath = Path.normalize(rootPath);
     if (!ShellJS.test("-d", rootPath)) {
         ShellJS.mkdir(rootPath);
     }
@@ -61,6 +66,20 @@ function() {
     }
 
     return tmpFile;
+};
+
+Util.prototype.createTmpApplication =
+function(packageId) {
+
+    var basePath = this.createTmpDir();
+    return new Application(basePath, packageId);
+};
+
+Util.prototype.deleteTmpApplication =
+function(application) {
+
+    var basePath = Path.dirname(application.rootPath);
+    ShellJS.rm("-rf", basePath);
 };
 
 module.exports = new Util();

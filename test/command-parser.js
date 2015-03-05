@@ -6,7 +6,8 @@
 require("../src/Config").getInstance().setSilentConsole(true);
 var CommandParser = require("../src/CommandParser");
 
-var _output = require("../src/Main").output;
+var _output = require("../src/TerminalOutput").getInstance();
+
 
 exports.tests = {
 

@@ -13,8 +13,7 @@ var Util = require("./util/Util.js");
 
 // Test involves output, make it visible.
 require("../src/Config").getInstance().setSilentConsole(false);
-var _output = require("../src/Main").output;
-
+var _output = require("../src/TerminalOutput").getInstance();
 
 
 function testMethod(func, message) {

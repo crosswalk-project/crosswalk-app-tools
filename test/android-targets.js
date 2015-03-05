@@ -41,6 +41,7 @@ var _androidTargets = "" +
 '     Skins: HVGA, QVGA, WQVGA400, WQVGA432, WSVGA, WVGA800 (default), WVGA854, WXGA720, WXGA800, WXGA800-7in\n' +
 ' Tag/ABIs : android-tv/armeabi-v7a';
 
+
 exports.tests = {
 
     parse: function(test) {

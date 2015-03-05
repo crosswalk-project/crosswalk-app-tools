@@ -4,7 +4,8 @@
 
 // Test involves progress output, make it visible.
 require("../src/Config").getInstance().setSilentConsole(false);
-var _output = require("../src/Main").output;
+var _output = require("../src/TerminalOutput").getInstance();
+
 
 exports.tests = {
 

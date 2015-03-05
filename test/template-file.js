@@ -11,7 +11,7 @@ var Util = require("./util/Util.js");
 
 // Run tests silently to avoid spew from tests failing on purpose.
 require("../src/Config").getInstance().setSilentConsole(true);
-var _output = require("../src/Main").output;
+var _output = require("../src/TerminalOutput").getInstance();
 
 
 exports.tests = {

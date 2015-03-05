@@ -10,8 +10,8 @@ var Util = require("./util/Util.js");
 
 // Run tests silently to avoid spew from tests failing on purpose.
 require("../src/Config").getInstance().setSilentConsole(true);
-var _application = require("../src/Main");
-var _output = _application.output;
+var _output = require("../src/TerminalOutput").getInstance();
+
 
 exports.tests = {
 
@@ -19,15 +19,18 @@ exports.tests = {
 
         test.expect(1);
 
+        var app = Util.createTmpApplication("com.example.foo");
+
         // Throws exception if not available.
         try {
-            var sdk = new AndroidSDK(_application);
+            var sdk = new AndroidSDK(app);
             test.equal(true, true);
         } catch (e) {
             // Fall through
             // Test will fail because number of assertions not correct.
         }
 
+        Util.deleteTmpApplication(app);
         test.done();
     },
 
@@ -35,7 +38,8 @@ exports.tests = {
 
         test.expect(1);
 
-        var sdk = new AndroidSDK(_application);
+        var app = Util.createTmpApplication("com.example.foo");
+        var sdk = new AndroidSDK(app);
         sdk.queryTarget(14, function(target, error) {
 
             _output.info("  " + target);
@@ -45,6 +49,7 @@ exports.tests = {
             // above, means Android 4.0+.
             test.equal(typeof target, "string");
 
+            Util.deleteTmpApplication(app);
             test.done();
         });
     },
@@ -53,7 +58,8 @@ exports.tests = {
 
         test.expect(2);
 
-        var sdk = new AndroidSDK(_application);
+        var app = Util.createTmpApplication("com.example.foo");
+        var sdk = new AndroidSDK(app);
         sdk.queryTarget(14, function(target, error) {
 
             _output.info("  " + target);
@@ -75,12 +81,14 @@ exports.tests = {
                 } else {
                     _output.info(log);
                     test.equal(true, true);
-                    test.done();
                 }
 
                 // Clean up removing project skeleton directory.
                 ShellJS.popd();
                 ShellJS.rm("-rf", tmpdir);
+
+                Util.deleteTmpApplication(app);
+                test.done();
             });
         });
     }

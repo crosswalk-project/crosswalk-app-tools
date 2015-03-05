@@ -11,8 +11,8 @@ var Util = require("./util/Util.js");
 
 // Test involves progress output, make it visible.
 require("../src/Config").getInstance().setSilentConsole(false);
-var _application = require("../src/Main");
-var _output = _application.output;
+var _output = require("../src/TerminalOutput").getInstance();
+
 
 exports.tests = {
 
@@ -20,7 +20,8 @@ exports.tests = {
 
         test.expect(1);
 
-        var deps = new AndroidProjectDeps(_application, "stable");
+        var app = Util.createTmpApplication("com.example.foo");
+        var deps = new AndroidProjectDeps(app, "stable");
         var versions = [
             "1.2.3.4",
             "5.9.7.8",
@@ -28,6 +29,7 @@ exports.tests = {
         ];
         var version = deps.pickLatest(versions);
         test.equal(version, "7.6.5.4");
+        Util.deleteTmpApplication(app);
         test.done();
     },
 
@@ -35,37 +37,38 @@ exports.tests = {
 
         test.expect(1);
 
+        var app = Util.createTmpApplication("com.example.foo");
         // Bad test, suppress error output
-        _application.config.setSilentConsole(true);
+        app.config.setSilentConsole(true);
 
-        var deps = new AndroidProjectDeps(_application, "stable");
+        var deps = new AndroidProjectDeps(app, "stable");
         var version = deps.pickLatest(null);
         test.equal(version, null);
+        Util.deleteTmpApplication(app);
         test.done();
-
-        _application.config.setSilentConsole(false);
     },
 
     pickLatest3: function(test) {
 
         test.expect(1);
 
+        var app = Util.createTmpApplication("com.example.foo");
         // Bad test, suppress error output
-        _application.config.setSilentConsole(true);
+        app.config.setSilentConsole(true);
 
-        var deps = new AndroidProjectDeps(_application, "stable");
+        var deps = new AndroidProjectDeps(app, "stable");
         var version = deps.pickLatest([]);
         test.equal(version, null);
+        Util.deleteTmpApplication(app);
         test.done();
-
-        _application.config.setSilentConsole(false);
     },
 
     fetchVersions: function(test) {
 
         test.expect(2);
 
-        var deps = new AndroidProjectDeps(_application, "stable");
+        var app = Util.createTmpApplication("com.example.foo");
+        var deps = new AndroidProjectDeps(app, "stable");
         deps.fetchVersions(function(versions, errormsg) {
 
             if (errormsg)
@@ -73,6 +76,7 @@ exports.tests = {
 
             test.equal(versions instanceof Array, true);
             test.equal(versions.length > 0, true);
+            Util.deleteTmpApplication(app);
             test.done();
         });
     },
@@ -81,7 +85,8 @@ exports.tests = {
 
         test.expect(2);
 
-        var deps = new AndroidProjectDeps(_application, "stable");
+        var app = Util.createTmpApplication("com.example.foo");
+        var deps = new AndroidProjectDeps(app, "stable");
         var tmpDir = Util.createTmpDir();
         deps.download("9.38.208.10", tmpDir, function(filename, errormsg) {
 
@@ -91,6 +96,7 @@ exports.tests = {
             test.equal(typeof filename === "string", true);
             test.equal(filename.length > 0, true);
             ShellJS.rm("-rf", tmpDir);
+            Util.deleteTmpApplication(app);
             test.done();
         });
     }
