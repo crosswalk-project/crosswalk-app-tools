@@ -176,7 +176,7 @@ function(packagePath) {
         throw new InvalidPathException("Package could not be found " + this.pkgPath);
     }
 
-    ShellJS.mv(packagePath, this.pkgPath);
+    ShellJS.mv('-f', packagePath, this.pkgPath);
 };
 
 /**
