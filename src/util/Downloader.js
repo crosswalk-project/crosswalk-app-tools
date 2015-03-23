@@ -7,6 +7,8 @@ var Http = require("http");
 var Https = require("https");
 var Url = require("url");
 
+var HttpsProxyAgent = require("https-proxy-agent");
+
 var ShellJS = require("shelljs");
 
 
@@ -61,12 +63,18 @@ function(callback) {
         return;
     }
 
+    var proxyUrl = null;
     if (urlInfo.protocol == "http:" &&
         process.env.http_proxy) {
 
-        // This is a bit of a hack to get the proxy name:port into a
-        // format that the url parser can digest.
-        var proxyInfo = Url.parse("http://" + process.env.http_proxy);
+        // http GET via proxy.
+        proxyUrl = process.env.http_proxy;
+        if (proxyUrl.substring(0, "http:".length) != "http:" &&
+            proxyUrl.substring(0, "https:".length) != "https:") {
+            callback("Proxy URL is missing protocol portion (http: and https: are supported)");
+            return;
+        }
+        var proxyInfo = Url.parse(proxyUrl);
 
         urlInfo.host = proxyInfo.hostname;
         delete urlInfo.href;
@@ -76,22 +84,30 @@ function(callback) {
         urlInfo.headers = { Host: urlInfo.hostname };
         delete urlInfo.hostname;
 
-        this.getDefaultImpl(urlInfo, callback);
+        this.httpGetImpl(urlInfo, callback);
 
     } else if (urlInfo.protocol == "https:" &&
                process.env.https_proxy) {
 
-        // this.getHttpsProxyImpl(urlInfo, callback);
-        callback("HTTPS proxy not implemented");
-        return;
+        // http GET via proxy.
+        proxyUrl = process.env.https_proxy;
+        if (proxyUrl.substring(0, "http:".length) != "http:" &&
+            proxyUrl.substring(0, "https:".length) != "https:") {
+            callback("Proxy URL is missing protocol portion (http: and https: are supported)");
+            return;
+        }
+
+        var agent = new HttpsProxyAgent(proxyUrl);
+        urlInfo.agent = agent;
+        this.httpGetImpl(urlInfo, callback);
 
     } else {
 
-        this.getDefaultImpl(urlInfo, callback);
+        this.httpGetImpl(urlInfo, callback);
     }
 };
 
-Downloader.prototype.getDefaultImpl =
+Downloader.prototype.httpGetImpl =
 function(urlInfo, callback) {
 
     var getFunc;
