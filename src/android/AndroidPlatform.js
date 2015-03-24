@@ -16,10 +16,11 @@ var TemplateFile = require("../util/TemplateFile");
  * @extends PlatformBase
  * @constructor
  * @param {Function} PlatformBase Base class constructor {@link PlatformBase}
- * @param {PlatformData} platformData Init data passed to the platform
+ * @param {PlatformData} baseData Init data passed to the platform
+ * @param {Object} args Platform-specific args, only if specified and actually given
  * @throws {@link AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
  */
-function AndroidPlatform(PlatformBase, baseData) {
+function AndroidPlatform(PlatformBase, baseData, args) {
 
     // Create base instance.
     var instance = new PlatformBase(baseData);

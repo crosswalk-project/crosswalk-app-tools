@@ -4,12 +4,14 @@
 
 var Path = require("path");
 
+var Minimist = require("minimist");
 var ShellJS = require("shelljs");
 
 var Application = require("./Application");
 var CommandParser = require("./CommandParser");
 var PlatformBase = require("./PlatformBase");
 var PlatformsManager = require("./PlatformsManager");
+var TerminalOutput = require("./TerminalOutput");
 
 /**
  * Callback signature for toplevel operations.
@@ -60,19 +62,35 @@ function() {
 
     var mgr = new PlatformsManager(output);
     var platformInfo = mgr.loadDefault();
-    if (!platformInfo) {
+    if (platformInfo) {
+        output.info("Using backend '" + platformInfo.platformId + "'");
+    } else {
         output.error("Failed to load platform backend");
         return null;
     }
 
-    var platformData = {
+    // Collect backend-specific args
+    var allArgs = Minimist(process.argv.slice(2));
+    var args = {};
+    for (var key in platformInfo.args) {
+        // Strip dash prefix before matching, Minimist strips them also.
+        var key_ = key.substring("--".length);
+        if (allArgs[key_]) {
+            // Also strip platform prefix before collecting the arg.
+            var argPrefix = platformInfo.platformId + "-";
+            var argName = key_.substring(argPrefix.length);
+            args[argName] = allArgs[key_];
+        }
+    }
+
+    var baseData = {
         application: this,
         platformId: platformInfo.platformId
     };
     var platform = null;
 
     try {
-        platform = new platformInfo.Ctor(PlatformBase, platformData);
+        platform = new platformInfo.Ctor(PlatformBase, baseData, args);
     } catch (e) {
         output.error("The Android SDK could not be found. " +
                       "Make sure the directory containing the 'android' " +
@@ -176,10 +194,26 @@ function(type, callback) {
 Main.prototype.printHelp =
 function(parser) {
 
+    var output = TerminalOutput.getInstance();
+
+    // Builtin args
     var buf = parser.help();
-    // Do not use output infrastructure because this is
-    // a static method, so the parent is not initialised.
-    console.log(buf + "\n");
+    output.write(buf + "\n");
+
+    // Platform args
+    var mgr = new PlatformsManager(output);
+    var platformInfo = mgr.loadDefault();
+    if (!platformInfo) {
+        output.error("Failed to load platform backend");
+        return;
+    }
+
+    if (platformInfo.args) {
+        output.write("    Options for platform '" + platformInfo.platformId + "'\n");
+        for (var arg in platformInfo.args) {
+            output.write("        " + arg + "    " + platformInfo.args[arg] + "\n");
+        }
+    }
 };
 
 /**

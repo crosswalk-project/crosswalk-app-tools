@@ -56,13 +56,22 @@ function() {
             } else {
                 throw new Error("Unhandled platform name " + implementations[i]);
             }
+
+            var platformArgs = {};
+            if (Ctor.getArgs) {
+                var args = Ctor.getArgs();
+                for (var key in args) {
+                    platformArgs["--" + platformId + "-" + key] = args[key];
+                }
+            }
+
             platformInfo = {
                 Ctor: Ctor,
-                platformId: platformId
+                platformId: platformId,
+                args: platformArgs
             };
 
             // If we get here there backend has been instantiated successfully.
-            output.info("Using backend '" + platformId + "'");
             break;
 
         } catch (e) {
