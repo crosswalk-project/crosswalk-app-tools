@@ -5,12 +5,12 @@
 /**
  * Class that manages platform backends.
  * @constructor
- * @param {Application} Application instance
+ * @param {OutputIface} Output instance
  * @private
  */
-function PlatformsManager(application) {
+function PlatformsManager(output) {
 
-    this._application = application;
+    this._output = output;
 }
 
 /**
@@ -28,7 +28,7 @@ function PlatformsManager(application) {
 PlatformsManager.prototype.loadDefault =
 function() {
 
-    var output = this._application.output;
+    var output = this._output;
 
     var implementations = [
         "crosswalk-app-tools-backend-ios",

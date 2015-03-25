@@ -58,7 +58,7 @@ function() {
 
     var output = this.output;
 
-    var mgr = new PlatformsManager(this);
+    var mgr = new PlatformsManager(output);
     var platformInfo = mgr.loadDefault();
     if (!platformInfo) {
         output.error("Failed to load platform backend");
