@@ -1,0 +1,21 @@
+{
+  "name": "crosswalk-app-tools-backend-demo",
+  "version": "0.0.1",
+  "description": "Crosswalk App Tools demo backend",
+  "author": "Robert Staudinger <robert.staudinger@intel.com>",
+  "license": "APACHE-V2",
+  "main": "index.js",
+  "dependencies": {
+    "crosswalk-app-tools": "~0.3.0"
+  },
+  "devDependencies": {
+
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:crosswalk-project/crosswalk-app-tools.git"
+  },
+  "keywords": [
+    "crosswalk"
+  ]
+}
