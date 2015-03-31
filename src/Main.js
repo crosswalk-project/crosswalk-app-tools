@@ -236,7 +236,9 @@ function() {
 Main.prototype.run =
 function() {
 
-    var parser = new CommandParser(this.output, process.argv);
+    // Temporary output object because of static method here
+    var output = TerminalOutput.getInstance();
+    var parser = new CommandParser(output, process.argv);
     var cmd = parser.getCommand();
     var options = null;
     if (cmd) {

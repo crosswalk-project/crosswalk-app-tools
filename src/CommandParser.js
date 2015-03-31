@@ -242,6 +242,15 @@ function(packageId, output) {
         return null;
     }
 
+    // Elements must begin with a lowercase letter
+    for (var i = 0; i < parts.length; i++) {
+        var part = parts[i];
+        if (!part.match("^[a-z]")) {
+            output.error("Each component of the name must start with a lowercase ascii letter");
+            return null;
+        }
+    }
+
     return packageId;
 };
 

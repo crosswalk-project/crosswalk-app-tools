@@ -60,10 +60,10 @@ exports.tests = {
 
     createGetPackageId: function(test) {
 
-        test.expect(5);
+        test.expect(13);
 
         // Good test
-        var argv1 = ["node", "foo", "create", "com.example.Bar"];
+        var argv1 = ["node", "foo", "create", "com.example.bar"];
         var cp1 = new CommandParser(_output, argv1);
 
         test.equal(cp1.getCommand(), "create");
@@ -75,12 +75,40 @@ exports.tests = {
         test.equal(pkg1, argv1[3]);
 
         // Bad test, invalid package name
-        var argv2 = ["node", "foo", "create", "com.exam ple.Bar"];
+        var argv2 = ["node", "foo", "create", "com.exam ple.bar"];
         var cp2 = new CommandParser(_output, argv2);
 
         test.equal(cp2.getCommand(), null);
 
         var pkg2 = cp2.createGetPackageId();
+        test.equal(pkg2, null);
+
+        // Bad test, invalid package name
+        argv2 = ["node", "foo", "create", "1com.example.bar"];
+        cp2 = new CommandParser(_output, argv2);
+        test.equal(cp2.getCommand(), null);
+        pkg2 = cp2.createGetPackageId();
+        test.equal(pkg2, null);
+
+        // Bad test, invalid package name
+        argv2 = ["node", "foo", "create", "com.1example.bar"];
+        cp2 = new CommandParser(_output, argv2);
+        test.equal(cp2.getCommand(), null);
+        pkg2 = cp2.createGetPackageId();
+        test.equal(pkg2, null);
+
+        // Bad test, invalid package name
+        argv2 = ["node", "foo", "create", "com.example.1bar"];
+        cp2 = new CommandParser(_output, argv2);
+        test.equal(cp2.getCommand(), null);
+        pkg2 = cp2.createGetPackageId();
+        test.equal(pkg2, null);
+
+        // Bad test, invalid package name (uppercase)
+        argv2 = ["node", "foo", "create", "com.example.Bar"];
+        cp2 = new CommandParser(_output, argv2);
+        test.equal(cp2.getCommand(), null);
+        pkg2 = cp2.createGetPackageId();
         test.equal(pkg2, null);
 
         test.done();
@@ -90,7 +118,7 @@ exports.tests = {
 
         test.expect(5);
 
-        var argv1 = ["node", "foo", "create", "com.example.Bar",
+        var argv1 = ["node", "foo", "create", "com.example.bar",
                      "--crosswalk=crosswalk-10.39.235.16.zip",
                      "--foo=bar"];
         var cp1 = new CommandParser(_output, argv1);

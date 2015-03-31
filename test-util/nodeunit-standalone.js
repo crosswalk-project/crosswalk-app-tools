@@ -38,6 +38,7 @@ if (process.argv.length <= 2) {
     console.log("Running " + script);
 
     var test = require(script);
+    var driver = null;
     // Force verbose
     _config.setSilentConsole(false);
 
@@ -52,7 +53,8 @@ if (process.argv.length <= 2) {
 
             // Run named test.
             console.log("Testing " + testCase);
-            test.tests[testCase](new Driver());
+            driver = new Driver();
+            test.tests[testCase](driver);
 
         } else {
 
@@ -63,7 +65,8 @@ if (process.argv.length <= 2) {
                     continue;
 
                 console.log("Testing " + key);
-                test.tests[key](new Driver());
+                driver = new Driver();
+                test.tests[key](driver);
             }
         }
 
