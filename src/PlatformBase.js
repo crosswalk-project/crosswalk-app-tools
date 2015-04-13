@@ -193,10 +193,11 @@ function(options, callback) {
 /**
  * Update platform project to latest Crosswalk.
  * @param {String} version Version to update to, format w.x.y.z
+ * @param {Object} options Extra options for the command
  * @param {PlatformBase~platformBaseOperationCb} callback callback function
  */
 PlatformBase.prototype.update =
-function(version, callback) {
+function(version, options, callback) {
 
     throw new Error("PlatformBase.update() not implemented.");
 };

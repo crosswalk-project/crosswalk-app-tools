@@ -377,7 +377,9 @@ function(options, callback) {
  * Implements {@link PlatformBase.update}
  */
 AndroidPlatform.prototype.update =
-function(version, callback) {
+function(version, options, callback) {
+
+    this.output.write("\n update " + version + "\n\n");
 
     // TODO implement
 };

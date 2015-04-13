@@ -145,13 +145,19 @@ function() {
 CommandParser.prototype.updateGetVersion =
 function() {
 
-    var errormsg = "Version must be of format ab.cd.ef.gh";
+    var errormsg = "Version must be channel 'stable', 'beta', 'canary', or format ab.cd.ef.gh";
 
     if (this._argv.length < 4) {
         return null;
     }
 
     var version = this._argv[3];
+
+    // Recognise channel name for version
+    if (["beta", "canary", "stable"].indexOf(version) > -1) {
+        return version;
+    }
+
     var match = version.match("[0-9\\.]*");
     if (match[0] != version) {
         this._output.error(errormsg);
