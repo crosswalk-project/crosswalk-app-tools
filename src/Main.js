@@ -141,6 +141,40 @@ function(options, callback) {
 };
 
 /**
+ * Update crosswalk in the application package.
+ * @param {String} version Version to update to, or null for latest stable version
+ * @param {Main~mainOperationCb} [callback] Callback function
+ * @static
+ */
+Main.prototype.update =
+function(version, callback) {
+
+    var output = this.output;
+
+    // Handle callback not passed.
+    if (!callback)
+        callback = function() {};
+
+    var project = this.instantiateProject();
+    if (!project) {
+        callback(false);
+        return;
+    }
+
+    project.update(version, function(errormsg) {
+
+        if (errormsg) {
+            output.error(errormsg);
+            callback(false);
+            return;
+        } else {
+            callback(true);
+            return;
+        }
+    });
+};
+
+/**
  * Build application package.
  * @param {String} type Build "debug" or "release" configuration
  * @param {Main~mainOperationCb} [callback] Callback function
@@ -256,7 +290,11 @@ function() {
 
         case "update":
             var version = parser.updateGetVersion();
-            this.output.warning("TODO implement");
+
+            // Chain up the constructor.
+            Application.call(this, process.cwd(), null);
+
+            this.update(version);
             break;
 
         case "build":
