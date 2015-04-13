@@ -161,7 +161,7 @@ function(version, callback) {
         return;
     }
 
-    project.update(version, function(errormsg) {
+    project.update(version, {}, function(errormsg) {
 
         if (errormsg) {
             output.error(errormsg);

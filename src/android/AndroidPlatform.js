@@ -234,19 +234,13 @@ function(crosswalkPath, projectPath) {
  * Turn a freshly created empty Android project into a Crosswalk project.
  * @param {String} localCrosswalk Local Crosswalk download or null
  * @param {String} channel Crosswalk channel (stable, beta, canary) or null
- * @param {String} apiTarget Android API target (greater android-14)
  * @param {String} projectPath Path to root dir of project
  * @returns {Boolean} True on success.
  */
-AndroidPlatform.prototype.fillSkeletonProject =
-function(localCrosswalk, channel, apiTarget, projectPath, callback) {
+AndroidPlatform.prototype.importCrosswalk =
+function(localCrosswalk, channel, projectPath, callback) {
 
     var output = this.application.output;
-
-    if (!this.fillTemplates(apiTarget, projectPath)) {
-        callback("Failed to initialise project templates");
-        return;
-    }
 
     // Use local Crosswalk if path given, and not a channel identifier.
     if (localCrosswalk) {
@@ -357,7 +351,12 @@ function(options, callback) {
                 output.info("Defaulting to download channel " + channel);
             }
 
-            this.fillSkeletonProject(localCrosswalk, channel, apiTarget, path,
+            if (!this.fillTemplates(apiTarget, path)) {
+                callback("Failed to initialise project templates");
+                return;
+            }
+
+            this.importCrosswalk(localCrosswalk, channel, path,
                                      function(errormsg) {
 
                 if (errormsg) {
