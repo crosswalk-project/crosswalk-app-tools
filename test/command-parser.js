@@ -141,7 +141,19 @@ exports.tests = {
 
     updateGetVersion: function(test) {
 
-        test.expect(5);
+        test.expect(8);
+
+        // No version, good test
+        var argv0 = ["node", "foo", "update"];
+        var cp0 = new CommandParser(_output, argv0);
+
+        test.equal(cp0.getCommand(), "update");
+
+        var cmd0 = cp0.getCommand();
+        test.equal(cmd0, argv0[2]);
+
+        var version0 = cp0.updateGetVersion();
+        test.equal(version0, null);
 
         // Good test
         var argv1 = ["node", "foo", "update", "12.34.56.78"];
@@ -162,7 +174,7 @@ exports.tests = {
         test.equal(cp2.getCommand(), null);
 
         var version2 = cp2.updateGetVersion();
-        test.equal(version2, null);
+        test.equal(version2, false);
 
         test.done();
     },

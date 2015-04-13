@@ -53,7 +53,11 @@ function() {
         return packageId !== null ? cmd : null;
     case "update":
         var version = this.updateGetVersion();
-        return version !== null ? cmd : null;
+        if (version === false) {
+            // Error: version could not be parsed.
+            return null;
+        }
+        return cmd;
     case "build":
         var type = this.buildGetType();
         return type !== null ? cmd : null;
@@ -135,7 +139,7 @@ function() {
 
 /**
  * Get version when command is "update".
- * @returns {String} Crosswalk version string or null.
+ * @returns {String} Crosswalk version string when given and valid. Null when not given, false when invalid.
  * @see {@link https://crosswalk-project.org/documentation/downloads.html}
  */
 CommandParser.prototype.updateGetVersion =
@@ -151,13 +155,13 @@ function() {
     var match = version.match("[0-9\\.]*");
     if (match[0] != version) {
         this._output.error(errormsg);
-        return null;
+        return false;
     }
 
     var parts = version.split('.');
     if (parts.length != 4) {
         this._output.error(errormsg);
-        return null;
+        return false;
     }
 
     return version;
