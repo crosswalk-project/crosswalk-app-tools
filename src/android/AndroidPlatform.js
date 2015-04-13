@@ -373,8 +373,11 @@ function(options, callback) {
     }.bind(this));
 };
 
+/**
+ * Implements {@link PlatformBase.update}
+ */
 AndroidPlatform.prototype.update =
-function() {
+function(version, callback) {
 
     // TODO implement
 };

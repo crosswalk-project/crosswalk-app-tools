@@ -60,8 +60,13 @@ function(options, callback) {
     callback(null);
 };
 
+/**
+ * Update platform project to latest Crosswalk.
+ * @param {String} version Version to update to, format w.x.y.z
+ * @param {PlatformBase~platformBaseOperationCb} callback callback function
+ */
 DemoPlatform.prototype.update =
-function(callback) {
+function(version, callback) {
 
     // TODO implement updating of project to new Crosswalk version.
     // This function is not supported yet.
