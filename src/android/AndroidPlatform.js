@@ -357,7 +357,7 @@ function(options, callback) {
             }
 
             this.importCrosswalk(localCrosswalk, channel, path,
-                                     function(errormsg) {
+                                 function(errormsg) {
 
                 if (errormsg) {
                     output.error(errormsg);
@@ -373,6 +373,65 @@ function(options, callback) {
 };
 
 /**
+ * Find a specific version in a specific channel.
+ * @param {String} version Version to look for, pick lastest if null is given
+ * @param {String} channel Release channel to seach in, null for all channels
+ * @param {Function} callback Callback (version, channel, errormsg)
+ */
+AndroidPlatform.prototype.findCrosswalkVersion =
+function(version, channel, callback) {
+
+    var versionName = version ?
+                        version :
+                        "latest version";
+
+    // Start with first channel if not given.
+    if (!channel) {
+        channel = AndroidProjectDeps.CHANNELS[0];
+    }
+
+    this.output.info("Looking for " + versionName + " in channel '" + channel + "'");
+
+    var deps = new AndroidProjectDeps(this.application, channel);
+    deps.fetchVersions(function(versions, errormsg) {
+
+        if (errormsg) {
+            callback(null, null, errormsg);
+            return;
+        }
+
+        // Look for specific version?
+        if (version &&
+            versions.indexOf(version) > -1) {
+
+            callback(version, channel, null);
+            return;
+
+        } else if (version) {
+
+            // Try next channel.
+            var channelIndex = AndroidProjectDeps.CHANNELS.indexOf(channel);
+            if (channelIndex < AndroidProjectDeps.CHANNELS.length - 1) {
+                this.output.info("Version " + version + " not found in '" + channel + "', trying next channel");
+                channelIndex++;
+                channel = AndroidProjectDeps.CHANNELS[channelIndex];
+                this.findCrosswalkVersion(version, channel, callback);
+            } else {
+                // Already at last channel, version not found
+                this.output.info("Version " + version + " not found in '" + channel + "', search failed");
+                callback(null, null, "Version " + version + " seems not to be available on the server");
+                return;
+            }
+        } else {
+            // Use latest from current channel.
+            version = deps.pickLatest(versions);
+            callback(version, channel, null);
+            return;
+        }
+    }.bind(this));
+};
+
+/**
  * Implements {@link PlatformBase.update}
  */
 AndroidPlatform.prototype.update =
@@ -380,7 +439,21 @@ function(version, options, callback) {
 
     this.output.write("\n update " + version + "\n\n");
 
-    // TODO implement
+/*TODO
+
+    this.importCrosswalk(localCrosswalk, channel, path,
+                         function(errormsg) {
+
+        if (errormsg) {
+            output.error(errormsg);
+            callback("Creating project template failed.");
+            return;
+        }
+
+        output.info("Project template created at '" + path + "'");
+        callback(null);
+    });
+*/
 };
 
 AndroidPlatform.prototype.refresh =

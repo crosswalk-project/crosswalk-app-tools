@@ -13,7 +13,9 @@ var FileCreationFailed = require("../util/exceptions").FileCreationFailed;
 var IndexParser = require("../util/IndexParser");
 
 var BASE_URL = "https://download.01.org/crosswalk/releases/crosswalk/android/";
-var CHANNELS = ["beta", "canary", "stable"];
+
+// Channels are in preferred search order.
+var CHANNELS = ["stable", "beta", "canary"];
 
 
 
