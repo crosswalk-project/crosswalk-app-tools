@@ -53,5 +53,27 @@ exports.tests = {
             Util.deleteTmpApplication(application);
             test.done();
         });
+    },
+
+    invalid: function(test) {
+
+        test.expect(2);
+
+        var application = Util.createTmpApplication("com.example.foo");
+        var platformData = {
+            application: application,
+            platformId: "android"
+        };
+
+        var android = new AndroidPlatform(PlatformBase, platformData);
+        android.findCrosswalkVersion("0.0.0.0", null,
+                                     function(version, channel, errormsg) {
+
+            test.equal(version, null);
+            test.equal(channel, null);
+
+            Util.deleteTmpApplication(application);
+            test.done();
+        });
     }
 };
