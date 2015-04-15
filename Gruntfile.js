@@ -38,11 +38,11 @@ module.exports = function(grunt) {
     release: {
       options: {
         add: true,
-        commit: true,
-        push: true,
-        bump: true,
-        tag: true,
-        pushTags: true,
+        commit: false,
+        push: false,
+        bump: false,
+        tag: false,
+        pushTags: false,
         npm: true,
         folder: '.',
         tagName: '<%= version %>',
