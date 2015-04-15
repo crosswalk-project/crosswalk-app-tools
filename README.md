@@ -6,10 +6,6 @@ Version 2.0, please refer to the LICENSE-APACHE-V2 included with the package.
 
 Crosswalk-app-tools is in very early stages of development, and not suitable for use in a production environment. "Releases" and announcements are made available as a technology preview only. No packages are being published at this time, but git tags serve as reference points for release milestones.
 
-### Version compatibility
-
-The supported Crosswalk version for Crosswalk-app-tools 0.1.0 (as obtained by `git checkout 0.1.0` below) is Crosswalk 8. Due to changes to Crosswalk internals, newer versions will fail to create usable projects. The master branch of Crosswalk-app-tools is being moved to support Crosswalk 9.
-
 ### Preparation
 
 Linux is the only tested platform. Node.js, the Android SDK, and git must be functional.
@@ -28,10 +24,32 @@ drwxrwxr-x. 11 user user     4096 Dec  1 15:43 crosswalk-app-tools
 
 ### Usage
 
-`crosswalk-app-tools/bin/crosswalk-app create com.example.Foo`: This sets up a skeleton project in directory com.example.Foo/, imports Crosswalk from the zip, and puts a sample "hello world" web app under com.example.Foo/assets/www/.
+```
+Crosswalk Application Project and Packaging Tool
 
-`cd com.example.Foo`: move to the project root.
+    crosswalk-app create <package-id>		Create project <package-id>
+                         --crosswalk=<path>	Use downloaded Crosswalk
+                         --channel=<name>	Release channel: stable|beta|canary
 
-`../crosswalk-app-tools/bin/crosswalk-app build`: Build IA and ARM APKs for the web app. The packages Foo-debug.armeabi-v7a.apk and Foo-debug.x86.apk will end up under bin/.
+    crosswalk-app build [release|debug]		Build project to create packages
+                                       		Defaults to debug when not given
 
-That's all for now. More to come soon, and if all goes well, NPMs for new years.
+    crosswalk-app update <channel>|<version>    Update Crosswalk to latest in named
+                                                channel, or specific version
+
+    crosswalk-app help				Display usage information
+
+    crosswalk-app version			Display version information
+```
+#### Example: Create App
+`crosswalk-app create com.example.foo`: This sets up a skeleton project in directory com.example.foo/, downloads and imports Crosswalk, and puts a sample "hello world" web app under com.example.foo/app/.
+
+#### Example: Build App
+`cd com.example.foo` and then `crosswalk-app build` builds packages. The APKs can be found under pkg/ when done.
+
+#### Example: Update Crosswalk
+`crosswalk-app update stable` updates Crosswalk to the latest version available in the stable channel.
+
+### Limitations
+* This is alpha stage software and under continuous development. We encourage trying it and appreciate feedback, but use in a production environment is not supported at this point in time.
+* A problem prevents use with anyting but releases from the "stable" crosswalk channel. 
