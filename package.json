@@ -1,6 +1,6 @@
 {
   "name": "crosswalk-app-tools",
-  "version": "0.4.0",
+  "version": "0.4.2",
   "description": "An APK packager for Crosswalk -- http://crosswalk-project.org",
   "author": "Robert Staudinger <robert.staudinger@intel.com>",
   "license": "Apache V2",
@@ -42,7 +42,16 @@
     "url": "https://github.com/crosswalk-project/crosswalk-app-tools/issues"
   },
   "files": [
+    "bin",
+    "data",
+    "examples",
+    "Gruntfile.js",
+    "LICENSE-APACHE-V2",
+    "package.json",
     "README.md",
-    "LICENSE-APACHE-V2"
+    "src",
+    "test",
+    "test-results",
+    "test-util"
   ]
 }

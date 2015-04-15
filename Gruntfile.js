@@ -44,7 +44,6 @@ module.exports = function(grunt) {
         tag: false,
         pushTags: false,
         npm: true,
-        folder: '.',
         tagName: '<%= version %>',
         tagMessage: 'Version <%= version %>'
       }
