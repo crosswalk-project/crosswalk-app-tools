@@ -9,8 +9,8 @@ var Application = require("../src/Application");
 var CommandParser = require("../src/CommandParser");
 var Util = require("./util/Util.js");
 
-// Run tests silently to avoid spew from tests failing on purpose.
-require("../src/Config").getInstance().setSilentConsole(true);
+// Let's see progress.
+require("../src/Config").getInstance().setSilentConsole(false);
 
 
 exports.tests = {
@@ -74,6 +74,50 @@ exports.tests = {
                     ShellJS.rm("-rf", tmpdir);
                 });
             } else {
+                test.done();
+            }
+        });
+    },
+
+    update: function(test) {
+
+        test.expect(1);
+
+        // Good test.
+        var tmpdir = Util.createTmpDir();
+        ShellJS.pushd(tmpdir);
+
+        var app = require("../src/Main");
+        Application.call(app, tmpdir, "com.example.foo");
+        // Create
+        app.create(null, function(success) {
+
+            if (success) {
+                // Update
+                ShellJS.pushd("com.example.foo");
+                app.update("stable", function(success) {
+
+                    if (success) {
+                        // Build
+                        app.build("debug", function(success) {
+
+                            test.equal(success, true);
+                            ShellJS.popd();
+                            ShellJS.popd();
+                            ShellJS.rm("-rf", tmpdir);
+                            test.done();
+                        });
+                    } else {
+                        ShellJS.popd();
+                        ShellJS.popd();
+                        ShellJS.rm("-rf", tmpdir);
+                        test.done();
+                    }
+                });
+            } else {
+                ShellJS.popd();
+                ShellJS.popd();
+                ShellJS.rm("-rf", tmpdir);
                 test.done();
             }
         });

@@ -435,25 +435,45 @@ function(version, channel, callback) {
  * Implements {@link PlatformBase.update}
  */
 AndroidPlatform.prototype.update =
-function(version, options, callback) {
+function(versionSpec, options, callback) {
 
-    this.output.write("\n update " + version + "\n\n");
+    var channel = null;
+    var version = null;
 
-/*TODO
+    if (AndroidProjectDeps.CHANNELS.indexOf(versionSpec) > -1) {
+        // versionSpec is a channel name
+        channel = versionSpec;
+    } else {
+        version = versionSpec;
+    }
 
-    this.importCrosswalk(localCrosswalk, channel, path,
-                         function(errormsg) {
+    this.findCrosswalkVersion(version, channel,
+                              function(version, channel, errormsg) {
 
         if (errormsg) {
-            output.error(errormsg);
-            callback("Creating project template failed.");
+            callback(errormsg);
             return;
         }
 
-        output.info("Project template created at '" + path + "'");
-        callback(null);
-    });
-*/
+        var deps = new AndroidProjectDeps(this.application, channel);
+        deps.download(version, ".", function(filename, errormsg) {
+
+            if (errormsg) {
+                callback(errormsg);
+                return;
+            }
+
+            var ret = this.importCrosswalkFromZip(filename, this.platformPath);
+            if (ret) {
+                this.output.info("Project updated to version " + version);
+            } else {
+                errormsg = "Failed to update Crosswalk from " + filename;
+            }
+            callback(errormsg);
+            return;
+
+        }.bind(this));
+    }.bind(this));
 };
 
 AndroidPlatform.prototype.refresh =

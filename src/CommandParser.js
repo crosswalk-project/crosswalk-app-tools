@@ -30,11 +30,21 @@ function CommandParser(output, argv) {
 CommandParser.prototype.help =
 function() {
     return "" +
+        "\n" +
         "Crosswalk Application Project and Packaging Tool\n" +
+        "\n" +
         "    crosswalk-app create <package-id>\t\tCreate project <package-id>\n" +
-        "                         --crosswalk=<path>\tOptional path to downloaded Crosswalk\n" +
+        "                         --crosswalk=<path>\tUse downloaded Crosswalk\n" +
         "                         --channel=<name>\tRelease channel: stable|beta|canary\n" +
+        "\n" +
+        "    crosswalk-app build [release|debug]\t\tBuild project to create packages\n" +
+        "                                       \t\tDefaults to debug when not given\n" +
+        "\n" +
+        "    crosswalk-app update <channel>|<version>    Update Crosswalk to latest in named\n" +
+        "                                                channel, or specific version\n" +
+        "\n" +
         "    crosswalk-app help\t\t\t\tDisplay usage information\n" +
+        "\n" +
         "    crosswalk-app version\t\t\tDisplay version information\n";
 };
 
