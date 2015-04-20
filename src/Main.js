@@ -248,6 +248,11 @@ function(parser) {
             output.write("        " + arg + "    " + platformInfo.args[arg] + "\n");
         }
     }
+    output.write("\n");
+
+    output.write("    Environment Variables\n");
+    output.write("        CROSSWALK_APP_TOOLS_CACHE_DIR\t\tKeep downloaded files in this dir\n");
+    output.write("\n");
 };
 
 /**
