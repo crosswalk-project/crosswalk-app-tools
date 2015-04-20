@@ -136,22 +136,11 @@ AndroidPlatform.prototype.importCrosswalkFromZip =
 function(crosswalkPath, projectPath) {
 
     var output = this.application.output;
-    var indicator = output.createFiniteProgress("Extracting " + crosswalkPath);
-
-    var zip = new AdmZip(crosswalkPath);
-    if (!zip) {
-        output.error("Failed to open " + crosswalkPath);
-        return false;
-    }
-
-    indicator.update(0.1);
 
     // Derive root entry from file name.
     var parts = crosswalkPath.split(Path.sep);
     var filename = parts[parts.length - 1];
     var base = filename.substring(0, filename.length - ".zip".length) + "/";
-
-    indicator.update(0.2);
 
     // Extract major version
     var numbers = base.split("-")[1].split(".");
@@ -161,6 +150,15 @@ function(crosswalkPath, projectPath) {
         return false;
     } else if (major > 12) {
         output.warning("This tool has not been tested with Crosswalk " + major + ".");
+    }
+
+    var indicator = output.createFiniteProgress("Extracting " + crosswalkPath);
+    indicator.update(0.1);
+
+    var zip = new AdmZip(crosswalkPath);
+    if (!zip) {
+        output.error("Failed to open " + crosswalkPath);
+        return false;
     }
 
     indicator.update(0.3);
