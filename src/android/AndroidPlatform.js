@@ -159,7 +159,7 @@ function(crosswalkPath, projectPath) {
     if (major < 8) {
         output.error("Crosswalk version " + major + " not supported. Use 8+.");
         return false;
-    } else if (major > 11) {
+    } else if (major > 12) {
         output.warning("This tool has not been tested with Crosswalk " + major + ".");
     }
 
@@ -179,6 +179,8 @@ function(crosswalkPath, projectPath) {
     entry = zip.getEntry(name);
     if (entry) {
         path = projectPath + Path.sep + "xwalk_core_library";
+        // Remove existing dir to prevent stale files when updating crosswalk
+        ShellJS.rm("-rf", path);
         ShellJS.mkdir(path);
         zip.extractEntryTo(entry, path, false, true);
     } else {
