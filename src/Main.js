@@ -13,6 +13,9 @@ var PlatformBase = require("./PlatformBase");
 var PlatformsManager = require("./PlatformsManager");
 var TerminalOutput = require("./TerminalOutput");
 
+var MAIN_EXIT_CODE_OK = 0;
+var MAIN_EXIT_CODE_ERROR = 127;
+
 /**
  * Callback signature for toplevel operations.
  * @param {Boolean} success true on operation completion, otherwise false
@@ -104,17 +107,13 @@ function() {
 /**
  * Create skeleton project.
  * @param {Object} options Extra options for the command
- * @param {Main~mainOperationCb} [callback] Callback function
+ * @param {Main~mainOperationCb} callback Callback function
  * @static
  */
 Main.prototype.create =
 function(options, callback) {
 
     var output = this.output;
-
-    // Handle callback not passed.
-    if (!callback)
-        callback = function() {};
 
     // Copy sample web app content
     ShellJS.cp("-r",
@@ -123,7 +122,7 @@ function(options, callback) {
 
     var project = this.instantiateProject();
     if (!project) {
-        callback(false);
+        callback(MAIN_EXIT_CODE_ERROR);
         return;
     }
 
@@ -131,10 +130,10 @@ function(options, callback) {
 
         if (errormsg) {
             output.error(errormsg);
-            callback(false);
+            callback(MAIN_EXIT_CODE_ERROR);
             return;
         } else {
-            callback(true);
+            callback(MAIN_EXIT_CODE_OK);
             return;
         }
     });
@@ -143,7 +142,7 @@ function(options, callback) {
 /**
  * Update crosswalk in the application package.
  * @param {String} version Version to update to, or null for latest stable version
- * @param {Main~mainOperationCb} [callback] Callback function
+ * @param {Main~mainOperationCb} callback Callback function
  * @static
  */
 Main.prototype.update =
@@ -151,13 +150,9 @@ function(version, callback) {
 
     var output = this.output;
 
-    // Handle callback not passed.
-    if (!callback)
-        callback = function() {};
-
     var project = this.instantiateProject();
     if (!project) {
-        callback(false);
+        callback(MAIN_EXIT_CODE_ERROR);
         return;
     }
 
@@ -165,10 +160,10 @@ function(version, callback) {
 
         if (errormsg) {
             output.error(errormsg);
-            callback(false);
+            callback(MAIN_EXIT_CODE_ERROR);
             return;
         } else {
-            callback(true);
+            callback(MAIN_EXIT_CODE_OK);
             return;
         }
     });
@@ -177,17 +172,13 @@ function(version, callback) {
 /**
  * Build application package.
  * @param {String} type Build "debug" or "release" configuration
- * @param {Main~mainOperationCb} [callback] Callback function
+ * @param {Main~mainOperationCb} callback Callback function
  * @static
  */
 Main.prototype.build =
 function(type, callback) {
 
     var output = this.output;
-
-    // Handle callback not passed.
-    if (!callback)
-        callback = function() {};
 
     // Check we're inside a project
     /* TODO move this inside the AndroidProject
@@ -200,7 +191,7 @@ function(type, callback) {
 
     var project = this.instantiateProject(null);
     if (!project) {
-        callback(false);
+        callback(MAIN_EXIT_CODE_ERROR);
         return;
     }
 
@@ -211,10 +202,10 @@ function(type, callback) {
 
         if (errormsg) {
             output.error(errormsg);
-            callback(false);
+            callback(MAIN_EXIT_CODE_ERROR);
             return;
         } else {
-            callback(true);
+            callback(MAIN_EXIT_CODE_OK);
             return;
         }
     });
@@ -278,54 +269,74 @@ function() {
     // Temporary output object because of static method here
     var output = TerminalOutput.getInstance();
     var parser = new CommandParser(output, process.argv);
-    var cmd = parser.getCommand();
-    var options = null;
-    if (cmd) {
 
-        switch (cmd) {
-        case "create":
-            var packageId = parser.createGetPackageId();
-            options = parser.createGetOptions();
-
-            // Chain up the constructor.
-            Application.call(this, process.cwd(), packageId);
-
-            this.create(options);
-            break;
-
-        case "update":
-            var version = parser.updateGetVersion();
-
-            // Chain up the constructor.
-            Application.call(this, process.cwd(), null);
-
-            this.update(version);
-            break;
-
-        case "build":
-            var type = parser.buildGetType();
-
-            // Chain up the constructor.
-            Application.call(this, process.cwd(), null);
-
-            this.build(type);
-            break;
-
-        case "help":
-            this.printHelp(parser);
-            break;
-
-        case "version":
-            this.printVersion();
-            break;
-
-        default:
-            // TODO
-        }
-
-    } else {
-
+    if (process.argv.length < 3) {
+        // No command given, print help and exit without error code.
         this.printHelp(parser);
+        return;
+    }
+
+    // Unknown or bogus command?
+    var cmd = parser.getCommand();
+    if (!cmd) {
+        output.error("Unhandled command '" + process.argv[2] + "'");
+        process.exit(MAIN_EXIT_CODE_ERROR);
+        return;
+    }
+
+    var options = null;
+    switch (cmd) {
+    case "create":
+        var packageId = parser.createGetPackageId();
+        options = parser.createGetOptions();
+
+        // Chain up the constructor.
+        Application.call(this, process.cwd(), packageId);
+
+        this.create(options, function(errno) {
+            if (errno) {
+                process.exit(errno);
+            }
+        });
+        break;
+
+    case "update":
+        var version = parser.updateGetVersion();
+
+        // Chain up the constructor.
+        Application.call(this, process.cwd(), null);
+
+        this.update(version, function(errno) {
+            if (errno) {
+                process.exit(errno);
+            }
+        });
+        break;
+
+    case "build":
+        var type = parser.buildGetType();
+
+        // Chain up the constructor.
+        Application.call(this, process.cwd(), null);
+
+        this.build(type, function(errno) {
+            if (errno) {
+                process.exit(errno);
+            }
+        });
+        break;
+
+    case "help":
+        this.printHelp(parser);
+        break;
+
+    case "version":
+        this.printVersion();
+        break;
+
+    default:
+        output.error("Unhandled command " + cmd);
+        process.exit(MAIN_EXIT_CODE_ERROR);
     }
 };
 

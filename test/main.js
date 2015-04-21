@@ -20,6 +20,10 @@ exports.tests = {
         test.expect(0);
 
         // Just call main without args, this should display help.
+        // Need to strip extra command-line args though, so the
+        // command parser is not confused.
+        process.argv = process.argv.slice(0, 2);
+
         // As long as no exception hits us we're good.
         var app = require("../src/Main");
         app.run();
@@ -37,9 +41,9 @@ exports.tests = {
 
         var app = require("../src/Main");
         Application.call(app, tmpdir, "com.example.foo");
-        app.create(null, function(success) {
+        app.create(null, function(errno) {
 
-            test.equal(success, true);
+            test.equal(errno, 0);
 
             ShellJS.popd();
             ShellJS.rm("-rf", tmpdir);
@@ -58,15 +62,15 @@ exports.tests = {
 
         var app = require("../src/Main");
         Application.call(app, tmpdir, "com.example.foo");
-        app.create(null, function(success) {
+        app.create(null, function(errno) {
 
-            if (success) {
+            if (!errno) {
 
                 // Build
                 ShellJS.pushd("com.example.foo");
-                app.build("debug", function(success) {
+                app.build("debug", function(errno) {
 
-                    test.equal(success, true);
+                    test.equal(errno, 0);
                     test.done();
 
                     ShellJS.popd();
@@ -90,18 +94,18 @@ exports.tests = {
         var app = require("../src/Main");
         Application.call(app, tmpdir, "com.example.foo");
         // Create
-        app.create(null, function(success) {
+        app.create(null, function(errno) {
 
-            if (success) {
+            if (!errno) {
                 // Update
                 ShellJS.pushd("com.example.foo");
-                app.update("stable", function(success) {
+                app.update("stable", function(errno) {
 
-                    if (success) {
+                    if (!errno) {
                         // Build
-                        app.build("debug", function(success) {
+                        app.build("debug", function(errno) {
 
-                            test.equal(success, true);
+                            test.equal(errno, 0);
                             ShellJS.popd();
                             ShellJS.popd();
                             ShellJS.rm("-rf", tmpdir);
