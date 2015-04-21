@@ -4,7 +4,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
 
     nodeunit: {
-      all: ['test/**/*.js'],
+      all: ['test/*.js', 'android/test/*.js'],
       options: {
         reporter: 'default',
         reporterOptions: {

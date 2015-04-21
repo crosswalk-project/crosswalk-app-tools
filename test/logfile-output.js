@@ -9,7 +9,7 @@ var Path = require("path");
 var ShellJS = require("shelljs");
 
 var LogfileOutput = require("../src/LogfileOutput");
-var Util = require("./util/Util.js");
+var Util = require("../test-util/Util.js");
 
 // Test involves output, make it visible.
 require("../src/Config").getInstance().setSilentConsole(false);

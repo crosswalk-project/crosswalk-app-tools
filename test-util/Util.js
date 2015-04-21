@@ -8,7 +8,7 @@ var Path = require('path');
 var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
 
-var Application = require("../../src/Application");
+var Application = require("../src/Application");
 
 
 
@@ -17,7 +17,7 @@ function Util() {}
 Util.prototype.ensureTestRoot =
 function() {
 
-    var rootPath = Path.join(__dirname, "..", "..", "test-tmp");
+    var rootPath = Path.join(__dirname, "..", "test-tmp");
     rootPath = Path.normalize(rootPath);
     if (!ShellJS.test("-d", rootPath)) {
         ShellJS.mkdir(rootPath);

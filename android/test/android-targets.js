@@ -2,9 +2,7 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
-// Run tests silently to avoid spew from tests failing on purpose.
-require("../src/Config").getInstance().setSilentConsole(false);
-var AndroidTargets = require("../android/src/AndroidTargets");
+var AndroidTargets = require("../src/AndroidTargets");
 
 var _androidTargets = "" +
 'Available Android targets:\n' +

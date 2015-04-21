@@ -8,8 +8,9 @@ var ShellJS = require("shelljs");
 
 var Application = require("../src/Application");
 var LogfileOutput = require("../src/LogfileOutput");
-var TestPlatformScope = require("./util/TestPlatform");
-var Util = require("./util/Util.js");
+
+var TestPlatformScope = require("../test-util/TestPlatform");
+var Util = require("../test-util/Util.js");
 
 var _packageId = "com.example.foo";
 var _platformId = "test";

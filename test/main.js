@@ -7,7 +7,7 @@ var ShellJS = require("shelljs");
 
 var Application = require("../src/Application");
 var CommandParser = require("../src/CommandParser");
-var Util = require("./util/Util.js");
+var Util = require("../test-util/Util.js");
 
 // Let's see progress.
 require("../src/Config").getInstance().setSilentConsole(false);

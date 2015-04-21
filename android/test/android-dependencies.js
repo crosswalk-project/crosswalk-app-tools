@@ -6,12 +6,10 @@ var OS = require('os');
 
 var ShellJS = require("shelljs");
 
-var AndroidDependencies = require("../android/src/AndroidDependencies");
-var Util = require("./util/Util.js");
+var AndroidDependencies = require("../src/AndroidDependencies");
+var Util = require("../../test-util/Util.js");
 
-// Test involves progress output, make it visible.
-require("../src/Config").getInstance().setSilentConsole(false);
-var _output = require("../src/TerminalOutput").getInstance();
+var _output = require("../../src/TerminalOutput").getInstance();
 
 
 exports.tests = {

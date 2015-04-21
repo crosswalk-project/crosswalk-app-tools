@@ -12,7 +12,7 @@ var Config = require("../src/Config");
 var IllegalAccessException = require("../src/util/exceptions").IllegalAccessException;
 var LogfileOutput = require("../src/LogfileOutput");
 var OutputTee = require("../src/OutputTee");
-var Util = require("./util/Util.js");
+var Util = require("../test-util/Util.js");
 
 
 exports.tests = {

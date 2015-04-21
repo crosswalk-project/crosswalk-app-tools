@@ -2,11 +2,9 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
-// Run tests silently to avoid spew from tests failing on purpose.
-require("../src/Config").getInstance().setSilentConsole(false);
-var AndroidPlatform = require("../android/src/AndroidPlatform");
-var PlatformBase = require("../src/PlatformBase");
-var Util = require("./util/Util.js");
+var AndroidPlatform = require("../src/AndroidPlatform");
+var PlatformBase = require("../../src/PlatformBase");
+var Util = require("../../test-util/Util.js");
 
 exports.tests = {
 
