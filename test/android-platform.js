@@ -4,7 +4,7 @@
 
 // Run tests silently to avoid spew from tests failing on purpose.
 require("../src/Config").getInstance().setSilentConsole(false);
-var AndroidPlatform = require("../src/android/AndroidPlatform");
+var AndroidPlatform = require("../android/src/AndroidPlatform");
 var PlatformBase = require("../src/PlatformBase");
 var Util = require("./util/Util.js");
 

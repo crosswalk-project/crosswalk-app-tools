@@ -9,7 +9,7 @@ var ShellJS = require("shelljs");
 var AndroidDependencies = require("./AndroidDependencies");
 var AndroidSDK = require("./AndroidSDK");
 
-var TemplateFile = require("../util/TemplateFile");
+var TemplateFile = require("../../src/util/TemplateFile");
 
 /**
  * Android project class.
@@ -59,31 +59,19 @@ function(apiTarget, projectPath) {
     };
 
     // AndroidManifest.xml
-    var tpl = new TemplateFile(__dirname + Path.sep +
-                               ".."+ Path.sep + ".."+ Path.sep +
-                               "data" + Path.sep +
-                               "AndroidManifest.xml.tpl");
+    var tpl = new TemplateFile(Path.join(__dirname, "..", "data", "AndroidManifest.xml.tpl"));
     tpl.render(data, projectPath + Path.sep + "AndroidManifest.xml");
 
     // build.xml
-    tpl = new TemplateFile(__dirname + Path.sep +
-                               ".."+ Path.sep + ".."+ Path.sep +
-                               "data" + Path.sep +
-                               "build.xml.tpl");
+    tpl = new TemplateFile(Path.join(__dirname, "..", "data", "build.xml.tpl"));
     tpl.render(data, projectPath + Path.sep + "build.xml");
 
     // project.properties
-    tpl = new TemplateFile(__dirname + Path.sep +
-                               ".."+ Path.sep + ".."+ Path.sep +
-                               "data" + Path.sep +
-                               "project.properties.tpl");
+    tpl = new TemplateFile(Path.join(__dirname, "..", "data", "project.properties.tpl"));
     tpl.render(data, projectPath + Path.sep + "project.properties");
 
     // MainActivity.java
-    tpl = new TemplateFile(__dirname + Path.sep +
-                               ".."+ Path.sep + ".."+ Path.sep +
-                               "data" + Path.sep +
-                               "MainActivity.java.tpl");
+    tpl = new TemplateFile(Path.join(__dirname, "..", "data", "MainActivity.java.tpl"));
     var activityPath = projectPath + Path.sep +
                        "src" + Path.sep +
                        parts.join(Path.sep);

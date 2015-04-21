@@ -5,7 +5,7 @@
   "author": "Robert Staudinger <robert.staudinger@intel.com>",
   "license": "Apache V2",
   "bin": {
-    "crosswalk-app": "./bin/crosswalk-app"
+    "crosswalk-app": "./src/crosswalk-app"
   },
   "scripts": {
     "test": "node_modules/grunt-cli/bin/grunt test"
@@ -42,8 +42,7 @@
     "url": "https://github.com/crosswalk-project/crosswalk-app-tools/issues"
   },
   "files": [
-    "bin",
-    "data",
+    "android",
     "examples",
     "Gruntfile.js",
     "LICENSE-APACHE-V2",
@@ -51,7 +50,6 @@
     "README.md",
     "src",
     "test",
-    "test-results",
     "test-util"
   ]
 }

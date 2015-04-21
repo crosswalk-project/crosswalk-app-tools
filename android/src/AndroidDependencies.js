@@ -8,9 +8,9 @@ var Path = require("path");
 var MemoryStream = require("memorystream");
 var ShellJS = require("shelljs");
 
-var Downloader = require("../util/Downloader");
-var FileCreationFailed = require("../util/exceptions").FileCreationFailed;
-var IndexParser = require("../util/IndexParser");
+var Downloader = require("../../src/util/Downloader");
+var FileCreationFailed = require("../../src/util/exceptions").FileCreationFailed;
+var IndexParser = require("../../src/util/IndexParser");
 
 var BASE_URL = "https://download.01.org/crosswalk/releases/crosswalk/android/";
 

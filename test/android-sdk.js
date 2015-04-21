@@ -5,7 +5,7 @@
 var OS = require('os');
 var ShellJS = require("shelljs");
 
-var AndroidSDK = require("../src/android/AndroidSDK");
+var AndroidSDK = require("../android/src/AndroidSDK");
 var Util = require("./util/Util.js");
 
 // Run tests silently to avoid spew from tests failing on purpose.

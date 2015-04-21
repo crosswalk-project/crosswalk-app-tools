@@ -34,7 +34,7 @@ function() {
         "crosswalk-app-tools-backend-ios",
         "crosswalk-app-tools-backend-deb",
         "crosswalk-app-tools-backend-demo",
-        "./android/AndroidPlatform"
+        "../android/index.js"
     ];
 
     var platformInfo = null;
@@ -50,7 +50,7 @@ function() {
             if (implementations[i].substring(0, prefix.length) == prefix) {
                 // Extract last part after common prefix.
                 platformId = implementations[i].substring(prefix.length);
-            } else if (implementations[i] == "./android/AndroidPlatform") {
+            } else if (implementations[i] == "../android/index.js") {
                 // Special case built-in android backend, so we get a conforming name.
                 platformId = "android";
             } else {

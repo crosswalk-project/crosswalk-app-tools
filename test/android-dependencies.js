@@ -6,7 +6,7 @@ var OS = require('os');
 
 var ShellJS = require("shelljs");
 
-var AndroidDependencies = require("../src/android/AndroidDependencies");
+var AndroidDependencies = require("../android/src/AndroidDependencies");
 var Util = require("./util/Util.js");
 
 // Test involves progress output, make it visible.
