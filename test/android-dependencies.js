@@ -6,7 +6,7 @@ var OS = require('os');
 
 var ShellJS = require("shelljs");
 
-var AndroidProjectDeps = require("../src/android/AndroidProjectDeps");
+var AndroidDependencies = require("../src/android/AndroidDependencies");
 var Util = require("./util/Util.js");
 
 // Test involves progress output, make it visible.
@@ -21,7 +21,7 @@ exports.tests = {
         test.expect(1);
 
         var app = Util.createTmpApplication("com.example.foo");
-        var deps = new AndroidProjectDeps(app, "stable");
+        var deps = new AndroidDependencies(app, "stable");
         var versions = [
             "1.2.3.4",
             "5.9.7.8",
@@ -41,7 +41,7 @@ exports.tests = {
         // Bad test, suppress error output
         app.config.setSilentConsole(true);
 
-        var deps = new AndroidProjectDeps(app, "stable");
+        var deps = new AndroidDependencies(app, "stable");
         var version = deps.pickLatest(null);
         test.equal(version, null);
         Util.deleteTmpApplication(app);
@@ -56,7 +56,7 @@ exports.tests = {
         // Bad test, suppress error output
         app.config.setSilentConsole(true);
 
-        var deps = new AndroidProjectDeps(app, "stable");
+        var deps = new AndroidDependencies(app, "stable");
         var version = deps.pickLatest([]);
         test.equal(version, null);
         Util.deleteTmpApplication(app);
@@ -68,7 +68,7 @@ exports.tests = {
         test.expect(2);
 
         var app = Util.createTmpApplication("com.example.foo");
-        var deps = new AndroidProjectDeps(app, "stable");
+        var deps = new AndroidDependencies(app, "stable");
         deps.fetchVersions(function(versions, errormsg) {
 
             if (errormsg)
@@ -86,7 +86,7 @@ exports.tests = {
         test.expect(2);
 
         var app = Util.createTmpApplication("com.example.foo");
-        var deps = new AndroidProjectDeps(app, "stable");
+        var deps = new AndroidDependencies(app, "stable");
         var tmpDir = Util.createTmpDir();
         deps.download("9.38.208.10", tmpDir, function(filename, errormsg) {
 

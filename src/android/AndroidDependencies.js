@@ -20,20 +20,20 @@ var CHANNELS = ["stable", "beta", "canary"];
 
 
 /**
- * Callback signature for {@link AndroidProjectDeps.fetchVersions}
+ * Callback signature for {@link AndroidDependencies.fetchVersions}
  * @param {String[]} versions Array of available Crosswalk versions sorted oldest - newest
  * @param {String} errormsg Message in case of Error
  * @inner
- * @memberOf AndroidProjectDeps
+ * @memberOf AndroidDependencies
  */
 function fetchVersionsFinishedCb(versions, errormsg) {}
 
 /**
- * Callback signature for {@link AndroidProjectDeps.download}.
+ * Callback signature for {@link AndroidDependencies.download}.
  * @param {String} path Path to downloaded file, or null on error
  * @param {String} errormsg null if success, otherwise error message
  * @inner
- * @memberOf AndroidProjectDeps
+ * @memberOf AndroidDependencies
  */
 function downloadFinishedCb(path, errormsg) {}
 
@@ -44,9 +44,9 @@ function downloadFinishedCb(path, errormsg) {}
  * @constructor
  * @param {Application} application application instance
  * @param {String} channel Crosswalk channel beta/canary/stable
- * @throws {AndroidProjectDeps~InvalidChannelError} If no valid channel was specified.
+ * @throws {AndroidDependencies~InvalidChannelError} If no valid channel was specified.
  */
-function AndroidProjectDeps(application, channel) {
+function AndroidDependencies(application, channel) {
 
     this._application = application;
 
@@ -61,9 +61,9 @@ function AndroidProjectDeps(application, channel) {
  * Read-only array of valid release channels (stable, beta, canary).
  * @member {String[]} CHANNELS
  * @static
- * @memberOf AndroidProjectDeps
+ * @memberOf AndroidDependencies
  */
-Object.defineProperty(AndroidProjectDeps, "CHANNELS", {
+Object.defineProperty(AndroidDependencies, "CHANNELS", {
                       get: function() {
                                 return CHANNELS;
                            },
@@ -74,9 +74,9 @@ Object.defineProperty(AndroidProjectDeps, "CHANNELS", {
 
 /**
  * Fetch available Crosswalk versions index.
- * @param {AndroidProjectDeps~fetchVersionsFinishedCb} callback callback function
+ * @param {AndroidDependencies~fetchVersionsFinishedCb} callback callback function
  */
-AndroidProjectDeps.prototype.fetchVersions =
+AndroidDependencies.prototype.fetchVersions =
 function(callback) {
 
     var output = this._application.output;
@@ -120,7 +120,7 @@ function(callback) {
  * @param {String[]} versions Array of version strings
  * @returns {String} Latest version or null on error.
  */
-AndroidProjectDeps.prototype.pickLatest =
+AndroidDependencies.prototype.pickLatest =
 function(versions) {
 
     var output = this._application.output;
@@ -163,7 +163,7 @@ function(versions) {
  * @param {String} version Crosswalk version to look for
  * @returns {String} Relative path to zip file.
  */
-AndroidProjectDeps.prototype.findLocally =
+AndroidDependencies.prototype.findLocally =
 function(version) {
 
     var filename = "crosswalk-" + version + ".zip";
@@ -182,10 +182,10 @@ function(version) {
  * Download crosswalk zip.
  * @param {String} version Crosswalk version string
  * @param {String} dir Directory to download to
- * @param {AndroidProjectDeps~downloadFinishedCb} callback callback function
+ * @param {AndroidDependencies~downloadFinishedCb} callback callback function
  * @throws {FileCreationFailed} If download file could not be written.
  */
-AndroidProjectDeps.prototype.download =
+AndroidDependencies.prototype.download =
 function(version, dir, callback) {
 
     var output = this._application.output;
@@ -259,15 +259,15 @@ function(version, dir, callback) {
  * @constructor
  * @param {String} message Error message
  * @inner
- * @memberOf AndroidProjectDeps
+ * @memberOf AndroidDependencies
  */
 function InvalidChannelError(message) {
     Error.call(this, message);
 }
 InvalidChannelError.prototype = Error.prototype;
 
-AndroidProjectDeps.prototype.InvalidChannelError = InvalidChannelError;
+AndroidDependencies.prototype.InvalidChannelError = InvalidChannelError;
 
 
 
-module.exports = AndroidProjectDeps;
+module.exports = AndroidDependencies;
