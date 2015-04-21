@@ -18,11 +18,11 @@ var MAIN_EXIT_CODE_ERROR = 127;
 
 /**
  * Callback signature for toplevel operations.
- * @param {Boolean} success true on operation completion, otherwise false
+ * @param {Number} errno 0 on operation completion, otherwise error number
  * @inner
  * @memberOf Main
  */
-function mainOperationCb(success) {}
+function mainOperationCb(errno) {}
 
 /**
  * Main class.
@@ -261,10 +261,11 @@ function() {
 
 /**
  * Main entry point.
+ * @param {Main~mainOperationCb} callback Callback function
  * @static
  */
 Main.prototype.run =
-function() {
+function(callback) {
 
     // Temporary output object because of static method here
     var output = TerminalOutput.getInstance();
@@ -273,6 +274,7 @@ function() {
     if (process.argv.length < 3) {
         // No command given, print help and exit without error code.
         this.printHelp(parser);
+        callback(MAIN_EXIT_CODE_OK);
         return;
     }
 
@@ -280,7 +282,7 @@ function() {
     var cmd = parser.getCommand();
     if (!cmd) {
         output.error("Unhandled command '" + process.argv[2] + "'");
-        process.exit(MAIN_EXIT_CODE_ERROR);
+        callback(MAIN_EXIT_CODE_ERROR);
         return;
     }
 
@@ -293,11 +295,7 @@ function() {
         // Chain up the constructor.
         Application.call(this, process.cwd(), packageId);
 
-        this.create(options, function(errno) {
-            if (errno) {
-                process.exit(errno);
-            }
-        });
+        this.create(options, callback);
         break;
 
     case "update":
@@ -306,11 +304,7 @@ function() {
         // Chain up the constructor.
         Application.call(this, process.cwd(), null);
 
-        this.update(version, function(errno) {
-            if (errno) {
-                process.exit(errno);
-            }
-        });
+        this.update(version, callback);
         break;
 
     case "build":
@@ -319,11 +313,7 @@ function() {
         // Chain up the constructor.
         Application.call(this, process.cwd(), null);
 
-        this.build(type, function(errno) {
-            if (errno) {
-                process.exit(errno);
-            }
-        });
+        this.build(type, callback);
         break;
 
     case "help":
@@ -336,8 +326,10 @@ function() {
 
     default:
         output.error("Unhandled command " + cmd);
-        process.exit(MAIN_EXIT_CODE_ERROR);
+        callback(MAIN_EXIT_CODE_ERROR);
     }
+
+    callback(MAIN_EXIT_CODE_OK);
 };
 
 module.exports = new Main();

@@ -17,7 +17,7 @@ exports.tests = {
 
     main: function(test) {
 
-        test.expect(0);
+        test.expect(1);
 
         // Just call main without args, this should display help.
         // Need to strip extra command-line args though, so the
@@ -26,9 +26,10 @@ exports.tests = {
 
         // As long as no exception hits us we're good.
         var app = require("../src/Main");
-        app.run();
-
-        test.done();
+        app.run(function (errno) {
+            test.equal(errno, 0);
+            test.done();
+        });
     },
 
     create: function(test) {
