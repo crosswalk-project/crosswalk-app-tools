@@ -9,8 +9,6 @@ var ShellJS = require("shelljs");
 var AndroidDependencies = require("./AndroidDependencies");
 var AndroidSDK = require("./AndroidSDK");
 
-var TemplateFile = require("../../src/util/TemplateFile");
-
 /**
  * Android project class.
  * @extends PlatformBase
@@ -50,6 +48,9 @@ function AndroidPlatform(PlatformBase, baseData, args) {
 AndroidPlatform.prototype.fillTemplates =
 function(apiTarget, projectPath) {
 
+    // Namespace util
+    var util = this.application.util;
+
     var parts = this.packageId.split('.');
     var packageName = parts[parts.length - 1];
     var data = {
@@ -59,19 +60,19 @@ function(apiTarget, projectPath) {
     };
 
     // AndroidManifest.xml
-    var tpl = new TemplateFile(Path.join(__dirname, "..", "data", "AndroidManifest.xml.tpl"));
+    var tpl = new util.TemplateFile(Path.join(__dirname, "..", "data", "AndroidManifest.xml.tpl"));
     tpl.render(data, projectPath + Path.sep + "AndroidManifest.xml");
 
     // build.xml
-    tpl = new TemplateFile(Path.join(__dirname, "..", "data", "build.xml.tpl"));
+    tpl = new util.TemplateFile(Path.join(__dirname, "..", "data", "build.xml.tpl"));
     tpl.render(data, projectPath + Path.sep + "build.xml");
 
     // project.properties
-    tpl = new TemplateFile(Path.join(__dirname, "..", "data", "project.properties.tpl"));
+    tpl = new util.TemplateFile(Path.join(__dirname, "..", "data", "project.properties.tpl"));
     tpl.render(data, projectPath + Path.sep + "project.properties");
 
     // MainActivity.java
-    tpl = new TemplateFile(Path.join(__dirname, "..", "data", "MainActivity.java.tpl"));
+    tpl = new util.TemplateFile(Path.join(__dirname, "..", "data", "MainActivity.java.tpl"));
     var activityPath = projectPath + Path.sep +
                        "src" + Path.sep +
                        parts.join(Path.sep);

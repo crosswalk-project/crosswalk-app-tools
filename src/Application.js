@@ -244,4 +244,30 @@ Object.defineProperty(Application.prototype, "output", {
                            }
                       });
 
+/**
+ * Namespace for exceptions.
+ * @member {Namespace} exceptions
+ * @instance
+ * @memberOf Application
+ * @see Namespace {@link exceptions}
+ */
+Object.defineProperty(Application.prototype, "exceptions", {
+                      get: function() {
+                                return require("./util/exceptions.js");
+                           }
+                      });
+
+/**
+ * Namespace for utility classes.
+ * @member {Namespace} util
+ * @instance
+ * @memberOf Application
+ * @see Namespace {@link util}
+ */
+Object.defineProperty(Application.prototype, "util", {
+                      get: function() {
+                                return require("./util/index.js");
+                           }
+                      });
+
 module.exports = Application;

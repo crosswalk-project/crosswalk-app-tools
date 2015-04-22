@@ -8,10 +8,6 @@ var Path = require("path");
 var MemoryStream = require("memorystream");
 var ShellJS = require("shelljs");
 
-var Downloader = require("../../src/util/Downloader");
-var FileCreationFailed = require("../../src/util/exceptions").FileCreationFailed;
-var IndexParser = require("../../src/util/IndexParser");
-
 var BASE_URL = "https://download.01.org/crosswalk/releases/crosswalk/android/";
 
 // Channels are in preferred search order.
@@ -79,6 +75,8 @@ Object.defineProperty(AndroidDependencies, "CHANNELS", {
 AndroidDependencies.prototype.fetchVersions =
 function(callback) {
 
+    // Namespace util
+    var util = this._application.util;
     var output = this._application.output;
     var url = BASE_URL + this._channel + "/";
 
@@ -89,7 +87,9 @@ function(callback) {
         buffer += data.toString();
     });
 
-    var downloader = new Downloader(url, stream);
+    // Namespace util
+    var util = this._application.util;
+    var downloader = new util.Downloader(url, stream);
 
     var label = "Fetching '" + this._channel + "' versions index";
     var indicator = output.createFiniteProgress(label);
@@ -108,7 +108,7 @@ function(callback) {
         } else {
 
             // Parse
-            var parser = new IndexParser(buffer);
+            var parser = new util.IndexParser(buffer);
             var versions = parser.parse();
             callback(versions);
         }
@@ -188,6 +188,8 @@ function(version) {
 AndroidDependencies.prototype.download =
 function(version, dir, callback) {
 
+    // Namespace exceptions
+    var exceptions = this._application.exceptions;
     var output = this._application.output;
     var filename = "crosswalk-" + version + ".zip";
     var url = BASE_URL +
@@ -224,10 +226,12 @@ function(version, dir, callback) {
     };
     var stream = FS.createWriteStream(downloadPath, options);
     if (!stream) {
-        throw new FileCreationFailed("Could not open file " + downloadPath);
+        throw new exceptions.FileCreationFailed("Could not open file " + downloadPath);
     }
 
-    var downloader = new Downloader(url, stream);
+    // Namespace util
+    var util = this._application.util;
+    var downloader = new util.Downloader(url, stream);
     downloader.progress = function(progress) {
         indicator.update(progress);
     };
