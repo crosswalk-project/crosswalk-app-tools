@@ -149,7 +149,7 @@ Object.defineProperty(PlatformBase.prototype, "platformPath", {
                       });
 
 /**
- * Absolute path to directory where the platform-specific project is located.
+ * Absolute path to directory where the platform-specific projects are located.
  * @member {String} prjPath
  * @instance
  * @memberOf PlatformBase

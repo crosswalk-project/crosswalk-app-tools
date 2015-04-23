@@ -199,9 +199,9 @@ function(version, defaultPath, callback) {
               version + "/" +
               filename;
 
-    // Check for existing download
+    // Check for existing download in defaultPath, parent dir, and cache dir if set
     var handler = new util.DownloadHandler(defaultPath, filename);
-    var localDirs = [defaultPath];
+    var localDirs = [defaultPath, ""];
     if (process.env.CROSSWALK_APP_TOOLS_CACHE_DIR)
         localDirs.push(process.env.CROSSWALK_APP_TOOLS_CACHE_DIR);
     var localPath = handler.findLocally(localDirs);

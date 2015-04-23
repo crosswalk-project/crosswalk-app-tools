@@ -42,11 +42,11 @@ function AndroidPlatform(PlatformBase, baseData, args) {
 /**
  * Fill template files and put them into the project skeleton.
  * @param {String} apiTarget Android API target (greater android-14)
- * @param {String} projectPath Path to root dir of project
+ * @param {String} platformPath Path to root dir of project
  * @returns {Boolean} True on success.
  */
 AndroidPlatform.prototype.fillTemplates =
-function(apiTarget, projectPath) {
+function(apiTarget, platformPath) {
 
     // Namespace util
     var util = this.application.util;
@@ -61,25 +61,25 @@ function(apiTarget, projectPath) {
 
     // AndroidManifest.xml
     var tpl = new util.TemplateFile(Path.join(__dirname, "..", "data", "AndroidManifest.xml.tpl"));
-    tpl.render(data, projectPath + Path.sep + "AndroidManifest.xml");
+    tpl.render(data, platformPath + Path.sep + "AndroidManifest.xml");
 
     // build.xml
     tpl = new util.TemplateFile(Path.join(__dirname, "..", "data", "build.xml.tpl"));
-    tpl.render(data, projectPath + Path.sep + "build.xml");
+    tpl.render(data, platformPath + Path.sep + "build.xml");
 
     // project.properties
     tpl = new util.TemplateFile(Path.join(__dirname, "..", "data", "project.properties.tpl"));
-    tpl.render(data, projectPath + Path.sep + "project.properties");
+    tpl.render(data, platformPath + Path.sep + "project.properties");
 
     // MainActivity.java
     tpl = new util.TemplateFile(Path.join(__dirname, "..", "data", "MainActivity.java.tpl"));
-    var activityPath = projectPath + Path.sep +
+    var activityPath = platformPath + Path.sep +
                        "src" + Path.sep +
                        parts.join(Path.sep);
     tpl.render(data, activityPath + Path.sep + "MainActivity.java");
 
     // Make html5 app dir and copy sample content
-    var assetsPath = Path.join(projectPath, "assets");
+    var assetsPath = Path.join(platformPath, "assets");
     ShellJS.mkdir("-p", assetsPath);
     var wwwPath = Path.join(assetsPath, "www");
     ShellJS.ln("-s", this.appPath, wwwPath);
@@ -91,38 +91,11 @@ function(apiTarget, projectPath) {
 /**
  * Import Crosswalk libraries and auxiliary files into the project.
  * @param {String} crosswalkPath Location of unpacked Crosswalk distribution
- * @param {String} projectPath Location of project to import Crosswalk into
- * @returns {Boolean} True on success or false.
- */
-AndroidPlatform.prototype.importCrosswalkFromDir =
-function(crosswalkPath, projectPath) {
-
-    // Copy xwalk_core_library
-    ShellJS.cp("-r",
-               crosswalkPath + Path.sep + "xwalk_core_library",
-               projectPath);
-
-    // Copy jars
-    ShellJS.cp(crosswalkPath + Path.sep + "template" + Path.sep + "libs" + Path.sep + "*.jar",
-               projectPath + Path.sep + "libs");
-
-    // Copy res
-    ShellJS.cp("-rf",
-               crosswalkPath + Path.sep + "template" + Path.sep + "res",
-               projectPath);
-
-    // TODO check for errors
-    return true;
-};
-
-/**
- * Import Crosswalk libraries and auxiliary files into the project.
- * @param {String} crosswalkPath Location of unpacked Crosswalk distribution
- * @param {String} projectPath Location of project to import Crosswalk into
+ * @param {String} platformPath Location of project to import Crosswalk into
  * @returns {Boolean} True on success or false.
  */
 AndroidPlatform.prototype.importCrosswalkFromZip =
-function(crosswalkPath, projectPath) {
+function(crosswalkPath, platformPath) {
 
     var output = this.application.output;
 
@@ -165,7 +138,7 @@ function(crosswalkPath, projectPath) {
     var name = base + "xwalk_core_library/";
     entry = zip.getEntry(name);
     if (entry) {
-        path = projectPath + Path.sep + "xwalk_core_library";
+        path = platformPath + Path.sep + "xwalk_core_library";
         // Remove existing dir to prevent stale files when updating crosswalk
         ShellJS.rm("-rf", path);
         ShellJS.mkdir(path);
@@ -183,7 +156,7 @@ function(crosswalkPath, projectPath) {
         name = base + "template/libs/xwalk_runtime_java.jar";
         entry = zip.getEntry(name);
         if (entry) {
-            zip.extractEntryTo(entry, projectPath + Path.sep + "libs", false, true);
+            zip.extractEntryTo(entry, platformPath + Path.sep + "libs", false, true);
         } else {
             output.error("Failed to find entry " + name);
             return false;
@@ -195,7 +168,7 @@ function(crosswalkPath, projectPath) {
     name = base + "template/libs/xwalk_app_runtime_java.jar";
     entry = zip.getEntry(name);
     if (entry) {
-        zip.extractEntryTo(entry, projectPath + Path.sep + "libs", false, true);
+        zip.extractEntryTo(entry, platformPath + Path.sep + "libs", false, true);
     } else {
         output.error("Failed to find entry " + name);
         return false;
@@ -207,7 +180,7 @@ function(crosswalkPath, projectPath) {
     name = base + "template/res/";
     entry = zip.getEntry(name);
     if (entry) {
-        zip.extractEntryTo(entry, projectPath + Path.sep + "res", false, true);
+        zip.extractEntryTo(entry, platformPath + Path.sep + "res", false, true);
     } else {
         output.error("Failed to find entry " + name);
         return false;
@@ -222,12 +195,12 @@ function(crosswalkPath, projectPath) {
 /**
  * Turn a freshly created empty Android project into a Crosswalk project.
  * @param {String} localCrosswalk Local Crosswalk download or null
- * @param {String} channel Crosswalk channel (stable, beta, canary) or null
- * @param {String} projectPath Path to root dir of project
+ * @param {String} versionSpec Crosswalk version or channel (stable, beta, canary)
+ * @param {String} platformPath Path to root dir of project
  * @returns {Boolean} True on success.
  */
 AndroidPlatform.prototype.importCrosswalk =
-function(localCrosswalk, channel, projectPath, callback) {
+function(localCrosswalk, versionSpec, platformPath, callback) {
 
     var output = this.application.output;
 
@@ -238,46 +211,38 @@ function(localCrosswalk, channel, projectPath, callback) {
         if (ShellJS.test("-f", localCrosswalk) ||
             ShellJS.test("-L", localCrosswalk)) {
 
-            var ret = this.importCrosswalkFromZip(localCrosswalk, projectPath);
-            if (ret) {
-                callback(null);
-                return;
-            } else {
-                output.warning("Import of local Crosswalk failed, attempting download ...");
+            var ret = this.importCrosswalkFromZip(localCrosswalk, platformPath);
+            var errormsg = null;
+            if (!ret) {
+                errormsg = "Import of local Crosswalk failed " + localCrosswalk;
             }
+            callback(errormsg);
+            return;
         }
     }
 
-    // Download latest Crosswalk
-    var deps = new AndroidDependencies(this.application, channel);
-    deps.fetchVersions(function(versions, errormsg) {
+    var channel = null;
+    var version = null;
+
+    if (AndroidDependencies.CHANNELS.indexOf(versionSpec) > -1) {
+        // versionSpec is a channel name
+        channel = versionSpec;
+    } else {
+        version = versionSpec;
+    }
+
+    this.findCrosswalkVersion(version, channel,
+                              function(version, channel, errormsg) {
 
         if (errormsg) {
             callback(errormsg);
             return;
         }
 
-        if (versions.length === 0) {
-            callback("Failed to load available Crosswalk versions for channel " + channel);
-            return;
-        }
-
-        // Look for existing download
-        var version = deps.pickLatest(versions);
-        output.info("Latest version is " + version);
-        var filename = deps.findLocally(version);
-        if (filename) {
-            output.info("Using local " + filename);
-            var ret = this.importCrosswalkFromZip(filename, projectPath);
-            if (!ret) {
-                errormsg = "Failed to extract " + filename;
-            }
-            callback(errormsg);
-            return;
-        }
-
-        // Download
-        deps.download(version, ".", function(filename, errormsg) {
+        // Download latest Crosswalk
+        var deps = new AndroidDependencies(this.application, channel);
+        deps.download(version, ".",
+                      function(filename, errormsg) {
 
             if (errormsg) {
                 callback(errormsg);
@@ -290,7 +255,7 @@ function(localCrosswalk, channel, projectPath, callback) {
             }
 
             errormsg = null;
-            var ret = this.importCrosswalkFromZip(filename, projectPath);
+            var ret = this.importCrosswalkFromZip(filename, platformPath);
             if (!ret) {
                 errormsg = "Failed to extract " + filename;
             }
@@ -309,7 +274,6 @@ function(options, callback) {
     var output = this.application.output;
 
     var minApiLevel = 21;
-    var apiTarget;
     this._sdk.queryTarget(minApiLevel,
                           function(apiTarget, errormsg) {
 
@@ -331,13 +295,13 @@ function(options, callback) {
             }
 
             var localCrosswalk = options ? options.crosswalk : null;
-            var channel = "stable";
+            var versionSpec = "stable";
             if (options &&
                 options.channel &&
                 AndroidDependencies.CHANNELS.indexOf(options.channel) >= 0) {
-                channel = options.channel;
+                versionSpec = options.channel;
             } else {
-                output.info("Defaulting to download channel " + channel);
+                output.info("Defaulting to download channel " + versionSpec);
             }
 
             if (!this.fillTemplates(apiTarget, path)) {
@@ -345,12 +309,12 @@ function(options, callback) {
                 return;
             }
 
-            this.importCrosswalk(localCrosswalk, channel, path,
+            this.importCrosswalk(localCrosswalk, versionSpec, path,
                                  function(errormsg) {
 
                 if (errormsg) {
                     output.error(errormsg);
-                    callback("Creating project template failed.");
+                    callback("Creating project template failed");
                     return;
                 }
 
@@ -426,43 +390,20 @@ function(version, channel, callback) {
 AndroidPlatform.prototype.update =
 function(versionSpec, options, callback) {
 
-    var channel = null;
-    var version = null;
+    var output = this.application.output;
 
-    if (AndroidDependencies.CHANNELS.indexOf(versionSpec) > -1) {
-        // versionSpec is a channel name
-        channel = versionSpec;
-    } else {
-        version = versionSpec;
-    }
-
-    this.findCrosswalkVersion(version, channel,
-                              function(version, channel, errormsg) {
+    this.importCrosswalk(null, versionSpec, this.platformPath,
+                         function(errormsg) {
 
         if (errormsg) {
-            callback(errormsg);
+            output.error(errormsg);
+            callback("Updating crosswalk to '" + versionSpec + "' failed");
             return;
         }
 
-        var deps = new AndroidDependencies(this.application, channel);
-        deps.download(version, ".", function(filename, errormsg) {
-
-            if (errormsg) {
-                callback(errormsg);
-                return;
-            }
-
-            var ret = this.importCrosswalkFromZip(filename, this.platformPath);
-            if (ret) {
-                this.output.info("Project updated to version " + version);
-            } else {
-                errormsg = "Failed to update Crosswalk from " + filename;
-            }
-            callback(errormsg);
-            return;
-
-        }.bind(this));
-    }.bind(this));
+        output.info("Project updated to crosswalk '" + versionSpec + "'");
+        callback(null);
+    });
 };
 
 AndroidPlatform.prototype.refresh =
