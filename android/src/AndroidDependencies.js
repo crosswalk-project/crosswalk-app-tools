@@ -179,17 +179,19 @@ function(version) {
 };
 
 /**
- * Download crosswalk zip.
+ * Download crosswalk zip, checks for already existing file, and returns it in case.
  * @param {String} version Crosswalk version string
- * @param {String} dir Directory to download to
+ * @param {String} defaultPath Directory to download to if not already exists
  * @param {AndroidDependencies~downloadFinishedCb} callback callback function
  * @throws {FileCreationFailed} If download file could not be written.
  */
 AndroidDependencies.prototype.download =
-function(version, dir, callback) {
+function(version, defaultPath, callback) {
 
-    // Namespace exceptions
+    // Namespaces
     var exceptions = this._application.exceptions;
+    var util = this._application.util;
+
     var output = this._application.output;
     var filename = "crosswalk-" + version + ".zip";
     var url = BASE_URL +
@@ -197,40 +199,23 @@ function(version, dir, callback) {
               version + "/" +
               filename;
 
-    var downloadPath = Path.join(dir, filename);
-    var cacheDir = null;
-    if (process.env.CROSSWALK_APP_TOOLS_CACHE_DIR &&
-        ShellJS.test("-d", process.env.CROSSWALK_APP_TOOLS_CACHE_DIR)) {
-
-        cacheDir = process.env.CROSSWALK_APP_TOOLS_CACHE_DIR;
-        cacheFile = Path.join(cacheDir, filename);
-        if (ShellJS.test("-f", cacheFile)) {
-            // Copy to requested download dir and report finished
-            if (downloadPath != cacheFile) {
-                ShellJS.cp("-f", cacheFile, downloadPath);
-            }
-            output.info("Using cached " + cacheFile);
-            callback(downloadPath);
-            return;
-        }
+    // Check for existing download
+    var handler = new util.DownloadHandler(defaultPath, filename);
+    var localDirs = [defaultPath];
+    if (process.env.CROSSWALK_APP_TOOLS_CACHE_DIR)
+        localDirs.push(process.env.CROSSWALK_APP_TOOLS_CACHE_DIR);
+    var localPath = handler.findLocally(localDirs);
+    if (localPath) {
+        output.info("Using cached " + localPath);
+        callback(localPath);
+        return;
     }
 
     // Download
-    // At the moment we unconditionally download, overwriting the existing copy.
     var label = "Downloading '" + this._channel + "' " + version;
     var indicator = output.createFiniteProgress(label);
 
-    var options = {
-        flags: "w",
-        mode: 0600
-    };
-    var stream = FS.createWriteStream(downloadPath, options);
-    if (!stream) {
-        throw new exceptions.FileCreationFailed("Could not open file " + downloadPath);
-    }
-
-    // Namespace util
-    var util = this._application.util;
+    var stream = handler.createStream();
     var downloader = new util.Downloader(url, stream);
     downloader.progress = function(progress) {
         indicator.update(progress);
@@ -245,12 +230,8 @@ function(version, dir, callback) {
 
         } else {
 
-            // Store file to cache
-            if (cacheDir) {
-                output.info("Storing download in " + cacheDir);
-                ShellJS.cp("-f", downloadPath, cacheDir);
-            }
-            callback(downloadPath);
+            var finishedPath = handler.finish(process.env.CROSSWALK_APP_TOOLS_CACHE_DIR);
+            callback(finishedPath);
         }
     });
 };

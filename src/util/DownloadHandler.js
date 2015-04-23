@@ -96,7 +96,7 @@ function(downloadsPath) {
     // Copy to downloads dir if given
     if (downloadsPath &&
         ShellJS.test("-d", downloadsPath)) {
-        ShellJS.cp(finishedPath, downloadPath);
+        ShellJS.cp(finishedPath, downloadsPath);
     }
 
     return finishedPath;
