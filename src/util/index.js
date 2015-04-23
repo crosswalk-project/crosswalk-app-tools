@@ -8,6 +8,8 @@
 var util = {
     /** {@link Downloader} */
     Downloader: require("./Downloader"),
+    /** {@link DownloadHandler} */
+    DownloadHandler: require("./DownloadHandler"),
     /** {@link IndexParser} */
     IndexParser: require("./IndexParser"),
     /** {@link TemplateFile} */

@@ -8,7 +8,6 @@ var Https = require("https");
 var Url = require("url");
 
 var HttpsProxyAgent = require("https-proxy-agent");
-
 var ShellJS = require("shelljs");
 
 
