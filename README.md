@@ -6,20 +6,17 @@ Version 2.0, please refer to the LICENSE-APACHE-V2 included with the package.
 
 Crosswalk-app-tools is in very early stages of development, and not suitable for use in a production environment. "Releases" and announcements are made available as a technology preview only. No packages are being published at this time, but git tags serve as reference points for release milestones.
 
-### Preparation
+### Installation
 
-Linux is the only tested platform. Node.js, the Android SDK, and git must be functional.
+Prerequisites are functional
+1. Android SDK
+2. Ant
+3. Node.js
+on the system.
 
-1. Download: `git clone https://github.com/crosswalk-project/crosswalk-app-tools.git`
-2. Optionally select a version: `git checkout 0.1.0`
-3. Install dependencies: `cd crosswalk-app-tools`, then `npm install`, and `cd ..`
-4. The main script is `crosswalk-app-tools/bin/crosswalk-app`. Set environment PATH or invoke with directory.
-5. Download Crosswalk, e.g. https://download.01.org/crosswalk/releases/crosswalk/android/stable/8.37.189.14/crosswalk-8.37.189.14.zip to the same directory.
-
-Your current directory should have those entries now.
+In order to get the `crosswalk-app` script available everywhere, global npm installation is required. On most Linux distributions this can be achieved by using `sudo`.
 ```
-drwxrwxr-x. 11 user user     4096 Dec  1 15:43 crosswalk-app-tools
--rw-rw-r--. 1  user user 35043139 Sep 30 11:43 crosswalk-8.37.189.12.zip
+sudo npm install -g crosswalk-app-tools
 ```
 
 ### Usage
@@ -53,3 +50,10 @@ Crosswalk Application Project and Packaging Tool
 ### Limitations
 * This is alpha stage software and under continuous development. We encourage trying it and appreciate feedback, but use in a production environment is not supported at this point in time.
 * A problem prevents use with anyting but releases from the "stable" crosswalk channel. 
+
+### Run development versions from git
+
+1. Download: `git clone https://github.com/crosswalk-project/crosswalk-app-tools.git`
+3. Install dependencies: `cd crosswalk-app-tools`, then `npm install`, and `cd ..`
+4. The main script is `crosswalk-app-tools/src/crosswalk-app`. Set environment PATH or invoke with directory.
+
