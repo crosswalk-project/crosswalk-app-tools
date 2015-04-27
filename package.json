@@ -1,6 +1,6 @@
 {
   "name": "crosswalk-app-tools",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "An APK packager for Crosswalk -- http://crosswalk-project.org",
   "author": "Robert Staudinger <robert.staudinger@intel.com>",
   "license": "Apache V2",
