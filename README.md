@@ -9,9 +9,10 @@ Crosswalk-app-tools is in very early stages of development, and not suitable for
 ### Installation
 
 Prerequisites are functional
-1. Android SDK
-2. Ant
-3. Node.js
+  1. Android SDK
+  2. Apache Ant
+  3. Node.js
+
 on the system.
 
 In order to get the `crosswalk-app` script available everywhere, global npm installation is required. On most Linux distributions this can be achieved by using `sudo`.
