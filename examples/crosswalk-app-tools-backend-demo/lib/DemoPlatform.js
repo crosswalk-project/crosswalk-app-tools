@@ -7,10 +7,9 @@
  * @constructor
  * @param {Function} PlatformBase Base class constructor {@link PlatformBase}
  * @param {PlatformData} platformData Init data passed to the platform
- * @param {Object} args Platform-specific args, only if specified and actually given
  * @protected
  */
-function DemoPlatform(PlatformBase, baseData, args) {
+function DemoPlatform(PlatformBase, baseData) {
 
     // Create base instance.
     var instance = new PlatformBase(baseData);
@@ -24,11 +23,6 @@ function DemoPlatform(PlatformBase, baseData, args) {
         }
     }
 
-    // Print args
-    for (var key in args) {
-        instance.output.write("DemoPlatform " + key + ": " + args[key] + "\n");
-    }
-
     return instance;
 }
 
@@ -39,8 +33,13 @@ function DemoPlatform(PlatformBase, baseData, args) {
 DemoPlatform.getArgs = function() {
 
     return {
-        "foo": "Option added by the backend.",
-        "bar": "Another option added by the backend."
+        create: { // Extra options for command "create"
+            foo: "Option added by the backend",
+            bar: "Another option added by the backend"
+        },
+        update: { // Extra options for command "update"
+            baz: "Another option added by the backend"
+        }
     };
 };
 
@@ -50,7 +49,7 @@ DemoPlatform.getArgs = function() {
  * @param {PlatformBase~platformBaseOperationCb} callback callback function
  * @abstract
  */
-DemoPlatform.prototype.generate =
+DemoPlatform.prototype.create =
 function(options, callback) {
 
     // TODO implement generation of project.
@@ -62,12 +61,12 @@ function(options, callback) {
 
 /**
  * Update platform project to latest Crosswalk.
- * @param {String} version Version to update to, format w.x.y.z
+ * @param {String} versionSpec Version to update to, format w.x.y.z
  * @param {Object} options Extra options for the command
  * @param {PlatformBase~platformBaseOperationCb} callback callback function
  */
 DemoPlatform.prototype.update =
-function(version, options, callback) {
+function(versionSpec, options, callback) {
 
     // TODO implement updating of project to new Crosswalk version.
     // This function is not supported yet.
@@ -91,14 +90,14 @@ function(callback) {
 /**
  * Build application package.
  * @function build
- * @param {String[]} abi Array of ABIs, supported armeabi-v7a, x86.
  * @param {Boolean} release Whether to build debug or release package.
+ * @param {Object} args Extra options for the command
  * @param {Function} callback see {@link Project~projectOperationCb}.
  * @abstract
  * @memberOf Project
  */
 DemoPlatform.prototype.build =
-function(abis, release, callback) {
+function(release, args, callback) {
 
     // TODO implement updating of project to new Crosswalk version.
     this.output.log("DemoPlatform: Building project\n");

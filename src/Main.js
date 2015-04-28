@@ -72,28 +72,16 @@ function() {
         return null;
     }
 
-    // Collect backend-specific args
-    var allArgs = Minimist(process.argv.slice(2));
-    var args = {};
-    for (var key in platformInfo.args) {
-        // Strip dash prefix before matching, Minimist strips them also.
-        var key_ = key.substring("--".length);
-        if (allArgs[key_]) {
-            // Also strip platform prefix before collecting the arg.
-            var argPrefix = platformInfo.platformId + "-";
-            var argName = key_.substring(argPrefix.length);
-            args[argName] = allArgs[key_];
-        }
-    }
-
-    var baseData = {
+    // See type PlatformData
+    var platformData = {
         application: this,
-        platformId: platformInfo.platformId
+        platformId: platformInfo.platformId,
+        argSpec: platformInfo.argSpec
     };
     var platform = null;
 
     try {
-        platform = new platformInfo.Ctor(PlatformBase, baseData, args);
+        platform = new platformInfo.Ctor(PlatformBase, platformData);
     } catch (e) {
         output.error("The Android SDK could not be found. " +
                       "Make sure the directory containing the 'android' " +
@@ -105,13 +93,36 @@ function() {
 };
 
 /**
+ * Collect arguments
+ */
+Main.prototype.collectArgs =
+function(allArgs, argsSpec) {
+
+    // Collect backend-specific args
+    var args = {};
+    for (var key in argsSpec) {
+        // Strip dash prefix before matching, Minimist strips them also.
+        var key_ = key.substring("--".length);
+        if (allArgs[key_]) {
+            // Also strip platform prefix before collecting the arg.
+            var argPrefix = platformInfo.platformId + "-";
+            var argName = key_.substring(argPrefix.length);
+            args[argName] = allArgs[key_];
+        }
+    }
+
+    return args;
+};
+
+/**
  * Create skeleton project.
  * @param {Object} options Extra options for the command
+ * @param {Object} extraArgs Unparsed extra arguments passed by command-line
  * @param {Main~mainOperationCb} callback Callback function
  * @static
  */
 Main.prototype.create =
-function(options, callback) {
+function(options, extraArgs, callback) {
 
     var output = this.output;
 
@@ -126,7 +137,19 @@ function(options, callback) {
         return;
     }
 
-    project.generate(options, function(errormsg) {
+    // Collect args for this command
+    var argSpec = project.argSpec;
+    if (argSpec && argSpec.create) {
+        var createArgs = this.collectArgs(extraArgs, argSpec.create);
+        for (var key in createArgs) {
+            // Do not overwrite built-in options
+            if (!options[key]) {
+                options[key] = createArgs[key];
+            }
+        }
+    }
+
+    project.create(options, function(errormsg) {
 
         if (errormsg) {
             output.error(errormsg);
@@ -142,11 +165,12 @@ function(options, callback) {
 /**
  * Update crosswalk in the application package.
  * @param {String} version Version to update to, or null for latest stable version
+ * @param {Object} extraArgs Unparsed extra arguments passed by command-line
  * @param {Main~mainOperationCb} callback Callback function
  * @static
  */
 Main.prototype.update =
-function(version, callback) {
+function(version, extraArgs, callback) {
 
     var output = this.output;
 
@@ -156,7 +180,14 @@ function(version, callback) {
         return;
     }
 
-    project.update(version, {}, function(errormsg) {
+    // Collect args for this command
+    var updateArgs = {};
+    var argSpec = project.argSpec;
+    if (argSpec && argSpec.update) {
+        updateArgs = this.collectArgs(extraArgs, argSpec.update);
+    }
+
+    project.update(version, updateArgs, function(errormsg) {
 
         if (errormsg) {
             output.error(errormsg);
@@ -172,11 +203,12 @@ function(version, callback) {
 /**
  * Build application package.
  * @param {String} type Build "debug" or "release" configuration
+ * @param {Object} extraArgs Unparsed extra arguments passed by command-line
  * @param {Main~mainOperationCb} callback Callback function
  * @static
  */
 Main.prototype.build =
-function(type, callback) {
+function(type, extraArgs, callback) {
 
     var output = this.output;
 
@@ -195,10 +227,16 @@ function(type, callback) {
         return;
     }
 
+    // Collect args for this command
+    var buildArgs = {};
+    var argSpec = project.argSpec;
+    if (argSpec && argSpec.build) {
+        buildArgs = this.collectArgs(extraArgs, argSpec.build);
+    }
+
     // Build
-    var abis = ["armeabi-v7a", "x86"];
     var release = type === "release" ? true : false;
-    project.build(abis, release, function(errormsg) {
+    project.build(release, buildArgs, function(errormsg) {
 
         if (errormsg) {
             output.error(errormsg);
@@ -235,8 +273,12 @@ function(parser) {
 
     if (platformInfo.args) {
         output.write("    Options for platform '" + platformInfo.platformId + "'\n");
-        for (var arg in platformInfo.args) {
-            output.write("        " + arg + "    " + platformInfo.args[arg] + "\n");
+        for (var cmd in platformInfo.args) {
+            output.write("    For command '" + cmd + "'\n");
+            var cmdArgs = platformInfo.args[cmd];
+            for (var arg in cmdArgs) {
+                output.write("        " + arg + "    " + cmdArgs[arg] + "\n");
+            }
         }
     }
     output.write("\n");
@@ -287,6 +329,7 @@ function(callback) {
     }
 
     var options = null;
+    var extraArgs = Minimist(process.argv.slice(2));
     switch (cmd) {
     case "create":
         var packageId = parser.createGetPackageId();
@@ -295,7 +338,7 @@ function(callback) {
         // Chain up the constructor.
         Application.call(this, process.cwd(), packageId);
 
-        this.create(options, callback);
+        this.create(options, extraArgs, callback);
         break;
 
     case "update":
@@ -304,7 +347,7 @@ function(callback) {
         // Chain up the constructor.
         Application.call(this, process.cwd(), null);
 
-        this.update(version, callback);
+        this.update(version, extraArgs, callback);
         break;
 
     case "build":
@@ -313,7 +356,7 @@ function(callback) {
         // Chain up the constructor.
         Application.call(this, process.cwd(), null);
 
-        this.build(type, callback);
+        this.build(type, extraArgs, callback);
         break;
 
     case "help":

@@ -88,7 +88,6 @@ function(callback) {
     });
 
     // Namespace util
-    var util = this._application.util;
     var downloader = new util.Downloader(url, stream);
 
     var label = "Fetching '" + this._channel + "' versions index";

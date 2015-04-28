@@ -42,7 +42,7 @@ exports.tests = {
 
         var app = require("../src/Main");
         Application.call(app, tmpdir, "com.example.foo");
-        app.create(null, function(errno) {
+        app.create(null, null, function(errno) {
 
             test.equal(errno, 0);
 
@@ -63,13 +63,13 @@ exports.tests = {
 
         var app = require("../src/Main");
         Application.call(app, tmpdir, "com.example.foo");
-        app.create(null, function(errno) {
+        app.create(null, null, function(errno) {
 
             if (!errno) {
 
                 // Build
                 ShellJS.pushd("com.example.foo");
-                app.build("debug", function(errno) {
+                app.build("debug", null, function(errno) {
 
                     test.equal(errno, 0);
                     test.done();
@@ -95,16 +95,16 @@ exports.tests = {
         var app = require("../src/Main");
         Application.call(app, tmpdir, "com.example.foo");
         // Create
-        app.create(null, function(errno) {
+        app.create(null, null, function(errno) {
 
             if (!errno) {
                 // Update
                 ShellJS.pushd("com.example.foo");
-                app.update("stable", function(errno) {
+                app.update("stable", null, function(errno) {
 
                     if (!errno) {
                         // Build
-                        app.build("debug", function(errno) {
+                        app.build("debug", null, function(errno) {
 
                             test.equal(errno, 0);
                             ShellJS.popd();

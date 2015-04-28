@@ -8,8 +8,10 @@ var ShellJS = require("shelljs");
 
 var Application = require("../src/Application");
 var LogfileOutput = require("../src/LogfileOutput");
+var PlatformBase = require("../src/PlatformBase");
+var PlatformsManager = require("../src/PlatformsManager");
 
-var TestPlatformScope = require("../test-util/TestPlatform");
+var TestPlatform = require("../test-util/TestPlatform");
 var Util = require("../test-util/Util.js");
 
 var _packageId = "com.example.foo";
@@ -19,19 +21,26 @@ exports.tests = {
 
     ctor: function(test) {
 
-        test.expect(8);
+        test.expect(9);
 
         var basePath = Util.createTmpDir();
         var application = new Application(basePath, _packageId);
+        var mgr = new PlatformsManager(application.output);
+
+        var platformInfo = mgr.buildInfo(TestPlatform, _platformId);
 
         var platformData = {
             application: application,
-            platformId: _platformId
+            platformId: _platformId,
+            argSpec: platformInfo.argSpec
         };
-        var PlatformBase = require("../src/PlatformBase");
-        var platform = new TestPlatformScope(PlatformBase, platformData);
+        var platform = new TestPlatform(PlatformBase, platformData);
 
         test.equal(platform.application instanceof Application, true);
+
+        var createArgSpec = platform.argSpec.create;
+        test.equal(typeof createArgSpec["--test-foo"], "string");
+
         test.equal(platform.appPath, Path.join(basePath, _packageId, "app"));
         test.equal(platform.logOutput instanceof LogfileOutput, true);
         test.equal(platform.packageId, _packageId);
@@ -56,14 +65,13 @@ exports.tests = {
             application: application,
             platformId: _platformId
         };
-        var PlatformBase = require("../src/PlatformBase");
-        var platform = new TestPlatformScope(PlatformBase, platformData);
+        var platform = new TestPlatform(PlatformBase, platformData);
 
-        platform.generate(null, function(errormsg) {
+        platform.create(null, function(errormsg) {
             test.equal(errormsg, null);
         });
 
-        platform.update(function(errormsg) {
+        platform.update(null, null, function(errormsg) {
             test.equal(errormsg, null);
         });
 
@@ -71,7 +79,7 @@ exports.tests = {
             test.equal(errormsg, null);
         });
 
-        platform.build(["foo"], false, function(errormsg) {
+        platform.build(false, null, function(errormsg) {
             test.equal(errormsg, null);
         });
 

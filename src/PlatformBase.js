@@ -24,6 +24,7 @@ function platformBaseOperationCb(result) {}
  * @type {Object}
  * @property {Application} application Application instance
  * @property {String} platformId Name for backend (android, ios, ...)
+ * @property {Object} argSpec Platform-specific command-line argument definitions
  * @memberOf PlatformBase
  */
 
@@ -48,6 +49,8 @@ function PlatformBase(platformData) {
         throw new Error("PlatformBase() invalid platformData.platformId '" + platformData.platformId + "'");
     }
 
+    this._argSpec = platformData.argSpec;
+
     var logfilePath = Path.join(this._application.logPath, this._platformId + ".log");
     this._logOutput = new LogfileOutput(logfilePath);
 }
@@ -61,6 +64,18 @@ function PlatformBase(platformData) {
 Object.defineProperty(PlatformBase.prototype, "application", {
                       get: function() {
                                 return this._application;
+                           }
+                      });
+
+/**
+ * Platform-specific argument definitions.
+ * @member {Object} argSpec
+ * @instance
+ * @memberOf PlatformBase
+ */
+Object.defineProperty(PlatformBase.prototype, "argSpec", {
+                      get: function() {
+                                return this._argSpec;
                            }
                       });
 
@@ -184,10 +199,10 @@ function(packagePath) {
  * @param {Object} options Extra options for the command
  * @param {PlatformBase~platformBaseOperationCb} callback callback function
  */
-PlatformBase.prototype.generate =
+PlatformBase.prototype.create =
 function(options, callback) {
 
-    throw new Error("PlatformBase.generate() not implemented.");
+    throw new Error("PlatformBase.create() not implemented.");
 };
 
 /**
@@ -214,11 +229,12 @@ function() {
 /**
  * Build application package.
  * @param {String[]} abi Array of ABIs, supported armeabi-v7a, x86
+ * @param {Object} args Extra options for the command
  * @param {Boolean} release Whether to build debug or release package
  * @param {PlatformBase~platformBaseOperationCb} callback Callback function.
  */
 PlatformBase.prototype.build =
-function(abis, release, callback) {
+function(release, args, callback) {
 
     throw new Error("PlatformBase.build() not implemented.");
 };

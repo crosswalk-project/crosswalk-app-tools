@@ -10,14 +10,14 @@ function TestPlatformScope(PlatformBase, baseData) {
     }
     TestPlatform.prototype = PlatformBase.prototype;
 
-    TestPlatform.prototype.generate =
+    TestPlatform.prototype.create =
     function(options, callback) {
         // Null means success, error string means failure.
         callback(null);
     };
 
     TestPlatform.prototype.update =
-    function(callback) {
+    function(versionSpec, args, callback) {
         // Null means success, error string means failure.
         callback(null);
     };
@@ -29,12 +29,24 @@ function TestPlatformScope(PlatformBase, baseData) {
     };
 
     TestPlatform.prototype.build =
-    function(abis, release, callback) {
+    function(release, args, callback) {
         // Null means success, error string means failure.
         callback(null);
     };
 
     return new TestPlatform(PlatformBase, baseData);
 }
+
+TestPlatformScope.getArgs = function() {
+    return {
+        create: { // Extra options for command "create"
+            foo: "Create option added by the platform",
+            bar: "Another create option added by the platform"
+        },
+        update: { // Extra options for command "update"
+            baz: "Update option added by the platform"
+        }
+    };
+};
 
 module.exports = TestPlatformScope;

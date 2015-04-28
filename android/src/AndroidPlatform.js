@@ -266,9 +266,9 @@ function(localCrosswalk, versionSpec, platformPath, callback) {
 };
 
 /**
- * Implements {@link PlatformBase.generate}
+ * Implements {@link PlatformBase.create}
  */
-AndroidPlatform.prototype.generate =
+AndroidPlatform.prototype.create =
 function(options, callback) {
 
     var output = this.application.output;
@@ -596,7 +596,7 @@ function(closure) {
  * Implements {@link PlatformBase.build}
  */
 AndroidPlatform.prototype.build =
-function(abis, release, callback) {
+function(release, args, callback) {
 
     var output = this.application.output;
 
@@ -604,7 +604,7 @@ function(abis, release, callback) {
     process.chdir(this.platformPath);
 
     var closure = {
-        abis: abis,
+        abis: ["armeabi-v7a", "x86"],
         abiIndex : 0,
         release: release,
         apks: [],
