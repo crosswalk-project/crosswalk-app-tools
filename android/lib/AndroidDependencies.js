@@ -115,49 +115,6 @@ function(callback) {
 };
 
 /**
- * Pick latest version from array of version strings.
- * @param {String[]} versions Array of version strings
- * @returns {String} Latest version or null on error.
- */
-AndroidDependencies.prototype.pickLatest =
-function(versions) {
-
-    var output = this._application.output;
-
-    if (!(versions instanceof Array) ||
-        versions.length === 0) {
-
-        output.error("No available Crosswalk versions found");
-        return null;
-    }
-
-    var zero = [0, 0, 0, 0];
-    var latest = zero;
-    for (var i = 0; i < versions.length; i++) {
-
-        // Split up version string.
-        var v = versions[i].split(".");
-        if (v.length != 4) {
-            output.error("Invalid Crosswalk version " + versions[i]);
-            return null;
-        }
-
-        // Check against latest remembered version.
-        var j = 0;
-        for (j = 0; j < 4; j++) {
-            if (v[j] > latest[j]) {
-                // Tested version is greater than what we have.
-                latest = v;
-                break;
-            }
-        }
-    }
-
-    // Make sure we found a version, return null otherwise.
-    return latest != zero ? latest.join(".") : null;
-};
-
-/**
  * Locate Crosswalk distribution zip.
  * @param {String} version Crosswalk version to look for
  * @returns {String} Relative path to zip file.

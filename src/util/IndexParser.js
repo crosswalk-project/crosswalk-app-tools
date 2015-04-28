@@ -36,6 +36,12 @@ function() {
             continue;
         }
 
+        // Also ignore symlink "latest"
+        var latestPrefix = '<img src="/icons/folder.gif" alt="[DIR]"> <a href="latest';
+        if (line.substring(0, latestPrefix.length) == latestPrefix) {
+            continue;
+        }
+
         var dirPrefix = '<img src="/icons/folder.gif" alt="[DIR]"> <a href="';
         if (line.substring(0, dirPrefix.length) == dirPrefix) {
 
@@ -45,6 +51,49 @@ function() {
     }
 
     return versions;
+};
+
+/**
+ * Pick latest version from array of version strings.
+ * @param {String[]} versions Array of version strings
+ * @param {Function} errorCb Synchronous callback delivering error message
+ * @returns {String} Latest version or null on error.
+ * @static
+ */
+IndexParser.pickLatest =
+function(versions, errorCb) {
+
+    if (!(versions instanceof Array) ||
+        versions.length === 0) {
+
+        errorCb("No available Crosswalk versions found");
+        return null;
+    }
+
+    var zero = [0, 0, 0, 0];
+    var latest = zero;
+    for (var i = 0; i < versions.length; i++) {
+
+        // Split up version string.
+        var v = versions[i].split(".");
+        if (v.length != 4) {
+            errorCb("Invalid Crosswalk version '" + versions[i] + "'");
+            return null;
+        }
+
+        // Check against latest remembered version.
+        var j = 0;
+        for (j = 0; j < 4; j++) {
+            if (v[j] > latest[j]) {
+                // Tested version is greater than what we have.
+                latest = v;
+                break;
+            }
+        }
+    }
+
+    // Make sure we found a version, return null otherwise.
+    return latest != zero ? latest.join(".") : null;
 };
 
 module.exports = IndexParser;

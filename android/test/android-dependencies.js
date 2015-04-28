@@ -14,53 +14,6 @@ var _output = require("../../src/TerminalOutput").getInstance();
 
 exports.tests = {
 
-    pickLatest1: function(test) {
-
-        test.expect(1);
-
-        var app = Util.createTmpApplication("com.example.foo");
-        var deps = new AndroidDependencies(app, "stable");
-        var versions = [
-            "1.2.3.4",
-            "5.9.7.8",
-            "7.6.5.4"
-        ];
-        var version = deps.pickLatest(versions);
-        test.equal(version, "7.6.5.4");
-        Util.deleteTmpApplication(app);
-        test.done();
-    },
-
-    pickLatest2: function(test) {
-
-        test.expect(1);
-
-        var app = Util.createTmpApplication("com.example.foo");
-        // Bad test, suppress error output
-        app.config.setSilentConsole(true);
-
-        var deps = new AndroidDependencies(app, "stable");
-        var version = deps.pickLatest(null);
-        test.equal(version, null);
-        Util.deleteTmpApplication(app);
-        test.done();
-    },
-
-    pickLatest3: function(test) {
-
-        test.expect(1);
-
-        var app = Util.createTmpApplication("com.example.foo");
-        // Bad test, suppress error output
-        app.config.setSilentConsole(true);
-
-        var deps = new AndroidDependencies(app, "stable");
-        var version = deps.pickLatest([]);
-        test.equal(version, null);
-        Util.deleteTmpApplication(app);
-        test.done();
-    },
-
     fetchVersions: function(test) {
 
         test.expect(2);

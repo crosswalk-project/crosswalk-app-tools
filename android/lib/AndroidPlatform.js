@@ -334,6 +334,9 @@ function(options, callback) {
 AndroidPlatform.prototype.findCrosswalkVersion =
 function(version, channel, callback) {
 
+    // Namespace util
+    var util = this.application.util;
+
     var versionName = version ?
                         version :
                         "latest version";
@@ -377,8 +380,10 @@ function(version, channel, callback) {
             }
         } else {
             // Use latest from current channel.
-            version = deps.pickLatest(versions);
-            callback(version, channel, null);
+            version = util.IndexParser.pickLatest(versions, function (errmsg) {
+                errormsg = errmsg;
+            });
+            callback(version, channel, errormsg);
             return;
         }
     }.bind(this));
