@@ -2,7 +2,7 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
-var AndroidPlatform = require("../src/AndroidPlatform");
+var AndroidPlatform = require("../lib/AndroidPlatform");
 var PlatformBase = require("../../src/PlatformBase");
 var Util = require("../../test-util/Util.js");
 

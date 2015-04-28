@@ -5,7 +5,7 @@
 var OS = require('os');
 var ShellJS = require("shelljs");
 
-var AndroidSDK = require("../src/AndroidSDK");
+var AndroidSDK = require("../lib/AndroidSDK");
 var Util = require("../../test-util/Util.js");
 
 var _output = require("../../src/TerminalOutput").getInstance();
