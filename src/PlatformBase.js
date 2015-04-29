@@ -196,23 +196,24 @@ function(packagePath) {
 
 /**
  * Generate platform project template.
- * @param {Object} options Extra options for the command
+ * @param {String} packageId Package ID
+ * @param {Object} args Extra options for the command
  * @param {PlatformBase~platformBaseOperationCb} callback callback function
  */
 PlatformBase.prototype.create =
-function(options, callback) {
+function(packageId, args, callback) {
 
     throw new Error("PlatformBase.create() not implemented.");
 };
 
 /**
  * Update platform project to latest Crosswalk.
- * @param {String} version Version to update to, format w.x.y.z
- * @param {Object} options Extra options for the command
+ * @param {String} versionSpec Channel name or version to update to, format w.x.y.z
+ * @param {Object} args Extra options for the command
  * @param {PlatformBase~platformBaseOperationCb} callback callback function
  */
 PlatformBase.prototype.update =
-function(version, options, callback) {
+function(versionSpec, args, callback) {
 
     throw new Error("PlatformBase.update() not implemented.");
 };
@@ -228,13 +229,13 @@ function() {
 
 /**
  * Build application package.
- * @param {String[]} abi Array of ABIs, supported armeabi-v7a, x86
+ * @param {String} release Configuration identifier for the build
  * @param {Object} args Extra options for the command
- * @param {Boolean} release Whether to build debug or release package
+ * @param {String} configId Name of configuration to build, typically "debug" or "release"
  * @param {PlatformBase~platformBaseOperationCb} callback Callback function.
  */
 PlatformBase.prototype.build =
-function(release, args, callback) {
+function(configId, args, callback) {
 
     throw new Error("PlatformBase.build() not implemented.");
 };

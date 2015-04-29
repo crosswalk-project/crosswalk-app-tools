@@ -114,31 +114,6 @@ exports.tests = {
         test.done();
     },
 
-    createGetOptions: function(test) {
-
-        test.expect(5);
-
-        var argv1 = ["node", "foo", "create", "com.example.bar",
-                     "--crosswalk=crosswalk-10.39.235.16.zip",
-                     "--foo=bar"];
-        var cp1 = new CommandParser(_output, argv1);
-
-        test.equal(cp1.getCommand(), "create");
-
-        var cmd1 = cp1.getCommand();
-        test.equal(cmd1, argv1[2]);
-
-        var pkg1 = cp1.createGetPackageId();
-        test.equal(pkg1, argv1[3]);
-
-        var opts1 = cp1.createGetOptions();
-        test.equal(opts1.crosswalk, "crosswalk-10.39.235.16.zip");
-        // Unknown option must be stripped.
-        test.equal(typeof opts1.foo, "undefined");
-
-        test.done();
-    },
-
     updateGetVersion: function(test) {
 
         test.expect(8);

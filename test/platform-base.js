@@ -67,7 +67,7 @@ exports.tests = {
         };
         var platform = new TestPlatform(PlatformBase, platformData);
 
-        platform.create(null, function(errormsg) {
+        platform.create(_platformId, null, function(errormsg) {
             test.equal(errormsg, null);
         });
 
@@ -79,7 +79,7 @@ exports.tests = {
             test.equal(errormsg, null);
         });
 
-        platform.build(false, null, function(errormsg) {
+        platform.build("debug", null, function(errormsg) {
             test.equal(errormsg, null);
         });
 

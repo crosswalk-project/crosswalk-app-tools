@@ -96,16 +96,16 @@ function() {
  * Collect arguments
  */
 Main.prototype.collectArgs =
-function(allArgs, argsSpec) {
+function(platformId, allArgs, argsSpec) {
 
     // Collect backend-specific args
     var args = {};
     for (var key in argsSpec) {
         // Strip dash prefix before matching, Minimist strips them also.
         var key_ = key.substring("--".length);
-        if (allArgs[key_]) {
+        if (allArgs && allArgs[key_]) {
             // Also strip platform prefix before collecting the arg.
-            var argPrefix = platformInfo.platformId + "-";
+            var argPrefix = platformId + "-";
             var argName = key_.substring(argPrefix.length);
             args[argName] = allArgs[key_];
         }
@@ -116,13 +116,13 @@ function(allArgs, argsSpec) {
 
 /**
  * Create skeleton project.
- * @param {Object} options Extra options for the command
+ * @param {String} packageId Package ID
  * @param {Object} extraArgs Unparsed extra arguments passed by command-line
  * @param {Main~mainOperationCb} callback Callback function
  * @static
  */
 Main.prototype.create =
-function(options, extraArgs, callback) {
+function(packageId, extraArgs, callback) {
 
     var output = this.output;
 
@@ -138,18 +138,13 @@ function(options, extraArgs, callback) {
     }
 
     // Collect args for this command
+    var createArgs = {};
     var argSpec = project.argSpec;
     if (argSpec && argSpec.create) {
-        var createArgs = this.collectArgs(extraArgs, argSpec.create);
-        for (var key in createArgs) {
-            // Do not overwrite built-in options
-            if (!options[key]) {
-                options[key] = createArgs[key];
-            }
-        }
+        createArgs = this.collectArgs(project.platformId, extraArgs, argSpec.create);
     }
 
-    project.create(options, function(errormsg) {
+    project.create(packageId, createArgs, function(errormsg) {
 
         if (errormsg) {
             output.error(errormsg);
@@ -184,7 +179,7 @@ function(version, extraArgs, callback) {
     var updateArgs = {};
     var argSpec = project.argSpec;
     if (argSpec && argSpec.update) {
-        updateArgs = this.collectArgs(extraArgs, argSpec.update);
+        updateArgs = this.collectArgs(project.platformId, extraArgs, argSpec.update);
     }
 
     project.update(version, updateArgs, function(errormsg) {
@@ -202,13 +197,13 @@ function(version, extraArgs, callback) {
 
 /**
  * Build application package.
- * @param {String} type Build "debug" or "release" configuration
+ * @param {String} configId Build "debug" or "release" configuration
  * @param {Object} extraArgs Unparsed extra arguments passed by command-line
  * @param {Main~mainOperationCb} callback Callback function
  * @static
  */
 Main.prototype.build =
-function(type, extraArgs, callback) {
+function(configId, extraArgs, callback) {
 
     var output = this.output;
 
@@ -231,12 +226,11 @@ function(type, extraArgs, callback) {
     var buildArgs = {};
     var argSpec = project.argSpec;
     if (argSpec && argSpec.build) {
-        buildArgs = this.collectArgs(extraArgs, argSpec.build);
+        buildArgs = this.collectArgs(project.platformId, extraArgs, argSpec.build);
     }
 
     // Build
-    var release = type === "release" ? true : false;
-    project.build(release, buildArgs, function(errormsg) {
+    project.build(configId, buildArgs, function(errormsg) {
 
         if (errormsg) {
             output.error(errormsg);
@@ -271,20 +265,19 @@ function(parser) {
         return;
     }
 
-    if (platformInfo.args) {
-        output.write("    Options for platform '" + platformInfo.platformId + "'\n");
-        for (var cmd in platformInfo.args) {
-            output.write("    For command '" + cmd + "'\n");
-            var cmdArgs = platformInfo.args[cmd];
+    if (platformInfo.argSpec) {
+        output.write("Options for platform '" + platformInfo.platformId + "'\n");
+        for (var cmd in platformInfo.argSpec) {
+            output.write("\n    For command '" + cmd + "'\n");
+            var cmdArgs = platformInfo.argSpec[cmd];
             for (var arg in cmdArgs) {
                 output.write("        " + arg + "    " + cmdArgs[arg] + "\n");
             }
         }
     }
-    output.write("\n");
 
-    output.write("    Environment Variables\n");
-    output.write("        CROSSWALK_APP_TOOLS_CACHE_DIR\t\tKeep downloaded files in this dir\n");
+    output.write("Environment Variables\n\n");
+    output.write("    CROSSWALK_APP_TOOLS_CACHE_DIR\t\tKeep downloaded files in this dir\n");
     output.write("\n");
 };
 
@@ -328,17 +321,15 @@ function(callback) {
         return;
     }
 
-    var options = null;
     var extraArgs = Minimist(process.argv.slice(2));
     switch (cmd) {
     case "create":
         var packageId = parser.createGetPackageId();
-        options = parser.createGetOptions();
 
         // Chain up the constructor.
         Application.call(this, process.cwd(), packageId);
 
-        this.create(options, extraArgs, callback);
+        this.create(packageId, extraArgs, callback);
         break;
 
     case "update":

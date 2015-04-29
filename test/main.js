@@ -9,9 +9,7 @@ var Application = require("../src/Application");
 var CommandParser = require("../src/CommandParser");
 var Util = require("../test-util/Util.js");
 
-// Let's see progress.
-require("../src/Config").getInstance().setSilentConsole(false);
-
+var _packageId = "com.example.foo";
 
 exports.tests = {
 
@@ -41,8 +39,8 @@ exports.tests = {
         ShellJS.pushd(tmpdir);
 
         var app = require("../src/Main");
-        Application.call(app, tmpdir, "com.example.foo");
-        app.create(null, null, function(errno) {
+        Application.call(app, tmpdir, _packageId);
+        app.create(_packageId, null, function(errno) {
 
             test.equal(errno, 0);
 
@@ -62,13 +60,13 @@ exports.tests = {
         ShellJS.pushd(tmpdir);
 
         var app = require("../src/Main");
-        Application.call(app, tmpdir, "com.example.foo");
-        app.create(null, null, function(errno) {
+        Application.call(app, tmpdir, _packageId);
+        app.create(_packageId, null, function(errno) {
 
             if (!errno) {
 
                 // Build
-                ShellJS.pushd("com.example.foo");
+                ShellJS.pushd(_packageId);
                 app.build("debug", null, function(errno) {
 
                     test.equal(errno, 0);
@@ -93,13 +91,13 @@ exports.tests = {
         ShellJS.pushd(tmpdir);
 
         var app = require("../src/Main");
-        Application.call(app, tmpdir, "com.example.foo");
+        Application.call(app, tmpdir, _packageId);
         // Create
-        app.create(null, null, function(errno) {
+        app.create(_packageId, null, function(errno) {
 
             if (!errno) {
                 // Update
-                ShellJS.pushd("com.example.foo");
+                ShellJS.pushd(_packageId);
                 app.update("stable", null, function(errno) {
 
                     if (!errno) {

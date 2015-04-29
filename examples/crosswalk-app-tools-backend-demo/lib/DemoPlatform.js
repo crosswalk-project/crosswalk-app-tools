@@ -44,13 +44,10 @@ DemoPlatform.getArgs = function() {
 };
 
 /**
- * Generate project template.
- * @param {Object} options Extra options for the command
- * @param {PlatformBase~platformBaseOperationCb} callback callback function
- * @abstract
+ * Implements {@link PlatformBase.create}
  */
 DemoPlatform.prototype.create =
-function(options, callback) {
+function(packageId, args, callback) {
 
     // TODO implement generation of project.
     this.output.write("DemoPlatform: Generating " + this.packageId + "\n");
@@ -60,13 +57,10 @@ function(options, callback) {
 };
 
 /**
- * Update platform project to latest Crosswalk.
- * @param {String} versionSpec Version to update to, format w.x.y.z
- * @param {Object} options Extra options for the command
- * @param {PlatformBase~platformBaseOperationCb} callback callback function
+ * Implements {@link PlatformBase.update}
  */
 DemoPlatform.prototype.update =
-function(versionSpec, options, callback) {
+function(versionSpec, args, callback) {
 
     // TODO implement updating of project to new Crosswalk version.
     // This function is not supported yet.
@@ -88,16 +82,10 @@ function(callback) {
 };
 
 /**
- * Build application package.
- * @function build
- * @param {Boolean} release Whether to build debug or release package.
- * @param {Object} args Extra options for the command
- * @param {Function} callback see {@link Project~projectOperationCb}.
- * @abstract
- * @memberOf Project
+ * Implements {@link PlatformBase.build}
  */
 DemoPlatform.prototype.build =
-function(release, args, callback) {
+function(configId, args, callback) {
 
     // TODO implement updating of project to new Crosswalk version.
     this.output.log("DemoPlatform: Building project\n");

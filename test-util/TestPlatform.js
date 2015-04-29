@@ -11,7 +11,7 @@ function TestPlatformScope(PlatformBase, baseData) {
     TestPlatform.prototype = PlatformBase.prototype;
 
     TestPlatform.prototype.create =
-    function(options, callback) {
+    function(packageId, args, callback) {
         // Null means success, error string means failure.
         callback(null);
     };
@@ -29,7 +29,7 @@ function TestPlatformScope(PlatformBase, baseData) {
     };
 
     TestPlatform.prototype.build =
-    function(release, args, callback) {
+    function(configId, args, callback) {
         // Null means success, error string means failure.
         callback(null);
     };

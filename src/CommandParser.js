@@ -34,8 +34,6 @@ function() {
         "Crosswalk Application Project and Packaging Tool\n" +
         "\n" +
         "    crosswalk-app create <package-id>\t\tCreate project <package-id>\n" +
-        "                         --crosswalk=<path>\tUse downloaded Crosswalk\n" +
-        "                         --channel=<name>\tRelease channel: stable|beta|canary\n" +
         "\n" +
         "    crosswalk-app build [release|debug]\t\tBuild project to create packages\n" +
         "                                       \t\tDefaults to debug when not given\n" +
@@ -132,22 +130,6 @@ function() {
 };
 
 /**
- * Get extra options for the create command.
- * @returns {Object} Options in name/value form, or null if there are none.
- */
-CommandParser.prototype.createGetOptions =
-function() {
-
-    if (this._createOptions) {
-        // Validate
-        var keys = [ "crosswalk", "channel" ];
-        this._createOptions = this.discardUnknownOptions(this._createOptions, keys);
-    }
-
-    return this._createOptions;
-};
-
-/**
  * Get version when command is "update".
  * @returns {String} Crosswalk version string when given and valid. Null when not given, false when invalid.
  * @see {@link https://crosswalk-project.org/documentation/downloads.html}
@@ -206,26 +188,6 @@ function() {
     }
 
     return null;
-};
-
-/**
- * Filter out unknown options from the options object.
- * @param {Object} options Options object holding name/value pairs
- * @param {String[]} knownKeys Known options to keep
- */
-CommandParser.prototype.discardUnknownOptions =
-function(options, knownKeys) {
-
-    var own = Object.getOwnPropertyNames(options);
-    for (var i = 0; i < own.length; i++) {
-        var prop = own[i];
-        if (knownKeys.indexOf(prop) < 0) {
-            // Property not among knownKeys, discard.
-            delete options[prop];
-        }
-    }
-
-    return options;
 };
 
 /**

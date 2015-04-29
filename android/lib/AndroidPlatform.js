@@ -39,6 +39,16 @@ function AndroidPlatform(PlatformBase, baseData, args) {
     return instance;
 }
 
+AndroidPlatform.getArgs =
+function() {
+    return {
+        create: {
+            "crosswalk": "\t\t\tChannel name (stable/beta/canary)\n" +
+                         "\t\t\t\t\t\tor version number (w.x.y.z)"
+        }
+    };
+};
+
 /**
  * Fill template files and put them into the project skeleton.
  * @param {String} apiTarget Android API target (greater android-14)
@@ -197,33 +207,15 @@ function(crosswalkPath, platformPath) {
 
 /**
  * Turn a freshly created empty Android project into a Crosswalk project.
- * @param {String} localCrosswalk Local Crosswalk download or null
  * @param {String} versionSpec Crosswalk version or channel (stable, beta, canary)
  * @param {String} platformPath Path to root dir of project
  * @param {Function} callback Callback(version, errormsg)
  * @returns {Boolean} True on success.
  */
 AndroidPlatform.prototype.importCrosswalk =
-function(localCrosswalk, versionSpec, platformPath, callback) {
+function(versionSpec, platformPath, callback) {
 
     var output = this.application.output;
-
-    // Use local Crosswalk if path given, and not a channel identifier.
-    if (localCrosswalk) {
-
-        output.info("Attempting to use local Crosswalk " + localCrosswalk);
-        if (ShellJS.test("-f", localCrosswalk) ||
-            ShellJS.test("-L", localCrosswalk)) {
-
-            var importedVersion = this.importCrosswalkFromZip(localCrosswalk, platformPath);
-            var errormsg = null;
-            if (!importedVersion) {
-                errormsg = "Import of local Crosswalk failed " + localCrosswalk;
-            }
-            callback(importedVersion, errormsg);
-            return;
-        }
-    }
 
     var channel = null;
     var version = null;
@@ -273,7 +265,7 @@ function(localCrosswalk, versionSpec, platformPath, callback) {
  * Implements {@link PlatformBase.create}
  */
 AndroidPlatform.prototype.create =
-function(options, callback) {
+function(packageId, args, callback) {
 
     var output = this.application.output;
 
@@ -298,13 +290,12 @@ function(options, callback) {
                 return;
             }
 
-            var localCrosswalk = options ? options.crosswalk : null;
-            var versionSpec = "stable";
-            if (options &&
-                options.channel &&
-                AndroidDependencies.CHANNELS.indexOf(options.channel) >= 0) {
-                versionSpec = options.channel;
+            var versionSpec = null;
+            if (args.crosswalk) {
+                // TODO verify version/channel
+                versionSpec = args.crosswalk;
             } else {
+                versionSpec = "stable";
                 output.info("Defaulting to download channel " + versionSpec);
             }
 
@@ -313,7 +304,7 @@ function(options, callback) {
                 return;
             }
 
-            this.importCrosswalk(localCrosswalk, versionSpec, path,
+            this.importCrosswalk(versionSpec, path,
                                  function(version, errormsg) {
 
                 if (errormsg) {
@@ -397,11 +388,11 @@ function(version, channel, callback) {
  * Implements {@link PlatformBase.update}
  */
 AndroidPlatform.prototype.update =
-function(versionSpec, options, callback) {
+function(versionSpec, args, callback) {
 
     var output = this.application.output;
 
-    this.importCrosswalk(null, versionSpec, this.platformPath,
+    this.importCrosswalk(versionSpec, this.platformPath,
                          function(version, errormsg) {
 
         if (errormsg) {
@@ -605,7 +596,7 @@ function(closure) {
  * Implements {@link PlatformBase.build}
  */
 AndroidPlatform.prototype.build =
-function(release, args, callback) {
+function(configId, args, callback) {
 
     var output = this.application.output;
 
@@ -613,9 +604,9 @@ function(release, args, callback) {
     process.chdir(this.platformPath);
 
     var closure = {
-        abis: ["armeabi-v7a", "x86"],
+        abis: ["armeabi-v7a", "x86"], // TODO export option
         abiIndex : 0,
-        release: release,
+        release: configId == "release", // TODO verify above
         apks: [],
         callback: function(errormsg) {
 
