@@ -4,14 +4,16 @@ Crosswalk-app-tools
 Command line tools to create and package Crosswalk applications. The license for this project is Apache License
 Version 2.0, please refer to the LICENSE-APACHE-V2 included with the package.
 
-Crosswalk-app-tools is in very early stages of development, and not suitable for use in a production environment. "Releases" and announcements are made available as a technology preview only. No packages are being published at this time, but git tags serve as reference points for release milestones.
+Crosswalk-app-tools is in early stages of development, and not suitable for use in a production environment. Preliminary releases and announcements are made available as a technology preview only. No packages are being published at this time, but git tags serve as reference points for release milestones.
 
 ### Installation
 
+Crosswalk-app-tools is cross-platform by virtue of being based on Node.js. However at this point most testing is done on Linux, so we expect the least number of hickups there. In any case we have seen reports of successful runs on Apple OS X, and are looking forward to hearing about adventurous individuals giving it a spin on Microsoft Windows as well.
+
 Prerequisites are functional
   1. Android SDK
-  2. Apache Ant
-  3. Node.js
+  2. Java JDK and Apache Ant
+  3. Node.js and NPM
 
 on the system.
 
@@ -26,8 +28,6 @@ sudo npm install -g crosswalk-app-tools
 Crosswalk Application Project and Packaging Tool
 
     crosswalk-app create <package-id>		Create project <package-id>
-                         --crosswalk=<path>	Use downloaded Crosswalk
-                         --channel=<name>	Release channel: stable|beta|canary
 
     crosswalk-app build [release|debug]		Build project to create packages
                                        		Defaults to debug when not given
@@ -38,6 +38,15 @@ Crosswalk Application Project and Packaging Tool
     crosswalk-app help				Display usage information
 
     crosswalk-app version			Display version information
+
+Options for platform 'android'
+
+    For command 'create'
+        --android-crosswalk    			Channel name (stable/beta/canary)
+						or version number (w.x.y.z)
+Environment Variables
+
+    CROSSWALK_APP_TOOLS_CACHE_DIR		Keep downloaded files in this dir
 ```
 #### Example: Create App
 `crosswalk-app create com.example.foo`: This sets up a skeleton project in directory com.example.foo/, downloads and imports Crosswalk, and puts a sample "hello world" web app under com.example.foo/app/.
