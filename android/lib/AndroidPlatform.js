@@ -92,7 +92,7 @@ function(apiTarget, platformPath) {
  * Import Crosswalk libraries and auxiliary files into the project.
  * @param {String} crosswalkPath Location of unpacked Crosswalk distribution
  * @param {String} platformPath Location of project to import Crosswalk into
- * @returns {Boolean} True on success or false.
+ * @returns {String} Imported version on success, otherwise null.
  */
 AndroidPlatform.prototype.importCrosswalkFromZip =
 function(crosswalkPath, platformPath) {
@@ -102,14 +102,15 @@ function(crosswalkPath, platformPath) {
     // Derive root entry from file name.
     var parts = crosswalkPath.split(Path.sep);
     var filename = parts[parts.length - 1];
-    var base = filename.substring(0, filename.length - ".zip".length) + "/";
+    var base = filename.substring(0, filename.length - ".zip".length);
 
-    // Extract major version
-    var numbers = base.split("-")[1].split(".");
+    // Extract version
+    var version = base.split("-")[1];
+    var numbers = version.split(".");
     var major = numbers[0];
     if (major < 8) {
         output.error("Crosswalk version " + major + " not supported. Use 8+.");
-        return false;
+        return null;
     } else if (major > 12) {
         output.warning("This tool has not been tested with Crosswalk " + major + ".");
     }
@@ -117,25 +118,27 @@ function(crosswalkPath, platformPath) {
     var indicator = output.createFiniteProgress("Extracting " + crosswalkPath);
     indicator.update(0.1);
 
+    // Extract contents
     var zip = new AdmZip(crosswalkPath);
     if (!zip) {
         output.error("Failed to open " + crosswalkPath);
-        return false;
+        return null;
     }
 
     indicator.update(0.3);
 
-    var entry = zip.getEntry(base);
+    var root = base + "/";
+    var entry = zip.getEntry(root);
     if (!entry) {
-        output.error("Failed to find root entry " + base);
-        return false;
+        output.error("Failed to find root entry " + root);
+        return null;
     }
 
     indicator.update(0.4);
 
     // Extract xwalk_core_library
     var path;
-    var name = base + "xwalk_core_library/";
+    var name = root + "xwalk_core_library/";
     entry = zip.getEntry(name);
     if (entry) {
         path = platformPath + Path.sep + "xwalk_core_library";
@@ -145,7 +148,7 @@ function(crosswalkPath, platformPath) {
         zip.extractEntryTo(entry, path, false, true);
     } else {
         output.error("Failed to find entry " + name);
-        return false;
+        return null;
     }
 
     // Extract jars
@@ -153,43 +156,43 @@ function(crosswalkPath, platformPath) {
 
     if (major === 8) {
         // Only for Version 8.
-        name = base + "template/libs/xwalk_runtime_java.jar";
+        name = root + "template/libs/xwalk_runtime_java.jar";
         entry = zip.getEntry(name);
         if (entry) {
             zip.extractEntryTo(entry, platformPath + Path.sep + "libs", false, true);
         } else {
             output.error("Failed to find entry " + name);
-            return false;
+            return null;
         }
     }
 
     indicator.update(0.6);
 
-    name = base + "template/libs/xwalk_app_runtime_java.jar";
+    name = root + "template/libs/xwalk_app_runtime_java.jar";
     entry = zip.getEntry(name);
     if (entry) {
         zip.extractEntryTo(entry, platformPath + Path.sep + "libs", false, true);
     } else {
         output.error("Failed to find entry " + name);
-        return false;
+        return null;
     }
 
     indicator.update(0.7);
 
     // Extract res
-    name = base + "template/res/";
+    name = root + "template/res/";
     entry = zip.getEntry(name);
     if (entry) {
         zip.extractEntryTo(entry, platformPath + Path.sep + "res", false, true);
     } else {
         output.error("Failed to find entry " + name);
-        return false;
+        return null;
     }
 
     indicator.update(1);
     indicator.done();
 
-    return true;
+    return version;
 };
 
 /**
@@ -197,6 +200,7 @@ function(crosswalkPath, platformPath) {
  * @param {String} localCrosswalk Local Crosswalk download or null
  * @param {String} versionSpec Crosswalk version or channel (stable, beta, canary)
  * @param {String} platformPath Path to root dir of project
+ * @param {Function} callback Callback(version, errormsg)
  * @returns {Boolean} True on success.
  */
 AndroidPlatform.prototype.importCrosswalk =
@@ -211,12 +215,12 @@ function(localCrosswalk, versionSpec, platformPath, callback) {
         if (ShellJS.test("-f", localCrosswalk) ||
             ShellJS.test("-L", localCrosswalk)) {
 
-            var ret = this.importCrosswalkFromZip(localCrosswalk, platformPath);
+            var importedVersion = this.importCrosswalkFromZip(localCrosswalk, platformPath);
             var errormsg = null;
-            if (!ret) {
+            if (!importedVersion) {
                 errormsg = "Import of local Crosswalk failed " + localCrosswalk;
             }
-            callback(errormsg);
+            callback(importedVersion, errormsg);
             return;
         }
     }
@@ -235,7 +239,7 @@ function(localCrosswalk, versionSpec, platformPath, callback) {
                               function(version, channel, errormsg) {
 
         if (errormsg) {
-            callback(errormsg);
+            callback(null, errormsg);
             return;
         }
 
@@ -245,21 +249,21 @@ function(localCrosswalk, versionSpec, platformPath, callback) {
                       function(filename, errormsg) {
 
             if (errormsg) {
-                callback(errormsg);
+                callback(null, errormsg);
                 return;
             }
 
             if (!filename) {
-                callback("Failed to download Crosswalk");
+                callback(null, "Failed to download Crosswalk");
                 return;
             }
 
             errormsg = null;
-            var ret = this.importCrosswalkFromZip(filename, platformPath);
-            if (!ret) {
+            var importedVersion = this.importCrosswalkFromZip(filename, platformPath);
+            if (!importedVersion) {
                 errormsg = "Failed to extract " + filename;
             }
-            callback(errormsg);
+            callback(importedVersion, errormsg);
 
         }.bind(this));
     }.bind(this));
@@ -310,7 +314,7 @@ function(options, callback) {
             }
 
             this.importCrosswalk(localCrosswalk, versionSpec, path,
-                                 function(errormsg) {
+                                 function(version, errormsg) {
 
                 if (errormsg) {
                     output.error(errormsg);
@@ -398,15 +402,15 @@ function(versionSpec, options, callback) {
     var output = this.application.output;
 
     this.importCrosswalk(null, versionSpec, this.platformPath,
-                         function(errormsg) {
+                         function(version, errormsg) {
 
         if (errormsg) {
             output.error(errormsg);
-            callback("Updating crosswalk to '" + versionSpec + "' failed");
+            callback("Updating crosswalk to '" + version + "' failed");
             return;
         }
 
-        output.info("Project updated to crosswalk '" + versionSpec + "'");
+        output.info("Project updated to crosswalk '" + version + "'");
         callback(null);
     });
 };
