@@ -235,6 +235,8 @@ function(versionSpec, platformPath, callback) {
             return;
         }
 
+        output.info("Found version '" + version + "' in channel '" + channel + "'");
+
         // Download latest Crosswalk
         var deps = new AndroidDependencies(this.application, channel);
         deps.download(version, ".",

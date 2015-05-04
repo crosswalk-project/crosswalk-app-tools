@@ -84,7 +84,7 @@ function(versions, errorCb) {
         // Check against latest remembered version.
         var j = 0;
         for (j = 0; j < 4; j++) {
-            if (v[j] > latest[j]) {
+            if (+v[j] > +latest[j]) {
                 // Tested version is greater than what we have.
                 latest = v;
                 break;
