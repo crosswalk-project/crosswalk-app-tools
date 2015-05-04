@@ -127,9 +127,14 @@ function(packageId, extraArgs, callback) {
     var output = this.output;
 
     // Copy sample web app content
-    ShellJS.cp("-r",
-               Path.join(__dirname, "..", "data", "www", "*"),
-               this.appPath);
+    var templatePath = Path.normalize(Path.join(__dirname, "..", "app-template"));
+    if (!ShellJS.test("-d", templatePath)) {
+        output.error("Could not find app template in " + templatePath);
+        callback(MAIN_EXIT_CODE_ERROR);
+        return;
+    }
+    output.info("Copying app template from " + templatePath);
+    ShellJS.cp("-r", Path.join(templatePath, "*"), this.appPath);
 
     var project = this.instantiateProject();
     if (!project) {

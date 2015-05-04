@@ -43,6 +43,7 @@
   },
   "files": [
     "android",
+    "app-template",
     "examples",
     "Gruntfile.js",
     "LICENSE-APACHE-V2",
