@@ -198,9 +198,15 @@ function(crosswalkPath, platformPath) {
     indicator.update(0.1);
 
     // Extract contents
-    var zip = new AdmZip(crosswalkPath);
-    if (!zip) {
+    var zip = null;
+    try {
+        zip = new AdmZip(crosswalkPath);
+    } catch (e) {
+        // HACK we're in the midst of a progress display, force line break
+        ShellJS.rm("-f", crosswalkPath);
+        output.write("\n");
         output.error("Failed to open " + crosswalkPath);
+        output.error("Invalid file has been deleted, please try again");
         return null;
     }
 
