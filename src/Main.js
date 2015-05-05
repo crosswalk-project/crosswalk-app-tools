@@ -66,9 +66,9 @@ function() {
     var mgr = new PlatformsManager(output);
     var platformInfo = mgr.loadDefault();
     if (platformInfo) {
-        output.info("Using backend '" + platformInfo.platformId + "'");
+        output.info("Loading '" + platformInfo.platformId + "' platform backend");
     } else {
-        output.error("Failed to load platform backend");
+        output.error("Failed to load '" + platformInfo.platformId + "' platform backend");
         return null;
     }
 
@@ -83,9 +83,7 @@ function() {
     try {
         platform = new platformInfo.Ctor(PlatformBase, platformData);
     } catch (e) {
-        output.error("The Android SDK could not be found. " +
-                      "Make sure the directory containing the 'android' " +
-                      "executable is mentioned in the PATH environment variable.");
+        output.error("Failed to load '" + platformInfo.platformId + "' platform backend");
         return null;
     }
 
