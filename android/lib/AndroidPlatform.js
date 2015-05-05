@@ -2,6 +2,8 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var FS = require("fs");
+
 var AdmZip = require("adm-zip");
 var Path = require('path');
 var ShellJS = require("shelljs");
@@ -81,13 +83,6 @@ function(apiTarget, platformPath) {
     tpl = new util.TemplateFile(Path.join(__dirname, "..", "data", "project.properties.tpl"));
     tpl.render(data, platformPath + Path.sep + "project.properties");
 
-    // MainActivity.java
-    tpl = new util.TemplateFile(Path.join(__dirname, "..", "data", "MainActivity.java.tpl"));
-    var activityPath = platformPath + Path.sep +
-                       "src" + Path.sep +
-                       parts.join(Path.sep);
-    tpl.render(data, activityPath + Path.sep + "MainActivity.java");
-
     // Make html5 app dir and copy sample content
     var assetsPath = Path.join(platformPath, "assets");
     ShellJS.mkdir("-p", assetsPath);
@@ -95,6 +90,80 @@ function(apiTarget, platformPath) {
     ShellJS.ln("-s", this.appPath, wwwPath);
 
     // TODO check for errors
+    return true;
+};
+
+AndroidPlatform.prototype.writeActivityJava =
+function(zipEntry) {
+
+    var output = this.application.output;
+
+    var templateData = zipEntry.getData().toString();
+    if (!templateData) {
+        output.error("Java main activity file could not be extracted");
+        return false;
+    }
+
+    // Change package name
+    var templatePackage = "org.xwalk.app.template";
+    var index = templateData.search(templatePackage);
+    if (index < 0) {
+        output.error("Failed to find template package '" + templatePackage + "' in " + zipEntry.name);
+        return false;
+    }
+    templateData = templateData.replace(templatePackage, this.packageId);
+
+    // Change class name
+    var templateClass = "AppTemplateActivity";
+    index = templateData.search(templateClass);
+    if (index < 0) {
+        output.error("Failed to find template class '" + templateClass + "' in " + zipEntry.name);
+        return false;
+    }
+    templateData = templateData.replace(templateClass, "MainActivity");
+
+    // Create target directory
+    var activityDirPath = Path.join(this.platformPath,
+                                 "src",
+                                 this.packageId.replace(/\./g, Path.sep));
+    ShellJS.mkdir("-p", activityDirPath);
+    if (!ShellJS.test("-d", activityDirPath)) {
+        output.error("Failed to create activity dir " + activityDirPath);
+        return false;
+    }
+
+    // Do not overwrite activity file because it may contain app-specific code
+    // FIXME we should be smarter about this:
+    // 1 - check if file is different from new content
+    // 2 - if yes, create a ".new" file
+    var activityFilePath = Path.join(activityDirPath, "MainActivity.java");
+    if (ShellJS.test("-f", activityFilePath)) {
+
+        // HACK force newline because we're in the midst of a progress indication
+        output.write("\n");
+        output.warning("File already exists: " + activityFilePath);
+
+        var activityBackupFilename;
+        var activityBackupPath;
+        var i = 0;
+        do {
+            activityBackupFilename = "MainActivity.java.orig-" + i;
+            activityBackupPath = Path.join(activityDirPath, activityBackupFilename);
+            i++;
+        } while (ShellJS.test("-f", activityBackupPath));
+
+        ShellJS.mv(activityFilePath, activityBackupPath);
+        output.warning("Existing activity file rename to: " + activityBackupPath);
+        output.warning("Please port any custom java code to the new MainActivity.java");
+    }
+
+    // Write activity file
+    FS.writeFileSync(activityFilePath, templateData);
+    if (!ShellJS.test("-f", activityFilePath)) {
+        output.error("Failed to write main activity " + activityFilePath);
+        return false;
+    }
+
     return true;
 };
 
@@ -188,6 +257,21 @@ function(crosswalkPath, platformPath) {
     }
 
     indicator.update(0.7);
+
+    // Extract main activity java file
+    name = root + "template/src/org/xwalk/app/template/AppTemplateActivity.java";
+    entry = zip.getEntry(name);
+    if (entry) {
+
+        if (!this.writeActivityJava(entry))
+            return null;
+
+    } else {
+        output.error("Failed to find in crosswalk release: " + name);
+        return null;
+    }
+
+    indicator.update(0.8);
 
     // Extract res
     name = root + "template/res/";
@@ -317,7 +401,7 @@ function(packageId, args, callback) {
 
                 output.info("Project template created at '" + path + "'");
                 callback(null);
-            });
+            }.bind(this));
         }.bind(this));
     }.bind(this));
 };
