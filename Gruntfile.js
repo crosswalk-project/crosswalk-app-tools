@@ -44,7 +44,7 @@ module.exports = function(grunt) {
         commit: false,
         push: false,
         bump: false,
-        tag: false,
+        tag: true,
         pushTags: false,
         npm: true,
         tagName: '<%= version %>',
