@@ -59,7 +59,6 @@ Environment Variables
 
 ### Limitations
 * This is alpha stage software and under continuous development. We encourage trying it and appreciate feedback, but use in a production environment is not supported at this point in time.
-* A problem prevents use with anyting but releases from the "stable" crosswalk channel. 
 
 ### Run development versions from git
 
