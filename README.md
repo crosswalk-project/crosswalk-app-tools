@@ -15,7 +15,7 @@ The following components are required
   2. Java JDK and Apache Ant
   3. Node.js and NPM
 
-The best way to check if a machine has all the required dependencies is to create build a plain empty Android app 
+The best way to check if a machine has all the required dependencies is to create and build a plain empty Android app 
 on the system. If this does not work, then building Crosswalk apps will not succeed either.
 
 ```
