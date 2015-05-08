@@ -279,8 +279,10 @@ function(parser) {
         }
     }
 
-    output.write("Environment Variables\n\n");
-    output.write("    CROSSWALK_APP_TOOLS_CACHE_DIR\t\tKeep downloaded files in this dir\n");
+    if (platformInfo.platformId != 'ios') {
+        output.write("Environment Variables\n\n");
+        output.write("    CROSSWALK_APP_TOOLS_CACHE_DIR\t\tKeep downloaded files in this dir\n");
+    }
     output.write("\n");
 };
 
