@@ -190,7 +190,7 @@ function(crosswalkPath, platformPath) {
     if (major < 8) {
         output.error("Crosswalk version " + major + " not supported. Use 8+.");
         return null;
-    } else if (major > 13) {
+    } else if (major > 14) {
         output.warning("This tool has not been tested with Crosswalk " + major + ".");
     }
 
