@@ -7,6 +7,7 @@ var ShellJS = require("shelljs");
 
 var Application = require("../src/Application");
 var CommandParser = require("../src/CommandParser");
+var TerminalOutput = require("../src/TerminalOutput");
 var Util = require("../test-util/Util.js");
 
 var _packageId = "com.example.foo";
@@ -132,8 +133,8 @@ exports.tests = {
         test.expect(0);
 
         var app = require("../src/Main");
-        var parser = new CommandParser(app.output, process.argv);
-        app.printHelp(parser);
+        var parser = new CommandParser(TerminalOutput.getInstance(), process.argv);
+        app.printHelp(parser, TerminalOutput.getInstance());
 
         test.done();
     },
@@ -144,7 +145,7 @@ exports.tests = {
         test.expect(0);
 
         var app = require("../src/Main");
-        app.printVersion();
+        app.printVersion(TerminalOutput.getInstance());
 
         test.done();
     }

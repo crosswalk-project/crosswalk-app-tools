@@ -249,12 +249,11 @@ function(configId, extraArgs, callback) {
 /**
  * Display usage information.
  * @param {CommandParser} parser Parser instance
+ * @param {OutputIface} output Output to write to
  * @static
  */
 Main.prototype.printHelp =
-function(parser) {
-
-    var output = TerminalOutput.getInstance();
+function(parser, output) {
 
     // Builtin args
     var buf = parser.help();
@@ -286,15 +285,15 @@ function(parser) {
 
 /**
  * Display version information.
+ * @param {OutputIface} output Output to write to
  * @static
  */
 Main.prototype.printVersion =
-function() {
+function(output) {
 
     var Package = require("../package.json");
-    // Do not use output infrastructure because this is
-    // a static method, so the parent is not initialised.
-    console.log(Package.version + "\n");
+
+    output.write(Package.version + "\n");
 };
 
 /**
@@ -311,7 +310,7 @@ function(callback) {
 
     if (process.argv.length < 3) {
         // No command given, print help and exit without error code.
-        this.printHelp(parser);
+        this.printHelp(parser, output);
         callback(MAIN_EXIT_CODE_OK);
         return;
     }
@@ -369,19 +368,17 @@ function(callback) {
         break;
 
     case "help":
-        this.printHelp(parser);
+        this.printHelp(parser, output);
         break;
 
     case "version":
-        this.printVersion();
+        this.printVersion(output);
         break;
 
     default:
         output.error("Unhandled command " + cmd);
         callback(MAIN_EXIT_CODE_ERROR);
     }
-
-    callback(MAIN_EXIT_CODE_OK);
 };
 
 module.exports = new Main();
