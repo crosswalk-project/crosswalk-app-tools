@@ -329,28 +329,43 @@ function(callback) {
     case "create":
         var packageId = parser.createGetPackageId();
 
-        // Chain up the constructor.
-        Application.call(this, process.cwd(), packageId);
-
-        this.create(packageId, extraArgs, callback);
+        try {
+            // Chain up the constructor.
+            Application.call(this, process.cwd(), packageId);
+            this.create(packageId, extraArgs, callback);
+        } catch (e) {
+            output.error("Failed to initialize");
+            output.error("Ensure directory '" + packageId + "' does not already exist");
+            callback(MAIN_EXIT_CODE_ERROR);
+        }
         break;
 
     case "update":
         var version = parser.updateGetVersion();
 
-        // Chain up the constructor.
-        Application.call(this, process.cwd(), null);
-
-        this.update(version, extraArgs, callback);
+        try {
+            // Chain up the constructor.
+            Application.call(this, process.cwd(), null);
+            this.update(version, extraArgs, callback);
+        } catch (e) {
+            output.error("Failed to initialize");
+            output.error("Ensure to invoke 'crosswalk-app-tools' from a toplevel project directory");
+            callback(MAIN_EXIT_CODE_ERROR);
+        }
         break;
 
     case "build":
         var type = parser.buildGetType();
 
-        // Chain up the constructor.
-        Application.call(this, process.cwd(), null);
-
-        this.build(type, extraArgs, callback);
+        try {
+            // Chain up the constructor.
+            Application.call(this, process.cwd(), null);
+            this.build(type, extraArgs, callback);
+        } catch (e) {
+            output.error("Failed to initialize");
+            output.error("Ensure to invoke 'crosswalk-app-tools' from a toplevel project directory");
+            callback(MAIN_EXIT_CODE_ERROR);
+        }
         break;
 
     case "help":
