@@ -2,25 +2,17 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var PlatformInfo = require("./PlatformInfo");
+
 /**
  * Class that manages platform backends.
  * @constructor
  * @param {OutputIface} Output instance
- * @private
  */
 function PlatformsManager(output) {
 
     this._output = output;
 }
-
-/**
- * @typedef PlatformInfo
- * @type {Object}
- * @property {Function} Ctor Constructor for the associated {@link PlatformBase} subclass
- * @property {String} platformId Name for backend (android, ios, ...)
- * @property {Object} argSpec Platform-specific command-line argument definitions
- * @memberOf PlatformsManager
- */
 
 /**
  * Load default backend.
@@ -59,7 +51,7 @@ function() {
                 throw new Error("Unhandled platform name " + implementations[i]);
             }
 
-            platformInfo = this.buildInfo(Ctor, platformId);
+            platformInfo = new PlatformInfo(Ctor, platformId);
 
             // If we get here there backend has been instantiated successfully.
             break;
@@ -76,41 +68,6 @@ function() {
             output.warning(warnings[j]);
         }
     }
-
-    return platformInfo;
-};
-
-/**
- * Load platform by constructor.
- * @param {Function} PlatformImplCtor Constructor for a {@link PlatformBase} subclass
- * @param {String} platformId Identifier for platform (android, ios, ...)
- * @returns {PlatformInfo}
- * @protected
- */
-PlatformsManager.prototype.buildInfo =
-function(PlatformImplCtor, platformId) {
-
-    var platformInfo = null;
-
-    // Prefix all platform-specific args with the platform name
-    var platformArgSpec = {};
-    if (PlatformImplCtor.getArgs) {
-        var argSpec = PlatformImplCtor.getArgs();
-        for (var cmd in argSpec) {
-            var cmdArgSpec = argSpec[cmd];
-            var platformCmdArgSpec = {};
-            for (var key in cmdArgSpec) {
-                platformCmdArgSpec["--" + platformId + "-" + key] = cmdArgSpec[key];
-            }
-            platformArgSpec[cmd] = platformCmdArgSpec;
-        }
-    }
-
-    platformInfo = {
-        Ctor: PlatformImplCtor,
-        platformId: platformId,
-        argSpec: platformArgSpec
-    };
 
     return platformInfo;
 };

@@ -49,4 +49,10 @@ TestPlatformScope.getArgs = function() {
     };
 };
 
+TestPlatformScope.getEnv = function() {
+    return {
+        CROSSWALK_APP_TOOL_TEST_FOO: "Another create option added by the platform"
+    };
+};
+
 module.exports = TestPlatformScope;

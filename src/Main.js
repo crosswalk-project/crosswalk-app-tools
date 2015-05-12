@@ -58,7 +58,7 @@ function workingDirectoryIsProject() {
  * @returns {PlatformBase} Platform implementation instance or null on error.
  * @static
  */
-Main.prototype.instantiateProject =
+Main.prototype.instantiatePlatform =
 function() {
 
     var output = this.output;
@@ -72,20 +72,7 @@ function() {
         return null;
     }
 
-    // See type PlatformData
-    var platformData = {
-        application: this,
-        platformId: platformInfo.platformId,
-        argSpec: platformInfo.argSpec
-    };
-    var platform = null;
-
-    try {
-        platform = new platformInfo.Ctor(PlatformBase, platformData);
-    } catch (e) {
-        output.error("Failed to load '" + platformInfo.platformId + "' platform backend");
-        return null;
-    }
+    var platform = platformInfo.create(this);
 
     return platform;
 };
@@ -134,7 +121,7 @@ function(packageId, extraArgs, callback) {
     output.info("Copying app template from " + templatePath);
     ShellJS.cp("-r", Path.join(templatePath, "*"), this.appPath);
 
-    var project = this.instantiateProject();
+    var project = this.instantiatePlatform();
     if (!project) {
         callback(MAIN_EXIT_CODE_ERROR);
         return;
@@ -172,7 +159,7 @@ function(version, extraArgs, callback) {
 
     var output = this.output;
 
-    var project = this.instantiateProject();
+    var project = this.instantiatePlatform();
     if (!project) {
         callback(MAIN_EXIT_CODE_ERROR);
         return;
@@ -219,7 +206,7 @@ function(configId, extraArgs, callback) {
     }
     */
 
-    var project = this.instantiateProject(null);
+    var project = this.instantiatePlatform(null);
     if (!project) {
         callback(MAIN_EXIT_CODE_ERROR);
         return;

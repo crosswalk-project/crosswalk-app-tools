@@ -17,10 +17,9 @@ var AndroidSDK = require("./AndroidSDK");
  * @constructor
  * @param {Function} PlatformBase Base class constructor {@link PlatformBase}
  * @param {PlatformData} baseData Init data passed to the platform
- * @param {Object} args Platform-specific args, only if specified and actually given
  * @throws {@link AndroidSDK~SDKNotFoundError} If the Android SDK was not found in the environment.
  */
-function AndroidPlatform(PlatformBase, baseData, args) {
+function AndroidPlatform(PlatformBase, baseData) {
 
     // Create base instance.
     var instance = new PlatformBase(baseData);

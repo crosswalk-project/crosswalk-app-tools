@@ -9,6 +9,7 @@ var ShellJS = require("shelljs");
 var Application = require("../src/Application");
 var LogfileOutput = require("../src/LogfileOutput");
 var PlatformBase = require("../src/PlatformBase");
+var PlatformInfo = require("../src/PlatformInfo");
 var PlatformsManager = require("../src/PlatformsManager");
 
 var TestPlatform = require("../test-util/TestPlatform");
@@ -27,7 +28,7 @@ exports.tests = {
         var application = new Application(basePath, _packageId);
         var mgr = new PlatformsManager(application.output);
 
-        var platformInfo = mgr.buildInfo(TestPlatform, _platformId);
+        var platformInfo = new PlatformInfo(TestPlatform, _platformId);
 
         var platformData = {
             application: application,

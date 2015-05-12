@@ -3,8 +3,8 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var PlatformBase = require("../src/PlatformBase");
+var PlatformInfo = require("../src/PlatformInfo");
 var PlatformsManager = require("../src/PlatformsManager");
-var TestPlatform = require("../test-util/TestPlatform");
 
 var _output = require("../src/TerminalOutput").getInstance();
 
@@ -12,17 +12,11 @@ exports.tests = {
 
     buildInfo: function(test) {
 
-        test.expect(3);
+        test.expect(1);
 
         var mgr = new PlatformsManager(_output);
-        var platformInfo = mgr.buildInfo(TestPlatform, "test");
-
-        var createArgs = platformInfo.argSpec.create;
-        test.equal(typeof createArgs["--test-foo"], "string");
-        test.equal(typeof createArgs["--test-bar"], "string");
-
-        var updateArgs = platformInfo.argSpec.update;
-        test.equal(typeof updateArgs["--test-baz"], "string");
+        var platformInfo = mgr.loadDefault();
+        test.equal(platformInfo instanceof PlatformInfo, true);
 
         test.done();
     }
