@@ -40,6 +40,9 @@ function AndroidPlatform(PlatformBase, baseData) {
     return instance;
 }
 
+/**
+ * Accessor function for platform-specific command-line argument spec.
+ */
 AndroidPlatform.getArgs =
 function() {
     return {
@@ -47,6 +50,16 @@ function() {
             "crosswalk": "\t\t\tChannel name (stable/beta/canary)\n" +
                          "\t\t\t\t\t\tor version number (w.x.y.z)"
         }
+    };
+};
+
+/**
+ * Accessor function for platform-specific environment variables spec.
+ */
+AndroidPlatform.getEnv =
+function() {
+    return {
+        CROSSWALK_APP_TOOLS_CACHE_DIR: "Keep downloaded files in this dir"
     };
 };
 

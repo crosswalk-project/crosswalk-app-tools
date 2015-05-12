@@ -254,7 +254,8 @@ function(parser, output) {
         return;
     }
 
-    if (platformInfo.argSpec) {
+    // Print args
+    if (Object.keys(platformInfo.argSpec).length > 0) {
         output.write("Options for platform '" + platformInfo.platformId + "'\n");
         for (var cmd in platformInfo.argSpec) {
             output.write("\n    For command '" + cmd + "'\n");
@@ -265,8 +266,14 @@ function(parser, output) {
         }
     }
 
-    output.write("Environment Variables\n\n");
-    output.write("    CROSSWALK_APP_TOOLS_CACHE_DIR\t\tKeep downloaded files in this dir\n");
+    // Print environment variables
+    if (Object.keys(platformInfo.envSpec).length > 0) {
+        output.write("Environment variables for platform '" + platformInfo.platformId + "'\n\n");
+        for (var env in platformInfo.envSpec) {
+            output.write("    " + env + "               " + platformInfo.envSpec[env] + "\n");
+        }
+    }
+
     output.write("\n");
 };
 

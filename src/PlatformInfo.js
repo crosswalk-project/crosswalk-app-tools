@@ -26,6 +26,9 @@ function PlatformInfo(PlatformCtor, platformId) {
         }
         this._argSpec[cmd] = platformCmdArgSpec;
     }
+
+    // Look for platforms env vars
+    this._envSpec = PlatformCtor.getEnv ? PlatformCtor.getEnv() : {};
 }
 
 /**
@@ -49,6 +52,18 @@ Object.defineProperty(PlatformInfo.prototype, "platformId", {
 Object.defineProperty(PlatformInfo.prototype, "argSpec", {
                       get: function() {
                                 return this._argSpec;
+                           }
+                      });
+
+/**
+ * Extra environment variables influencing platform behaviour
+ * @member {Object} envSpec
+ * @instance
+ * @memberOf PlatformInfo
+ */
+Object.defineProperty(PlatformInfo.prototype, "envSpec", {
+                      get: function() {
+                                return this._envSpec;
                            }
                       });
 

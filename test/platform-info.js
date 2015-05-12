@@ -12,7 +12,7 @@ var _output = require("../src/TerminalOutput").getInstance();
 
 exports.tests = {
 
-    ctor: function(test) {
+    args: function(test) {
 
         test.expect(3);
 
@@ -24,6 +24,18 @@ exports.tests = {
 
         var updateArgs = platformInfo.argSpec.update;
         test.equal(typeof updateArgs["--test-baz"], "string");
+
+        test.done();
+    },
+
+    env: function(test) {
+
+        test.expect(1);
+
+        var platformInfo = new PlatformInfo(TestPlatform, "test");
+
+        var envSpec = platformInfo.envSpec;
+        test.equal(envSpec.CROSSWALK_APP_TOOL_TEST_FOO != null, true);
 
         test.done();
     },
