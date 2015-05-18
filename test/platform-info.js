@@ -35,7 +35,7 @@ exports.tests = {
         var platformInfo = new PlatformInfo(TestPlatform, "test");
 
         var envSpec = platformInfo.envSpec;
-        test.equal(envSpec.CROSSWALK_APP_TOOL_TEST_FOO != null, true);
+        test.equal(envSpec.CROSSWALK_APP_TOOL_TEST_FOO !== null, true);
 
         test.done();
     },

@@ -4,12 +4,12 @@
 
 var FS = require("fs");
 
-var AdmZip = require("adm-zip");
 var Path = require('path');
 var ShellJS = require("shelljs");
 
 var AndroidDependencies = require("./AndroidDependencies");
 var AndroidSDK = require("./AndroidSDK");
+var CrosswalkZip = require("./CrosswalkZip");
 
 /**
  * Android project class.
@@ -190,29 +190,12 @@ function(crosswalkPath, platformPath) {
 
     var output = this.application.output;
 
-    // Derive root entry from file name.
-    var parts = crosswalkPath.split(Path.sep);
-    var filename = parts[parts.length - 1];
-    var base = filename.substring(0, filename.length - ".zip".length);
-
-    // Extract version
-    var version = base.split("-")[1];
-    var numbers = version.split(".");
-    var major = numbers[0];
-    if (major < 8) {
-        output.error("Crosswalk version " + major + " not supported. Use 8+.");
-        return null;
-    } else if (major > 15) {
-        output.warning("This tool has not been tested with Crosswalk " + major + ".");
-    }
-
     var indicator = output.createFiniteProgress("Extracting " + crosswalkPath);
-    indicator.update(0.1);
 
     // Extract contents
     var zip = null;
     try {
-        zip = new AdmZip(crosswalkPath);
+        zip = new CrosswalkZip(crosswalkPath);
     } catch (e) {
         // HACK we're in the midst of a progress display, force line break
         ShellJS.rm("-f", crosswalkPath);
@@ -222,12 +205,18 @@ function(crosswalkPath, platformPath) {
         return null;
     }
 
-    indicator.update(0.3);
+    indicator.update(0.2);
 
-    var root = base + "/";
-    var entry = zip.getEntry(root);
+    if (zip.version.major < 9) {
+        output.error("Crosswalk version " + zip.version.major + " not supported. Use 8+.");
+        return null;
+    } else if (zip.version.major > 15) {
+        output.warning("This tool has not been tested with Crosswalk " + zip.version.major + ".");
+    }
+
+    var entry = zip.getEntry(zip.root);
     if (!entry) {
-        output.error("Failed to find root entry " + root);
+        output.error("Failed to find root entry " + zip.root);
         return null;
     }
 
@@ -235,14 +224,14 @@ function(crosswalkPath, platformPath) {
 
     // Extract xwalk_core_library
     var path;
-    var name = root + "xwalk_core_library/";
+    var name = zip.root + "xwalk_core_library/";
     entry = zip.getEntry(name);
     if (entry) {
         path = platformPath + Path.sep + "xwalk_core_library";
         // Remove existing dir to prevent stale files when updating crosswalk
         ShellJS.rm("-rf", path);
         ShellJS.mkdir(path);
-        zip.extractEntryTo(entry, path, false, true);
+        zip.extractEntryTo(entry, path);
     } else {
         output.error("Failed to find entry " + name);
         return null;
@@ -251,24 +240,12 @@ function(crosswalkPath, platformPath) {
     // Extract jars
     indicator.update(0.5);
 
-    if (major === 8) {
-        // Only for Version 8.
-        name = root + "template/libs/xwalk_runtime_java.jar";
-        entry = zip.getEntry(name);
-        if (entry) {
-            zip.extractEntryTo(entry, platformPath + Path.sep + "libs", false, true);
-        } else {
-            output.error("Failed to find entry " + name);
-            return null;
-        }
-    }
-
     indicator.update(0.6);
 
-    name = root + "template/libs/xwalk_app_runtime_java.jar";
+    name = zip.root + "template/libs/xwalk_app_runtime_java.jar";
     entry = zip.getEntry(name);
     if (entry) {
-        zip.extractEntryTo(entry, platformPath + Path.sep + "libs", false, true);
+        zip.extractEntryTo(entry, platformPath + Path.sep + "libs");
     } else {
         output.error("Failed to find entry " + name);
         return null;
@@ -277,7 +254,7 @@ function(crosswalkPath, platformPath) {
     indicator.update(0.7);
 
     // Extract main activity java file
-    name = root + "template/src/org/xwalk/app/template/AppTemplateActivity.java";
+    name = zip.root + "template/src/org/xwalk/app/template/AppTemplateActivity.java";
     entry = zip.getEntry(name);
     if (entry) {
 
@@ -292,10 +269,10 @@ function(crosswalkPath, platformPath) {
     indicator.update(0.8);
 
     // Extract res
-    name = root + "template/res/";
+    name = zip.root + "template/res/";
     entry = zip.getEntry(name);
     if (entry) {
-        zip.extractEntryTo(entry, platformPath + Path.sep + "res", false, true);
+        zip.extractEntryTo(entry, platformPath + Path.sep + "res");
     } else {
         output.error("Failed to find entry " + name);
         return null;
@@ -304,7 +281,7 @@ function(crosswalkPath, platformPath) {
     indicator.update(1);
     indicator.done();
 
-    return version;
+    return zip.version.toString();
 };
 
 /**
