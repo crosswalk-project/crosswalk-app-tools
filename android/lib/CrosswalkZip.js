@@ -8,7 +8,16 @@ var Path = require('path');
 var AdmZip = require("adm-zip");
 
 
-
+/**
+ * Representation of a four part Crosswalk version number.
+ * @param {Number} major
+ * @param {Number} minor
+ * @param {Number} micro
+ * @param {Number} build
+ * @constructor
+ * @memberOf CrosswalkZip
+ * @inner
+ */
 function Version(major, minor, micro, build) {
 
     if (typeof major === "number" && major % 1 === 0)
@@ -80,8 +89,18 @@ Object.defineProperty(Version.prototype, "build", {
                            }
                       });
 
+Version.prototype.toString =
+function() {
+
+    return this.major + "." + this.minor + "." + this.micro + "." + this.build;
+};
 
 
+/**
+ * Creates a CrosswalkZip object.
+ * @param {String} path Path to downloaded release
+ * @constructor
+ */
 function CrosswalkZip(path) {
 
     this._adm = new AdmZip(path);
@@ -120,22 +139,28 @@ Object.defineProperty(CrosswalkZip.prototype, "root", {
                            }
                       });
 
+/**
+ * Get zip entry for path.
+ * @param {String} path Path inside zip file
+ * @returns {Object} Entry
+ */
 CrosswalkZip.prototype.getEntry =
 function(path) {
 
     return this._adm.getEntry(path);
 };
 
+/**
+ * Extract zip entry to path.
+ * @param {Object} entry Zip entry
+ * @param {String} path Path to extract to
+ */
 CrosswalkZip.prototype.extractEntryTo =
 function(entry, path) {
 
     return this._adm.extractEntryTo(entry, path, false, true);
 };
 
-CrosswalkZip.prototype.toString =
-function() {
 
-    return this.major + "." + this.minor + "." + this.micro + "." + this.build;
-};
 
 module.exports = CrosswalkZip;
