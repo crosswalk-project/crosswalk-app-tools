@@ -31,7 +31,7 @@ module.exports = function(grunt) {
 
     jsdoc : {
         dist : {
-            src: ['src/**/*.js'],
+            src: ['src/**/*.js', 'android/lib/*.js'],
             options: {
                 destination: 'doc'
             }
