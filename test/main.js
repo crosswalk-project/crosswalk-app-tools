@@ -127,6 +127,17 @@ exports.tests = {
         });
     },
 
+    listBackends: function(test) {
+
+        // Prints to stdout, so just run the code to see if it breaks.
+        test.expect(0);
+
+        var app = require("../src/Main");
+        app.listBackends(TerminalOutput.getInstance());
+
+        test.done();
+    },
+
     printHelp: function(test) {
 
         // Prints to stdout, so just run the code to see if it breaks.

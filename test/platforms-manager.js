@@ -19,5 +19,16 @@ exports.tests = {
         test.equal(platformInfo instanceof PlatformInfo, true);
 
         test.done();
+    },
+
+    loadAll: function(test) {
+
+        test.expect(1);
+
+        var mgr = new PlatformsManager(_output);
+        var backends = mgr.loadAll();
+        test.equal(backends.length > 0, true);
+
+        test.done();
     }
 };

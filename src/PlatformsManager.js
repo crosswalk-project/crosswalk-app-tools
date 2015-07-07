@@ -14,6 +14,14 @@ function PlatformsManager(output) {
     this._output = output;
 }
 
+PlatformsManager._implementations = [
+    "crosswalk-app-tools-backend-ios",
+    "crosswalk-app-tools-backend-deb",
+    "crosswalk-app-tools-backend-demo",
+    "crosswalk-app-tools-backend-test",
+    "../android/index.js"
+];
+
 /**
  * Load default backend.
  * @returns {PlatformInfo} Metadata object for loaded platform.
@@ -23,43 +31,20 @@ function() {
 
     var output = this._output;
 
-    var implementations = [
-        "crosswalk-app-tools-backend-ios",
-        "crosswalk-app-tools-backend-deb",
-        "crosswalk-app-tools-backend-demo",
-        "crosswalk-app-tools-backend-test",
-        "../android/index.js"
-    ];
-
     var platformInfo = null;
     var warnings = [];
 
-    for (var i = 0; i < implementations.length; i++) {
+    for (var i = 0; i < PlatformsManager._implementations.length; i++) {
 
-        try {
+        platformInfo = this.load(PlatformsManager._implementations[i]);
 
-            var Ctor = require(implementations[i]);
-            var prefix = "crosswalk-app-tools-backend-";
-            var platformId = null;
-            if (implementations[i].substring(0, prefix.length) == prefix) {
-                // Extract last part after common prefix.
-                platformId = implementations[i].substring(prefix.length);
-            } else if (implementations[i] == "../android/index.js") {
-                // Special case built-in android backend, so we get a conforming name.
-                platformId = "android";
-            } else {
-                throw new Error("Unhandled platform name " + implementations[i]);
-            }
+        if (platformInfo) {
 
-            platformInfo = new PlatformInfo(Ctor, platformId);
-
-            // If we get here there backend has been instantiated successfully.
             break;
 
-        } catch (e) {
-
+        } else {
             // Accumulate warnings, only emit them if no backend was found.
-            warnings.push("Loading backend " + implementations[i] + " failed (" + e + ")");
+            warnings.push("Loading backend " + PlatformsManager._implementations[i] + " failed");
         }
     }
 
@@ -67,6 +52,63 @@ function() {
         for (var j = 0; j < warnings.length; j++) {
             output.warning(warnings[j]);
         }
+    }
+
+    return platformInfo;
+};
+
+/**
+ * Load default backend.
+ * @returns {PlatformInfo} Metadata object for loaded platform.
+ */
+PlatformsManager.prototype.loadAll =
+function() {
+
+    var output = this._output;
+
+    var backends = [];
+
+    for (var i = 0; i < PlatformsManager._implementations.length; i++) {
+
+        platformInfo = this.load(PlatformsManager._implementations[i]);
+        if (platformInfo) {
+            backends.push(platformInfo);
+        }
+    }
+
+    return backends;
+};
+
+/**
+ * Load backend by name.
+ * @returns {PlatformInfo} Metadata object or null if platform could not be loaded.
+ */
+PlatformsManager.prototype.load =
+function(name) {
+
+    var platformInfo = null;
+
+    try {
+
+        var Ctor = require(name);
+        var prefix = "crosswalk-app-tools-backend-";
+        var platformId = null;
+        if (name.substring(0, prefix.length) == prefix) {
+            // Extract last part after common prefix.
+            platformId = name.substring(prefix.length);
+        } else if (name == "../android/index.js") {
+            // Special case built-in android backend, so we get a conforming name.
+            platformId = "android";
+        } else {
+            throw new Error("Unhandled platform name " + name);
+        }
+
+        platformInfo = new PlatformInfo(Ctor, platformId);
+
+    } catch (e) {
+
+        // Ignore because we have a hardcoded list of platforms and not all
+        // will be available.
     }
 
     return platformInfo;

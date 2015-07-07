@@ -234,6 +234,22 @@ function(configId, extraArgs, callback) {
 };
 
 /**
+ * Display available backends.
+ * @param {OutputIface} output Output to write to
+ * @static
+ */
+Main.prototype.listBackends =
+function(output) {
+
+    var mgr = new PlatformsManager(output);
+    var backends = mgr.loadAll();
+
+    for (var i = 0; i < backends.length; i++) {
+        output.write("  * " + backends[i].platformId + "\n");
+    }
+};
+
+/**
  * Display usage information.
  * @param {CommandParser} parser Parser instance
  * @param {OutputIface} output Output to write to
@@ -359,6 +375,10 @@ function(callback) {
             output.error("Ensure to invoke 'crosswalk-app-tools' from a toplevel project directory");
             callback(MAIN_EXIT_CODE_ERROR);
         }
+        break;
+
+    case "backends":
+        this.listBackends(output);
         break;
 
     case "help":
