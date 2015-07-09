@@ -40,7 +40,7 @@ exports.tests = {
         var version;
         var path;
 
-        test.expect(6);
+        test.expect(9);
 
         version = "2";
         path = produceManifest(version);
@@ -63,6 +63,18 @@ exports.tests = {
         test.equal(false, version == consumeManifest(path));
 
         version = "2.2.2.";
+        path = produceManifest(version);
+        test.equal(false, version == consumeManifest(path));
+
+        version = "3333";
+        path = produceManifest(version);
+        test.equal(false, version == consumeManifest(path));
+
+        version = "333.333";
+        path = produceManifest(version);
+        test.equal(false, version == consumeManifest(path));
+
+        version = "33.333.333";
         path = produceManifest(version);
         test.equal(false, version == consumeManifest(path));
 
