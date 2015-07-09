@@ -11,6 +11,7 @@ var Application = require("../src/Application");
 var Config = require("../src/Config");
 var IllegalAccessException = require("../src/util/exceptions").IllegalAccessException;
 var LogfileOutput = require("../src/LogfileOutput");
+var Manifest = require("../src/Manifest");
 var OutputTee = require("../src/OutputTee");
 var Util = require("../test-util/Util.js");
 
@@ -54,6 +55,30 @@ exports.tests = {
 
         Util.deleteTmpApplication(application);
 
+        test.done();
+    },
+
+    getManifest: function(test) {
+
+        test.expect(2);
+        var application = Util.createTmpApplication("com.example.foo");
+        var manifest = application.manifest;
+        test.equal(manifest instanceof Manifest, true);
+        test.equal(manifest.appVersion, "1");
+        Util.deleteTmpApplication(application);
+        test.done();
+    },
+
+    setManifest: function(test) {
+
+        test.expect(1);
+        var application = Util.createTmpApplication("com.example.foo");
+        try {
+            application.manifest = null;
+        } catch (e) {
+            test.equal(e instanceof IllegalAccessException, true);
+        }
+        Util.deleteTmpApplication(application);
         test.done();
     },
 

@@ -24,6 +24,23 @@ function Manifest(output, path) {
 }
 
 /**
+ * Create manifest at project creation stage.
+ * @param {OutputIface} output Output implementation
+ * @param {String} path Path to manifest.json
+ * @returns {Manifest} Loaded manifest instance.
+ * @memberOf Manifest
+ * @static
+ */
+Manifest.create =
+function(path) {
+
+    var buffer = JSON.stringify({
+        "crosswalk_app_version": "1"
+    });
+    FS.writeFileSync(path, buffer);
+};
+
+/**
  * Application version a.b.c where a,b < 100, c < 1000
  * @member {String} version
  * @instance

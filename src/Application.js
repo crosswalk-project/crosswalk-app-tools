@@ -10,6 +10,7 @@ var CommandParser = require("./CommandParser");
 var IllegalAccessException = require("./util/exceptions").IllegalAccessException;
 var InvalidPathException = require("./util/exceptions").InvalidPathException;
 var LogfileOutput = require("./LogfileOutput");
+var Manifest = require("./Manifest");
 var OutputTee = require("./OutputTee");
 var TerminalOutput = require("./TerminalOutput");
 
@@ -53,6 +54,9 @@ function Application(cwd, packageId) {
         ShellJS.mkdir(this._pkgPath);
         ShellJS.mkdir(this._prjPath);
 
+        // Create Manifest
+        Manifest.create(Path.join(this._rootPath, "manifest.json"));
+
     } else {
         
         // Get packageId from current directory
@@ -63,7 +67,6 @@ function Application(cwd, packageId) {
         }
 
         initMembers.call(this, Path.dirname(cwd));
-
     }
 
     // Check all paths exist.
@@ -91,6 +94,8 @@ function Application(cwd, packageId) {
     this._platformLogfileOutput = null;
 
     this._output = new OutputTee(this._logfileOutput, TerminalOutput.getInstance());
+
+    this._manifest = new Manifest(this._output, Path.join(this._rootPath, "manifest.json"));
 }
 
 function initMembers(basePath) {
@@ -176,6 +181,22 @@ Object.defineProperty(Application.prototype, "rootPath", {
                       get: function() {
                                 return this._rootPath;
                             }
+                      });
+
+/**
+ * Read-only {@link Manifest} object.
+ * @member {Manifest} manifest
+ * @throws {IllegalAccessException} If writing this property is attempted.
+ * @instance
+ * @memberOf Application
+ */
+Object.defineProperty(Application.prototype, "manifest", {
+                      get: function() {
+                                return this._manifest;
+                           },
+                      set: function(unused) {
+                                throw new IllegalAccessException("Attempting to write read-only property Application.manifest");
+                           }
                       });
 
 /**
