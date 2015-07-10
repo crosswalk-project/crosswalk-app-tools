@@ -585,6 +585,68 @@ function(abi, release) {
 };
 
 /**
+ * Generate versionCode for AndroidManifest.xml
+ * @param {String} abi ABI to create the code for
+ * @returns {String} Version code or null on failure.
+ * @private
+ * @static
+ */
+AndroidPlatform.prototype.generateVersionCode =
+function(output, appVersion, abi) {
+
+    function zeropad(string, length) {
+
+        var str = (typeof string === "string") ? string : "";
+        var padLen = length - str.length;
+        var pad = Array(padLen + 1).join("0");
+        return pad + str;
+    }
+
+    var abiCodes = {
+        "armeabi-v7a": 2,
+//        "arm64": 3, TODO check name
+        "x86": 6
+//        "x86_64": 7, TODO check name
+    };
+    var versionNums = appVersion.split(".");
+
+    var abiCode = abiCodes[abi];
+    if (!abiCode) {
+        output.error("Unsupported ABI code '" + abi + "'");
+        return null;
+    }
+
+    // The format for versionCode is "ammiiccc", where
+    // a .. abi
+    // m .. major release number (optional, or 0)
+    // i .. minor release number (optional, or 0)
+    // c .. micro release number
+    // This is a simplified version of
+    // https://software.intel.com/en-us/blogs/2012/11/12/how-to-publish-your-apps-on-google-play-for-x86-based-android-devices-using
+    //
+    // We build the array holding the numbers in a reverse fashion,
+    // that's easier with the optional parts.
+    var reversedCode = ["000", "00", "00", "0"];
+    var reversedVersion = versionNums.reverse();
+
+    reversedCode[0] = zeropad(reversedVersion[0], 3);
+
+    reversedCode[1] = zeropad(reversedVersion[1], 2);
+
+    reversedCode[2] = zeropad(reversedVersion[2], 2);
+
+    reversedCode[3] = abiCode;
+
+    return reversedCode.reverse().join("");
+};
+
+AndroidPlatform.prototype.updateVersionCode =
+function(abi) {
+
+//    TODO
+};
+
+/**
  * Build APK for one ABI. This method is calling itself recursively, until
  * all ABIs are built.
  * @param {Object} Closure Information to pass between ABI build runs
@@ -636,6 +698,9 @@ function(closure) {
             }
         }
     }.bind(this);
+
+    // Update versionCode in AndroidManifest.xml
+    // this.updateVersionCode(abi);
 
     // Build for ABI.
     this._sdk.buildProject(closure.release, function(success) {

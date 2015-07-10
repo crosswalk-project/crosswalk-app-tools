@@ -55,11 +55,12 @@ exports.tests = {
 
         test.expect(1);
 
+        var manifest;
         var path = createManifest();
-        var manifest = new AndroidManifest(_output, path);
+        manifest = new AndroidManifest(_output, path);
         manifest.versionCode = "2";
 
-        var manifest = new AndroidManifest(_output, path);
+        manifest = new AndroidManifest(_output, path);
         test.equal(manifest.versionCode, "2");
 
         ShellJS.rm("-f", path);

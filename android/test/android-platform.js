@@ -73,5 +73,49 @@ exports.tests = {
             Util.deleteTmpApplication(application);
             test.done();
         });
+    },
+
+    generateVersionCode: function(test) {
+
+        var versions = [
+            "1",
+            "1.1",
+            "1.1.1",
+            "11.1.1",
+            "11.11.1",
+            "11.11.11",
+            "11.11.111"
+        ];
+
+        var codes = [
+            "60000001",
+            "60001001",
+            "60101001",
+            "61101001",
+            "61111001",
+            "61111011",
+            "61111111"
+        ];
+
+        test.expect(versions.length);
+
+        var application = Util.createTmpApplication("com.example.foo");
+        var platformData = {
+            application: application,
+            platformId: "android"
+        };
+
+        var android = new AndroidPlatform(PlatformBase, platformData);
+
+        for (var i = 0; i < versions.length; i++) {
+
+            var versionCode = android.generateVersionCode(application.output,
+                                                          versions[i],
+                                                          "x86");
+            test.equal(versionCode, codes[i]);
+        }
+
+        Util.deleteTmpApplication(application);
+        test.done();
     }
 };
