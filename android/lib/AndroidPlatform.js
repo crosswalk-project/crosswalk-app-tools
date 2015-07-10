@@ -8,6 +8,7 @@ var Path = require('path');
 var ShellJS = require("shelljs");
 
 var AndroidDependencies = require("./AndroidDependencies");
+var AndroidManifest = require("./AndroidManifest");
 var AndroidSDK = require("./AndroidSDK");
 var CrosswalkZip = require("./CrosswalkZip");
 
@@ -640,10 +641,27 @@ function(output, appVersion, abi) {
     return reversedCode.reverse().join("");
 };
 
+/**
+ * Update versionCode in AndroidManifest.xml for ABI
+ * @param {String} abi ABI to generate the versionCode for
+ * @returns {Boolean} true on success, false on failure.
+ */
 AndroidPlatform.prototype.updateVersionCode =
 function(abi) {
 
-//    TODO
+    var output = this.application.output;
+
+    var manifest = new AndroidManifest(this.application.output,
+                                       Path.join(this.platformPath, "AndroidManifest.xml"));
+
+    var versionCode = this.generateVersionCode(this.application.output,
+                                               this.application.manifest.appVersion,
+                                               abi);
+
+    output.info("Using android:versionCode '" + versionCode + "'");
+    manifest.versionCode = versionCode;
+
+    return true;
 };
 
 /**
@@ -700,7 +718,7 @@ function(closure) {
     }.bind(this);
 
     // Update versionCode in AndroidManifest.xml
-    // this.updateVersionCode(abi);
+    this.updateVersionCode(abi);
 
     // Build for ABI.
     this._sdk.buildProject(closure.release, function(success) {
