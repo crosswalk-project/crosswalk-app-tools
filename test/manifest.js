@@ -14,10 +14,10 @@ var _output = require("../src/TerminalOutput").getInstance();
 
 
 function produceManifest(version) {
-    
+
     var path = Util.createTmpFile();
     var content = JSON.stringify({
-        "crosswalk_app_version": version                         
+        "crosswalk_app_version": version
     });
     FS.writeFileSync(path, content);
 
@@ -78,6 +78,24 @@ exports.tests = {
         path = produceManifest(version);
         test.equal(false, version == consumeManifest(path));
 
+        test.done();
+    },
+
+    targetPlatforms: function(test) {
+
+        test.expect(1);
+
+        var path = Util.createTmpFile();
+        var content = JSON.stringify({
+            "crosswalk_app_version": "1",
+            "crosswalk_target_platforms": "foo"
+        });
+        FS.writeFileSync(path, content);
+
+        var manifest = new Manifest(_output, path);
+        test.equal(manifest.targetPlatforms, "foo");
+
+        ShellJS.rm("-f", path);
         test.done();
     }
 };

@@ -36,13 +36,12 @@ function() {
 
     for (var platformId in PlatformsManager._implementations) {
 
-        var moduleName = PlatformsManager._implementations[platformId];
-        platformInfo = this.load(platformId, moduleName);
+        platformInfo = this.load(platformId);
         if (platformInfo) {
             break;
         } else {
             // Accumulate warnings, only emit them if no backend was found.
-            warnings.push("Loading platform '" + moduleName + "' failed");
+            warnings.push("Loading platform '" + platformId + "' failed");
         }
     }
 
@@ -68,8 +67,7 @@ function() {
 
     for (var platformId in PlatformsManager._implementations) {
 
-        var moduleName = PlatformsManager._implementations[platformId];
-        platformInfo = this.load(platformId, moduleName);
+        platformInfo = this.load(platformId);
         if (platformInfo) {
             backends.push(platformInfo);
         }
@@ -81,16 +79,16 @@ function() {
 /**
  * Load backend by name.
  * @param {String} platformId Unique platform name
- * @param {String} moduleName Name of node module that implements the platform
  * @returns {PlatformInfo} Metadata object or null if platform could not be loaded.
  */
 PlatformsManager.prototype.load =
-function(platformId, moduleName) {
+function(platformId) {
 
     var platformInfo = null;
 
     try {
 
+        var moduleName = PlatformsManager._implementations[platformId];
         var Ctor = require(moduleName);
         platformInfo = new PlatformInfo(Ctor, platformId);
 

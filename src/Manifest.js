@@ -46,6 +46,19 @@ function Manifest(output, path) {
         output.error("Invalid app version '" + json.crosswalk_app_version + "' in the manifest");
         // TODO maybe exception
     }
+
+    // Target platforms
+    if (json.crosswalk_target_platforms &&
+        typeof json.crosswalk_target_platforms === "string") {
+        this._targetPlatforms = json.crosswalk_target_platforms;
+    }
+
+    if (!this._targetPlatforms) {
+        output.error("Missing or invalid target platforms in the manifest");
+        output.error("Try adding");
+        output.error('    "crosswalk_target_platforms": "android"');
+        output.error("or similar for platform of choice.");
+    }
 }
 
 /**
@@ -59,8 +72,15 @@ function Manifest(output, path) {
 Manifest.create =
 function(path) {
 
+    // Emulate old behaviour of using default backend,
+    // Just put it into the manifest now, upon creation.
+    var PlatformsManager = require("./PlatformsManager");
+    var mgr = new PlatformsManager(require("./TerminalOutput").getInstance());
+    var platformInfo = mgr.loadDefault();
+
     var buffer = JSON.stringify({
-        "crosswalk_app_version": "1"
+        "crosswalk_app_version": "1",
+        "crosswalk_target_platforms": platformInfo.platformId
     });
     FS.writeFileSync(path, buffer);
 };
@@ -74,6 +94,18 @@ function(path) {
 Object.defineProperty(Manifest.prototype, "appVersion", {
                       get: function() {
                                 return this._appVersion;
+                           }
+                      });
+
+/**
+ * Build target platforms for the apps
+ * @member {String} targetPlatforms
+ * @instance
+ * @memberOf Manifest
+ */
+Object.defineProperty(Manifest.prototype, "targetPlatforms", {
+                      get: function() {
+                                return this._targetPlatforms;
                            }
                       });
 

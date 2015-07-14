@@ -64,7 +64,7 @@ function() {
     var output = this.output;
 
     var mgr = new PlatformsManager(output);
-    var platformInfo = mgr.loadDefault();
+    var platformInfo = mgr.load(this.manifest.targetPlatforms);
     if (platformInfo) {
         output.info("Loading '" + platformInfo.platformId + "' platform backend");
     } else {
