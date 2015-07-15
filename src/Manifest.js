@@ -80,6 +80,17 @@ function Manifest(output, path) {
             output.error("Invalid Windows Update ID + '" + json.crosswalk_windows_update_id + "'");
         }
     }
+
+    // Windows vendor field
+    // Optional field, only check if present.
+    this._windowsVendor = null;
+    if (json.crosswalk_windows_vendor) {
+        if (typeof json.crosswalk_windows_vendor === "string") {
+            this._windowsVendor = json.crosswalk_windows_vendor;
+        } else {
+            output.error("Windows target: Invalid vendor field + '" + json.crosswalk_windows_vendor + "'");
+        }
+    }
 }
 
 /**
@@ -117,7 +128,8 @@ function(path) {
     var buffer = JSON.stringify({
         "crosswalk_app_version": "1",
         "crosswalk_target_platforms": platformInfo.platformId,
-        "crosswalk_windows_update_id": windowsUpdateId
+        "crosswalk_windows_update_id": windowsUpdateId,
+        "crosswalk_windows_vendor": "(Vendor)"  // optional, placeholder
     });
     FS.writeFileSync(path, buffer);
 };
@@ -155,6 +167,18 @@ Object.defineProperty(Manifest.prototype, "targetPlatforms", {
 Object.defineProperty(Manifest.prototype, "windowsUpdateId", {
                       get: function() {
                                 return this._windowsUpdateId;
+                           }
+                      });
+
+/**
+ * Vendor field for Windows
+ * @member {String} windowsVendor
+ * @instance
+ * @memberOf Manifest
+ */
+Object.defineProperty(Manifest.prototype, "windowsVendor", {
+                      get: function() {
+                                return this._windowsVendor;
                            }
                       });
 

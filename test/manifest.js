@@ -115,5 +115,18 @@ exports.tests = {
 
         test.equal(false, m1.windowsUpdateId === m2.windowsUpdateId);
         test.done();
+    },
+
+    windowsVendor: function(test) {
+
+        test.expect(1);
+
+        var path3 = Util.createTmpFile();
+        Manifest.create(path3);
+        var m3 = new Manifest(_output, path3);
+        ShellJS.rm("-f", path3);
+
+        test.equal(typeof m3.windowsVendor === "string", true);
+        test.done();
     }
 };
