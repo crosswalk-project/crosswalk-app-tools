@@ -97,5 +97,23 @@ exports.tests = {
 
         ShellJS.rm("-f", path);
         test.done();
+    },
+
+    windowsUpdateId: function(test) {
+
+        test.expect(1);
+
+        var path1 = Util.createTmpFile();
+        Manifest.create(path1);
+        var m1 = new Manifest(_output, path1);
+        ShellJS.rm("-f", path1);
+
+        var path2 = Util.createTmpFile();
+        Manifest.create(path2);
+        var m2 = new Manifest(_output, path2);
+        ShellJS.rm("-f", path2);
+
+        test.equal(false, m1.windowsUpdateId === m2.windowsUpdateId);
+        test.done();
     }
 };

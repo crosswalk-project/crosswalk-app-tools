@@ -59,6 +59,27 @@ function Manifest(output, path) {
         output.error('    "crosswalk_target_platforms": "android"');
         output.error("or similar for platform of choice.");
     }
+
+    // Windows update ID
+    // Optional field, only check if present.
+    this._windowsUpdateId = null;
+    if (json.crosswalk_windows_update_id) {
+
+        var parts = json.crosswalk_windows_update_id.split("-");
+        if (parts.length === 5 &&
+            parts[0].length === 8 && parts[0].match("^[0-9]*$") &&
+            parts[1].length === 4 && parts[1].match("^[0-9]*$") &&
+            parts[2].length === 4 && parts[2].match("^[0-9]*$") &&
+            parts[3].length === 4 && parts[3].match("^[0-9]*$") &&
+            parts[4].length === 12 && parts[4].match("^[0-9]*$")) {
+
+            this._windowsUpdateId = json.crosswalk_windows_update_id;
+
+        } else {
+
+            output.error("Invalid Windows Update ID + '" + json.crosswalk_windows_update_id + "'");
+        }
+    }
 }
 
 /**
@@ -78,9 +99,25 @@ function(path) {
     var mgr = new PlatformsManager(require("./TerminalOutput").getInstance());
     var platformInfo = mgr.loadDefault();
 
+    // Create windows update id
+    // Format is: 12345678-1234-1234-1234-111111111111
+    // So we create 32+ random digits, then insert dashes.
+    var digits = "";
+    while (digits.length <= 32) {
+        // Cut off leading "0."
+        var randoms = Math.random().toString().substring(2);
+        digits += randoms;
+    }
+    var windowsUpdateId = digits.substring(0, 8) + "-" +
+                          digits.substring(8, 12) + "-" +
+                          digits.substring(12, 16) + "-" +
+                          digits.substring(16, 20) + "-" +
+                          digits.substring(20, 32);
+
     var buffer = JSON.stringify({
         "crosswalk_app_version": "1",
-        "crosswalk_target_platforms": platformInfo.platformId
+        "crosswalk_target_platforms": platformInfo.platformId,
+        "crosswalk_windows_update_id": windowsUpdateId
     });
     FS.writeFileSync(path, buffer);
 };
@@ -106,6 +143,18 @@ Object.defineProperty(Manifest.prototype, "appVersion", {
 Object.defineProperty(Manifest.prototype, "targetPlatforms", {
                       get: function() {
                                 return this._targetPlatforms;
+                           }
+                      });
+
+/**
+ * Windows update ID
+ * @member {String} windowsUpdateId
+ * @instance
+ * @memberOf Manifest
+ */
+Object.defineProperty(Manifest.prototype, "windowsUpdateId", {
+                      get: function() {
+                                return this._windowsUpdateId;
                            }
                       });
 
