@@ -41,7 +41,7 @@ function() {
         "    crosswalk-app update <channel>|<version>    Update Crosswalk to latest in named\n" +
         "                                                channel, or specific version\n" +
         "\n" +
-        "    crosswalk-app backends\t\t\tList available backends\n" +
+        "    crosswalk-app platforms\t\t\tList available target platforms\n" +
         "\n" +
         "    crosswalk-app help\t\t\t\tDisplay usage information\n" +
         "\n" +
@@ -71,7 +71,7 @@ function() {
     case "build":
         var type = this.buildGetType();
         return type !== null ? cmd : null;
-    case "backends":
+    case "platforms":
     case "help":
     case "version":
         return cmd;
@@ -103,7 +103,7 @@ function() {
         return "help";
     }
 
-    if (["create", "update", "refresh", "build", "backends"].indexOf(command) > -1) {
+    if (["create", "update", "refresh", "build", "platforms"].indexOf(command) > -1) {
         return command;
     }
 

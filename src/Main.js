@@ -238,7 +238,7 @@ function(configId, extraArgs, callback) {
  * @param {OutputIface} output Output to write to
  * @static
  */
-Main.prototype.listBackends =
+Main.prototype.listPlatforms =
 function(output) {
 
     var mgr = new PlatformsManager(output);
@@ -377,8 +377,8 @@ function(callback) {
         }
         break;
 
-    case "backends":
-        this.listBackends(output);
+    case "platforms":
+        this.listPlatforms(output);
         break;
 
     case "help":
