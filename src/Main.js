@@ -56,6 +56,7 @@ function workingDirectoryIsProject() {
 /**
  * Instantiate platform backend
  * @returns {PlatformBase} Platform implementation instance or null on error.
+ * @private
  * @static
  */
 Main.prototype.instantiatePlatform =
@@ -110,6 +111,19 @@ Main.prototype.create =
 function(packageId, extraArgs, callback) {
 
     var output = this.output;
+
+    // Handle "platform" arg to set default platform
+    // for new project.
+    var platform = extraArgs.platforms;
+    if (platform) {
+        try {
+            this.manifest.targetPlatforms = platform;
+        } catch (e) {
+            output.error("Invalid target platform '" + platform + "'");
+            callback(MAIN_EXIT_CODE_ERROR);
+            return;
+        }
+    }
 
     // Copy sample web app content
     var templatePath = Path.normalize(Path.join(__dirname, "..", "app-template"));
@@ -206,7 +220,7 @@ function(configId, extraArgs, callback) {
     }
     */
 
-    var project = this.instantiatePlatform(null);
+    var project = this.instantiatePlatform();
     if (!project) {
         callback(MAIN_EXIT_CODE_ERROR);
         return;

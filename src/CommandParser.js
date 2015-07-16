@@ -34,6 +34,7 @@ function() {
         "Crosswalk Application Project and Packaging Tool\n" +
         "\n" +
         "    crosswalk-app create <package-id>\t\tCreate project <package-id>\n" +
+        "                  --platforms=<targetPlatform>\tOptional, e.g. \"windows\"\n" +
         "\n" +
         "    crosswalk-app build [release|debug]\t\tBuild project to create packages\n" +
         "                                       \t\tDefaults to debug when not given\n" +

@@ -203,7 +203,6 @@ Object.defineProperty(Manifest.prototype, "targetPlatforms", {
                                     this._targetPlatforms = targetPlatforms;
                                     this.update({"crosswalk_target_platforms": this._targetPlatforms});
                                 } else {
-                                    // TODO exception?
                                     var errormsg = "Target platform '" + targetPlatforms + "' not available";
                                     this._output.error(errormsg);
                                     throw new IllegalAccessException(errormsg);
