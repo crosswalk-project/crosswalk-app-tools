@@ -66,5 +66,22 @@ exports.tests = {
         ShellJS.rm("-f", path);
 
         test.done();
+    },
+
+    versionName: function(test) {
+
+        test.expect(1);
+
+        var manifest;
+        var path = createManifest();
+        manifest = new AndroidManifest(_output, path);
+        manifest.versionName = "foo";
+
+        manifest = new AndroidManifest(_output, path);
+        test.equal(manifest.versionName, "foo");
+
+        ShellJS.rm("-f", path);
+
+        test.done();
     }
 };

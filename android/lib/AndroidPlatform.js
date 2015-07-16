@@ -661,6 +661,8 @@ function(abi) {
     output.info("Using android:versionCode '" + versionCode + "'");
     manifest.versionCode = versionCode;
 
+    manifest.versionName = this.application.manifest.appVersion;
+
     return true;
 };
 

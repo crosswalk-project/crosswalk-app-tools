@@ -18,6 +18,7 @@ function AndroidManifest(output, path) {
 
     var doc = this.read();
     this._versionCode = doc.documentElement.getAttribute("android:versionCode");
+    this._versionName = doc.documentElement.getAttribute("android:versionName");
 }
 
 /**
@@ -35,6 +36,25 @@ Object.defineProperty(AndroidManifest.prototype, "versionCode", {
 
                                 var doc = this.read();
                                 doc.documentElement.setAttribute("android:versionCode", versionCode);
+                                this.write(doc);
+                           }
+                      });
+
+/**
+ * Application version a.b.c where a,b < 100, c < 1000
+ * @member {String} version
+ * @instance
+ * @memberOf AndroidManifest
+ */
+Object.defineProperty(AndroidManifest.prototype, "versionName", {
+                      get: function() {
+                                return this._versionName;
+                           },
+                      set: function(versionName) {
+                                this._versionName = versionName;
+
+                                var doc = this.read();
+                                doc.documentElement.setAttribute("android:versionName", versionName);
                                 this.write(doc);
                            }
                       });
