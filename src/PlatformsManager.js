@@ -19,7 +19,8 @@ PlatformsManager._implementations = {
     "deb": "crosswalk-app-tools-backend-deb",
     "demo": "crosswalk-app-tools-backend-demo",
     "test": "crosswalk-app-tools-backend-test",
-    "android": "../android/index.js"
+    "android": "../android/index.js",
+    "windows": "../windows/index.js"
 };
 
 /**
