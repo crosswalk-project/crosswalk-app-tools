@@ -4,12 +4,17 @@
 
 var FS = require("fs");
 
+var IllegalAccessException = require("./util/exceptions").IllegalAccessException;
+
 /**
  * Manifest wrapper.
  * @param {OutputIface} output Output implementation
  * @param {String} path Path to manifest.json
  */
 function Manifest(output, path) {
+
+    this._output = output;
+    this._path = path;
 
     var buffer = FS.readFileSync(path, {"encoding": "utf8"});
     var json = JSON.parse(buffer);
@@ -135,6 +140,39 @@ function(path) {
 };
 
 /**
+ * Update fields in Manifest.json
+ * @param {Object} data Data object
+ * @returns {Boolean} True on success, false on failure
+ * @private
+ */
+Manifest.prototype.update =
+function(data) {
+
+    var buffer = FS.readFileSync(this._path, {"encoding": "utf8"});
+    if (!buffer) {
+        this._output.error("Failed to read '" + this._path + "'");
+        return false;
+    }
+
+    var json = JSON.parse(buffer);
+    if (!json) {
+        this._output.error("Failed to parse '" + this._path + "'");
+        return false;
+    }
+
+    // Update JSON
+    for (var prop in data) {
+        json[prop] = data[prop];
+    }
+
+    // Write back
+    buffer = JSON.stringify(json);
+    FS.writeFileSync(this._path, buffer);
+
+    return true;
+};
+
+/**
  * Application version a.b.c where a,b < 100, c < 1000
  * @member {String} version
  * @instance
@@ -149,12 +187,27 @@ Object.defineProperty(Manifest.prototype, "appVersion", {
 /**
  * Build target platforms for the apps
  * @member {String} targetPlatforms
+ * @throws {IllegalAccessException} If unknown target platforms are set.
  * @instance
  * @memberOf Manifest
  */
 Object.defineProperty(Manifest.prototype, "targetPlatforms", {
                       get: function() {
                                 return this._targetPlatforms;
+                           },
+                      set: function(targetPlatforms) {
+                                var PlatformsManager = require("./PlatformsManager");
+                                var mgr = new PlatformsManager(this._output);
+                                if (typeof targetPlatforms === "string" &&
+                                    mgr.load(targetPlatforms)) {
+                                    this._targetPlatforms = targetPlatforms;
+                                    this.update({"crosswalk_target_platforms": this._targetPlatforms});
+                                } else {
+                                    // TODO exception?
+                                    var errormsg = "Target platform '" + targetPlatforms + "' not available";
+                                    this._output.error(errormsg);
+                                    throw new IllegalAccessException(errormsg);
+                                }
                            }
                       });
 

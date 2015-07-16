@@ -83,7 +83,7 @@ exports.tests = {
 
     targetPlatforms: function(test) {
 
-        test.expect(1);
+        test.expect(2);
 
         var path = Util.createTmpFile();
         var content = JSON.stringify({
@@ -92,8 +92,16 @@ exports.tests = {
         });
         FS.writeFileSync(path, content);
 
+        // read
         var manifest = new Manifest(_output, path);
         test.equal(manifest.targetPlatforms, "foo");
+
+        // write
+        manifest.targetPlatforms = "android";
+
+        // read back
+        manifest = new Manifest(_output, path);
+        test.equal(manifest.targetPlatforms, "android");
 
         ShellJS.rm("-f", path);
         test.done();
