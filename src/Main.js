@@ -233,6 +233,12 @@ function(configId, extraArgs, callback) {
         buildArgs = this.collectArgs(project.platformId, extraArgs, argSpec.build);
     }
 
+    // Copy manifest.json from root to app so the latest is shipped with the app
+    // FIXME check there are no manual changes.
+    output.info("Sync'ing manifest.json to app dir");
+    ShellJS.cp(Path.join(this.rootPath, "manifest.json"),
+               this.appPath);
+
     // Build
     project.build(configId, buildArgs, function(errormsg) {
 
