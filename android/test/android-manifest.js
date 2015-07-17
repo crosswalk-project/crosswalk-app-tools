@@ -83,5 +83,22 @@ exports.tests = {
         ShellJS.rm("-f", path);
 
         test.done();
+    },
+
+    applicationLabel: function(test) {
+
+        test.expect(1);
+
+        var manifest;
+        var path = createManifest();
+        manifest = new AndroidManifest(_output, path);
+        manifest.applicationLabel = "foofoo";
+
+        manifest = new AndroidManifest(_output, path);
+        test.equal(manifest.applicationLabel, "foofoo");
+
+        ShellJS.rm("-f", path);
+
+        test.done();
     }
 };

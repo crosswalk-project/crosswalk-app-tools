@@ -19,6 +19,12 @@ function AndroidManifest(output, path) {
     var doc = this.read();
     this._versionCode = doc.documentElement.getAttribute("android:versionCode");
     this._versionName = doc.documentElement.getAttribute("android:versionName");
+
+    this._applicationLabel = null;
+    var node = this.findApplicationNode(doc);
+    if (node) {
+        this._applicationLabel = node.getAttribute("android:label");
+    }
 }
 
 /**
@@ -60,6 +66,35 @@ Object.defineProperty(AndroidManifest.prototype, "versionName", {
                       });
 
 /**
+ * Application label
+ * @member {String} applicationLabel Value for <application android:label= in the android manifest
+ * @instance
+ * @memberOf AndroidManifest
+ */
+Object.defineProperty(AndroidManifest.prototype, "applicationLabel", {
+                      get: function() {
+                                return this._applicationLabel;
+                           },
+                      set: function(applicationLabel) {
+                                // Look up <application> node
+                                var doc = this.read();
+                                var node = this.findApplicationNode(doc);
+                                // Test and set
+                                if (node) {
+                                    if (node.getAttribute("android:label")[0] === '@') {
+                                        this._output.warning("Field 'android:label' appears to be localised, please update manually");
+                                    } else {
+                                        this._applicationLabel = applicationLabel;
+                                        node.setAttribute("android:label", applicationLabel);
+                                        this.write(doc);
+                                    }
+                                } else {
+                                    this._output.warning("Did not find <application> element in AndroidManifest.xml");
+                                }
+                           }
+                      });
+
+/**
  * Read AndroidManifest.xml
  * @returns {xmldom.Document} XML Document
  * @protected
@@ -85,6 +120,28 @@ function(doc) {
     var serializer = new xmldom.XMLSerializer();
     var buf = serializer.serializeToString(doc);
     FS.writeFileSync(this._path, buf);
+};
+
+/**
+ * Find application node
+ * @param {xmldom.Document} document
+ * @returns {xmldom.Node} Node if found or null
+ * @private
+ */
+AndroidManifest.prototype.findApplicationNode =
+function(document) {
+
+    var node = null;
+
+    for (var idx in document.documentElement.childNodes) {
+        var n = document.documentElement.childNodes[idx];
+        if (n.nodeName === "application") {
+            node = n;
+            break;
+        }
+    }
+
+    return node;
 };
 
 module.exports = AndroidManifest;

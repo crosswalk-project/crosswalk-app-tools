@@ -80,7 +80,7 @@ function(apiTarget, platformPath) {
     var packageName = parts[parts.length - 1];
     var data = {
         "packageId" : this.packageId,
-        "packageName" : packageName,
+        "packageName" : this.packageId,
         "apiTarget" : apiTarget
     };
 
@@ -661,7 +661,9 @@ function(abi) {
     output.info("Using android:versionCode '" + versionCode + "'");
     manifest.versionCode = versionCode;
 
+    // TODO HACK this should be done only once per build
     manifest.versionName = this.application.manifest.appVersion;
+    manifest.applicationLabel = this.application.manifest.name;
 
     return true;
 };
