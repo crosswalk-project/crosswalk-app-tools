@@ -55,7 +55,7 @@ function Application(cwd, packageId) {
         ShellJS.mkdir(this._prjPath);
 
         // Create Manifest
-        Manifest.create(Path.join(this._rootPath, "manifest.json"));
+        Manifest.create(Path.join(this._rootPath, "manifest.json"), packageId);
 
     } else {
         

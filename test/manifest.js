@@ -13,13 +13,22 @@ var _output = require("../src/TerminalOutput").getInstance();
 
 
 
-function produceManifest(version) {
+function produceManifest(fields) {
 
     var path = Util.createTmpFile();
-    var content = JSON.stringify({
-        "crosswalk_app_version": version
-    });
-    FS.writeFileSync(path, content);
+    Manifest.create(path, "com.example.foo");
+
+    if (fields) {
+        // Override default values
+        var buffer = FS.readFileSync(path, {"encoding": "utf8"});
+        var json = JSON.parse(buffer);
+        for (var prop in fields) {
+            json[prop] = fields[prop];
+        }
+        // Write back
+        buffer = JSON.stringify(json);
+        FS.writeFileSync(path, buffer);
+    }
 
     return path;
 }
@@ -27,10 +36,9 @@ function produceManifest(version) {
 function consumeManifest(path) {
 
     var manifest = new Manifest(_output, path);
-    var appVersion = manifest.appVersion;
     ShellJS.rm("-f", path);
 
-    return appVersion;
+    return manifest;
 }
 
 exports.tests = {
@@ -43,40 +51,80 @@ exports.tests = {
         test.expect(9);
 
         version = "2";
-        path = produceManifest(version);
-        test.equal(version, consumeManifest(path));
+        path = produceManifest({"crosswalk_app_version": version});
+        test.equal(version, consumeManifest(path).appVersion);
 
         version = "2.2";
-        path = produceManifest(version);
-        test.equal(version, consumeManifest(path));
+        path = produceManifest({"crosswalk_app_version": version});
+        test.equal(version, consumeManifest(path).appVersion);
 
         version = "2.2.2";
-        path = produceManifest(version);
-        test.equal(version, consumeManifest(path));
+        path = produceManifest({"crosswalk_app_version": version});
+        test.equal(version, consumeManifest(path).appVersion);
 
         version = "2.";
-        path = produceManifest(version);
-        test.equal(false, version == consumeManifest(path));
+        path = produceManifest({"crosswalk_app_version": version});
+        test.equal(false, version == consumeManifest(path).appVersion);
 
         version = "2.2.";
-        path = produceManifest(version);
-        test.equal(false, version == consumeManifest(path));
+        path = produceManifest({"crosswalk_app_version": version});
+        test.equal(false, version == consumeManifest(path).appVersion);
 
         version = "2.2.2.";
-        path = produceManifest(version);
-        test.equal(false, version == consumeManifest(path));
+        path = produceManifest({"crosswalk_app_version": version});
+        test.equal(false, version == consumeManifest(path).appVersion);
 
         version = "3333";
-        path = produceManifest(version);
-        test.equal(false, version == consumeManifest(path));
+        path = produceManifest({"crosswalk_app_version": version});
+        test.equal(false, version == consumeManifest(path).appVersion);
 
         version = "333.333";
-        path = produceManifest(version);
-        test.equal(false, version == consumeManifest(path));
+        path = produceManifest({"crosswalk_app_version": version});
+        test.equal(false, version == consumeManifest(path).appVersion);
 
         version = "33.333.333";
-        path = produceManifest(version);
-        test.equal(false, version == consumeManifest(path));
+        path = produceManifest({"crosswalk_app_version": version});
+        test.equal(false, version == consumeManifest(path).appVersion);
+
+        test.done();
+    },
+
+    name: function(test) {
+
+        test.expect(2);
+
+        var path = produceManifest();
+
+        // read
+        var manifest = new Manifest(_output, path);
+        test.equal(manifest.name, "com.example.foo");
+
+        // write
+        manifest.name = "foofoo";
+
+        // read back
+        manifest = consumeManifest(path);
+        test.equal(manifest.name, "foofoo");
+
+        test.done();
+    },
+
+    shortName: function(test) {
+
+        test.expect(2);
+
+        var path = produceManifest();
+
+        // read
+        var manifest = new Manifest(_output, path);
+        test.equal(manifest.shortName, "foo");
+
+        // write
+        manifest.shortName = "foofoo";
+
+        // read back
+        manifest = consumeManifest(path);
+        test.equal(manifest.shortName, "foofoo");
 
         test.done();
     },
@@ -85,25 +133,19 @@ exports.tests = {
 
         test.expect(2);
 
-        var path = Util.createTmpFile();
-        var content = JSON.stringify({
-            "crosswalk_app_version": "1",
-            "crosswalk_target_platforms": "foo"
-        });
-        FS.writeFileSync(path, content);
+        var path = produceManifest({"crosswalk_target_platforms": "android"});
 
         // read
         var manifest = new Manifest(_output, path);
-        test.equal(manifest.targetPlatforms, "foo");
-
-        // write
-        manifest.targetPlatforms = "android";
-
-        // read back
-        manifest = new Manifest(_output, path);
         test.equal(manifest.targetPlatforms, "android");
 
-        ShellJS.rm("-f", path);
+        // write
+        manifest.targetPlatforms = "windows";
+
+        // read back
+        manifest = consumeManifest(path);
+        test.equal(manifest.targetPlatforms, "windows");
+
         test.done();
     },
 
@@ -111,15 +153,11 @@ exports.tests = {
 
         test.expect(1);
 
-        var path1 = Util.createTmpFile();
-        Manifest.create(path1);
-        var m1 = new Manifest(_output, path1);
-        ShellJS.rm("-f", path1);
+        var path1 = produceManifest();
+        var m1 = consumeManifest(path1);
 
-        var path2 = Util.createTmpFile();
-        Manifest.create(path2);
-        var m2 = new Manifest(_output, path2);
-        ShellJS.rm("-f", path2);
+        var path2 = produceManifest();
+        var m2 = consumeManifest(path2);
 
         test.equal(false, m1.windowsUpdateId === m2.windowsUpdateId);
         test.done();
@@ -129,10 +167,8 @@ exports.tests = {
 
         test.expect(1);
 
-        var path3 = Util.createTmpFile();
-        Manifest.create(path3);
-        var m3 = new Manifest(_output, path3);
-        ShellJS.rm("-f", path3);
+        var path3 = produceManifest();
+        var m3 = consumeManifest(path3);
 
         test.equal(typeof m3.windowsVendor === "string", true);
         test.done();

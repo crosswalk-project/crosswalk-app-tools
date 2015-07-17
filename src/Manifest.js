@@ -52,6 +52,22 @@ function Manifest(output, path) {
         // TODO maybe exception
     }
 
+    // Name
+    if (json.name &&
+        typeof json.name === "string") {
+        this._name = json.name;
+    }
+
+    if (!this._name) {
+        output.warning("Invalid or missing field 'name' in manifest.json");
+    }
+
+    // Short name
+    if (json.short_name &&
+        typeof json.short_name === "string") {
+        this._shortName= json.short_name;
+    }
+
     // Target platforms
     if (json.crosswalk_target_platforms &&
         typeof json.crosswalk_target_platforms === "string") {
@@ -102,12 +118,13 @@ function Manifest(output, path) {
  * Create manifest at project creation stage.
  * @param {OutputIface} output Output implementation
  * @param {String} path Path to manifest.json
+ * @param {String} packageId Unique package identifier com.example.foo
  * @returns {Manifest} Loaded manifest instance.
  * @memberOf Manifest
  * @static
  */
 Manifest.create =
-function(path) {
+function(path, packageId) {
 
     // Emulate old behaviour of using default backend,
     // Just put it into the manifest now, upon creation.
@@ -131,6 +148,8 @@ function(path) {
                           digits.substring(20, 32);
 
     var buffer = JSON.stringify({
+        "name": packageId,
+        "short_name": packageId.split(".").pop(),
         "crosswalk_app_version": "1",
         "crosswalk_target_platforms": platformInfo.platformId,
         "crosswalk_windows_update_id": windowsUpdateId,
@@ -181,6 +200,52 @@ function(data) {
 Object.defineProperty(Manifest.prototype, "appVersion", {
                       get: function() {
                                 return this._appVersion;
+                           }
+                      });
+
+/**
+ * Application name
+ * @member {String} name
+ * @throws {IllegalAccessException} If name is not a string.
+ * @instance
+ * @memberOf Manifest
+ */
+Object.defineProperty(Manifest.prototype, "name", {
+                      get: function() {
+                                return this._name;
+                           },
+                      set: function(name) {
+                                if (typeof name === "string") {
+                                    this._name = name;
+                                    this.update({"name": this._name});
+                                } else {
+                                    var errormsg = "Invalid app name '" + name + "'";
+                                    this._output.error(errormsg);
+                                    throw new IllegalAccessException(errormsg);
+                                }
+                           }
+                      });
+
+/**
+ * Application short name
+ * @member {String} shortName
+ * @throws {IllegalAccessException} If name is not a string.
+ * @instance
+ * @memberOf Manifest
+ */
+Object.defineProperty(Manifest.prototype, "shortName", {
+                      get: function() {
+                                return this._shortName;
+                           },
+                      set: function(shortName) {
+                                if (typeof shortName === "string") {
+                                    this._shortName = shortName;
+                                    this.update({"short_name": this._shortName});
+                                } else {
+                                    var errormsg = "Invalid app short name '" + shortName + "'";
+                                    this._output.error(errormsg);
+                                    throw new IllegalAccessException(errormsg);
+                                }
                            }
                       });
 
