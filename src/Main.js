@@ -278,33 +278,33 @@ function(parser, output) {
 
     // Platform args
     var mgr = new PlatformsManager(output);
-    var platformInfo = mgr.loadDefault();
-    if (!platformInfo) {
-        output.error("Failed to load platform backend");
-        return;
-    }
+    var infos = mgr.loadAll();
+    for (var i = 0; i < infos.length; i++) {
 
-    // Print args
-    if (Object.keys(platformInfo.argSpec).length > 0) {
-        output.write("Options for platform '" + platformInfo.platformId + "'\n");
-        for (var cmd in platformInfo.argSpec) {
-            output.write("\n    For command '" + cmd + "'\n");
-            var cmdArgs = platformInfo.argSpec[cmd];
-            for (var arg in cmdArgs) {
-                output.write("        " + arg + "    " + cmdArgs[arg] + "\n");
+        var platformInfo = infos[i];
+
+        // Print args
+        if (Object.keys(platformInfo.argSpec).length > 0) {
+            output.write("Options for platform '" + platformInfo.platformId + "'\n");
+            for (var cmd in platformInfo.argSpec) {
+                output.write("\n    For command '" + cmd + "'\n");
+                var cmdArgs = platformInfo.argSpec[cmd];
+                for (var arg in cmdArgs) {
+                    output.write("        " + arg + "    " + cmdArgs[arg] + "\n");
+                }
             }
         }
-    }
 
-    // Print environment variables
-    if (Object.keys(platformInfo.envSpec).length > 0) {
-        output.write("Environment variables for platform '" + platformInfo.platformId + "'\n\n");
-        for (var env in platformInfo.envSpec) {
-            output.write("    " + env + "               " + platformInfo.envSpec[env] + "\n");
+        // Print environment variables
+        if (Object.keys(platformInfo.envSpec).length > 0) {
+            output.write("Environment variables for platform '" + platformInfo.platformId + "'\n\n");
+            for (var env in platformInfo.envSpec) {
+                output.write("    " + env + "               " + platformInfo.envSpec[env] + "\n");
+            }
         }
-    }
 
-    output.write("\n");
+        output.write("\n");
+    }
 };
 
 /**

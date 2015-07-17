@@ -34,12 +34,11 @@ WinPlatform.getArgs = function() {
 
     return {
         create: { // Extra options for command "create"
-            foo: "Option added by the backend",
-            bar: "Another option added by the backend"
-        },
+            crosswalk: "\t\t\tPath to crosswalk zip"
+        }/*,
         update: { // Extra options for command "update"
             baz: "Another option added by the backend"
-        }
+        }*/
     };
 };
 
