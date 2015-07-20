@@ -190,8 +190,8 @@ function(release, callback) {
     }
 
     var exitStatus = { "code" : 0 };
-    var args = [ release ? "release" : "debug" ];
-    var child = ChildProcess.execFile(ant, args);
+    ant += release ? " release" : " debug";
+    var child = ChildProcess.exec(ant);
 
     child.stdout.on("data", function(data) {
 
