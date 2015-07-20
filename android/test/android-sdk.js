@@ -96,6 +96,7 @@ exports.tests = {
         test.expect(1);
 
         var buffer = "" +
+            "Picked up JAVA_TOOL_OPTIONS: -javaagent:/usr/share/java/jayatanaag.jar" + "\n" +
             "foo" + "\n" +
             "Picked up _JAVA_OPTIONS: -Djava.net.preferIPv4Stack=true";
 

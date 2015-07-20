@@ -65,19 +65,29 @@ function AndroidSDK(application) {
 AndroidSDK.prototype.filterErrorLog =
 function(buffer) {
 
-    var prefix = "Picked up _JAVA_OPTIONS";
+    var prefixes = [
+        "Picked up _JAVA_OPTIONS",
+        "Picked up JAVA_TOOL_OPTIONS" ];
+
     var filtered = "";
     var lines = buffer.split("\n");
     for (var i = 0; i < lines.length; i++) {
 
         var line = lines[i].trim();
         if (line.length > 0) {
-            if (line.substring(0, prefix.length) === prefix) {
 
-                // skip
-                continue;
+            var filter = false;
+            for (var j = 0; j < prefixes.length; j++) {
+                var prefix = prefixes[j];
+                if (line.substring(0, prefix.length) === prefix) {
+                    // skip
+                    filter = true;
+                    continue;
+                }
             }
-            filtered += line + "\n";
+
+            if (!filter)
+                filtered += line + "\n";
         }
     }
 
