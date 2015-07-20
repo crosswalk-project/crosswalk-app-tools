@@ -89,5 +89,18 @@ exports.tests = {
                 test.done();
             });
         });
+    },
+
+    filterErrorLog: function(test) {
+
+        test.expect(1);
+
+        var buffer = "" +
+            "foo" + "\n" +
+            "Picked up _JAVA_OPTIONS: -Djava.net.preferIPv4Stack=true";
+
+        var filtered = AndroidSDK.prototype.filterErrorLog(buffer);
+        test.equal(filtered, "foo\n");
+        test.done();
     }
 };

@@ -57,6 +57,34 @@ function AndroidSDK(application) {
 }
 
 /**
+ * Filter known messages from stderr buffer
+ * @param {String} buffer Input buffer
+ * @returns {String} Filtered output buffer
+ * @private
+ */
+AndroidSDK.prototype.filterErrorLog =
+function(buffer) {
+
+    var prefix = "Picked up _JAVA_OPTIONS";
+    var filtered = "";
+    var lines = buffer.split("\n");
+    for (var i = 0; i < lines.length; i++) {
+
+        var line = lines[i].trim();
+        if (line.length > 0) {
+            if (line.substring(0, prefix.length) === prefix) {
+
+                // skip
+                continue;
+            }
+            filtered += line + "\n";
+        }
+    }
+
+    return filtered;
+};
+
+/**
  * Query for lowest API target that supports apiLevel.
  * @param {Number} apiLevel Minimum supported API level
  * @param {AndroidSDK~queryTargetCb} callback callback function
@@ -127,6 +155,7 @@ function(path, packageId, apiTarget, callback) {
     var child = ChildProcess.execFile(this._scriptPath, args, {},
                                       function(errmsg, stdlog, errlog) {
 
+        errlog = this.filterErrorLog(errlog);
         if (errlog && !errmsg) {
             // Pass back errlog output as error message.
             errmsg = errlog;
@@ -135,7 +164,7 @@ function(path, packageId, apiTarget, callback) {
         indicator.done();
         callback(path, stdlog, errmsg);
         return;
-    });
+    }.bind(this));
 };
 
 AndroidSDK.prototype.refreshProject =
@@ -172,8 +201,11 @@ function(release, callback) {
     }.bind(this));
 
     child.stderr.on("data", function(data) {
-        output.warning(data, true);
-    });
+        data = this.filterErrorLog(data);
+        if (data) {
+            output.warning(data, true);
+        }
+    }.bind(this));
 
     child.on("exit", function(code, signal) {
         callback(code === 0);
