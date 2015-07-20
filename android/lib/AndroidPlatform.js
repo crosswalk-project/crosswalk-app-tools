@@ -560,13 +560,10 @@ function(abi, release) {
         apkInPattern = "*-debug.apk";
     }
 
-    var apkInPath = ShellJS.ls("bin" + Path.sep + apkInPattern)[0];
-    if (!apkInPath) {
-        output.error("APK bin" + Path.sep + apkInPattern + " not found");
-        return null;
-    }
+    ShellJS.pushd("bin");
+    var apkInName = ShellJS.ls(apkInPattern)[0];
+    ShellJS.popd();
 
-    var apkInName = apkInPath.split(Path.sep)[1];
     if (!ShellJS.test("-f", "bin" + Path.sep + apkInName)) {
         output.error("APK bin" + Path.sep + apkInName + " not found");
         return null;
