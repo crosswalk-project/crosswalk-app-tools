@@ -310,6 +310,11 @@ function(packageId, args, callback) {
                 return;
             }
 
+            // Remove _* from the default set of assets that are ignored
+            // see sdk/tools/ant/build.xml for more info
+            // the following is the default, without '_*'
+            'aapt.ignore.assets = "!.svn:!.git:.*:!CVS:!thumbs.db:!picasa.ini:!*.scc:*~"\n'.toEnd(path + Path.sep + 'ant.properties');
+
             var versionSpec = null;
             if (args.crosswalk) {
                 // TODO verify version/channel
