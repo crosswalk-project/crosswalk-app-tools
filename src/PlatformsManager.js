@@ -80,10 +80,14 @@ function() {
 /**
  * Load backend by name.
  * @param {String} platformId Unique platform name
+ * @param {Function} callback Callback carrying error message on failure
  * @returns {PlatformInfo} Metadata object or null if platform could not be loaded.
  */
 PlatformsManager.prototype.load =
-function(platformId) {
+function(platformId, callback) {
+
+    if (!callback)
+        callback = function(errormsg) {};
 
     var platformInfo = null;
 
@@ -95,8 +99,7 @@ function(platformId) {
 
     } catch (e) {
 
-        // Ignore because we have a hardcoded list of platforms and not all
-        // will be available.
+        callback(e.message);
     }
 
     return platformInfo;

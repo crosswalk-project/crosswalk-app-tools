@@ -63,12 +63,18 @@ Main.prototype.instantiatePlatform =
 function() {
 
     var output = this.output;
+    var errorDetail = null;
 
     var mgr = new PlatformsManager(output);
-    var platformInfo = mgr.load(this.manifest.targetPlatforms);
+    var platformInfo = mgr.load(this.manifest.targetPlatforms,
+                                function(errormsg) {
+                                    errorDetail = errormsg;
+                                });
     if (platformInfo) {
         output.info("Loading '" + platformInfo.platformId + "' platform backend");
     } else {
+        if (errorDetail)
+            output.error(errorDetail);
         output.error("Failed to load '" + platformInfo.platformId + "' platform backend");
         return null;
     }
