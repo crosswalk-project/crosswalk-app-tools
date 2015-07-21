@@ -3,14 +3,15 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var FS = require("fs");
-
 var Path = require('path');
+
 var ShellJS = require("shelljs");
 
 var AndroidDependencies = require("./AndroidDependencies");
 var AndroidManifest = require("./AndroidManifest");
 var AndroidSDK = require("./AndroidSDK");
 var CrosswalkZip = require("./CrosswalkZip");
+var JavaActivity = require("./JavaActivity");
 
 /**
  * Android project class.
@@ -106,80 +107,6 @@ function(apiTarget, platformPath) {
     return true;
 };
 
-AndroidPlatform.prototype.writeActivityJava =
-function(zipEntry) {
-
-    var output = this.application.output;
-
-    var templateData = zipEntry.getData().toString();
-    if (!templateData) {
-        output.error("Java main activity file could not be extracted");
-        return false;
-    }
-
-    // Change package name
-    var templatePackage = "org.xwalk.app.template";
-    var index = templateData.search(templatePackage);
-    if (index < 0) {
-        output.error("Failed to find template package '" + templatePackage + "' in " + zipEntry.name);
-        return false;
-    }
-    templateData = templateData.replace(templatePackage, this.packageId);
-
-    // Change class name
-    var templateClass = "AppTemplateActivity";
-    index = templateData.search(templateClass);
-    if (index < 0) {
-        output.error("Failed to find template class '" + templateClass + "' in " + zipEntry.name);
-        return false;
-    }
-    templateData = templateData.replace(templateClass, "MainActivity");
-
-    // Create target directory
-    var activityDirPath = Path.join(this.platformPath,
-                                 "src",
-                                 this.packageId.replace(/\./g, Path.sep));
-    ShellJS.mkdir("-p", activityDirPath);
-    if (!ShellJS.test("-d", activityDirPath)) {
-        output.error("Failed to create activity dir " + activityDirPath);
-        return false;
-    }
-
-    // Do not overwrite activity file because it may contain app-specific code
-    // FIXME we should be smarter about this:
-    // 1 - check if file is different from new content
-    // 2 - if yes, create a ".new" file
-    var activityFilePath = Path.join(activityDirPath, "MainActivity.java");
-    if (ShellJS.test("-f", activityFilePath)) {
-
-        // HACK force newline because we're in the midst of a progress indication
-        output.write("\n");
-        output.warning("File already exists: " + activityFilePath);
-
-        var activityBackupFilename;
-        var activityBackupPath;
-        var i = 0;
-        do {
-            activityBackupFilename = "MainActivity.java.orig-" + i;
-            activityBackupPath = Path.join(activityDirPath, activityBackupFilename);
-            i++;
-        } while (ShellJS.test("-f", activityBackupPath));
-
-        ShellJS.mv(activityFilePath, activityBackupPath);
-        output.warning("Existing activity file rename to: " + activityBackupPath);
-        output.warning("Please port any custom java code to the new MainActivity.java");
-    }
-
-    // Write activity file
-    FS.writeFileSync(activityFilePath, templateData);
-    if (!ShellJS.test("-f", activityFilePath)) {
-        output.error("Failed to write main activity " + activityFilePath);
-        return false;
-    }
-
-    return true;
-};
-
 /**
  * Import Crosswalk libraries and auxiliary files into the project.
  * @param {String} crosswalkPath Location of unpacked Crosswalk distribution
@@ -259,7 +186,19 @@ function(crosswalkPath, platformPath) {
     entry = zip.getEntry(name);
     if (entry) {
 
-        if (!this.writeActivityJava(entry))
+        // Create path
+        var activityDirPath = Path.join(platformPath,
+                                        "src",
+                                        this.packageId.replace(/\./g, Path.sep));
+        ShellJS.mkdir("-p", activityDirPath);
+        if (!ShellJS.test("-d", activityDirPath)) {
+            output.error("Failed to create activity dir " + activityDirPath);
+            return false;
+        }
+
+        var activity = new JavaActivity(output,
+                                        Path.join(activityDirPath, "MainActivity.java"));
+        if (!activity.importFromZip(entry, this.packageId))
             return null;
 
     } else {
@@ -756,6 +695,17 @@ function(closure) {
         }
     }.bind(this));
 };
+
+/*
+AndroidPlatform.prototype.updateJavaActivity =
+function(release) {
+
+    var output = this.application.output;
+
+    var activity = new JavaActivity(output, )
+    TODO
+};
+*/
 
 /**
  * Implements {@link PlatformBase.build}
