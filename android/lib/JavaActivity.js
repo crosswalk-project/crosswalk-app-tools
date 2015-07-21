@@ -19,6 +19,26 @@ function JavaActivity(output, path) {
 }
 
 /**
+ * Calculate java source path for package ID.
+ * @param {String} basePath Project location
+ * @param {String} packageId Package ID
+ * @returns {String} Path where java file will be located.
+ * @static
+ */
+JavaActivity.prototype.pathForPackage =
+function(basePath, packageId) {
+
+    var packagePath = Path.join(basePath,
+                                "src",
+                                packageId.replace(/\./g, Path.sep));
+
+    return packagePath;
+};
+
+// Also assign statically
+JavaActivity.pathForPackage = JavaActivity.prototype.pathForPackage;
+
+/**
  * Import java activity file from crosswalk zip release.
  * @param {adm-zip.ZipEntry} zipEntry Entry holding the activity
  * @param {String} packageId Package identifier for the project
@@ -90,9 +110,13 @@ function(zipEntry, packageId) {
 
 /**
  * Enable remote debugging.
+ * @param {Boolean} enable True if to be enabled, false to disable feature
+ * @returns {Boolean} True on success, otherwise false.
  */
 JavaActivity.prototype.enableRemoteDebugging =
-function() {
+function(enable) {
+
+    // FIXME better error handling
 
     var inBuf = FS.readFileSync(this._path, {"encoding": "utf8"});
     var lines = inBuf.split("\n");
@@ -101,21 +125,75 @@ function() {
     for (var i = 0; i < lines.length; i++) {
 
         var line = lines[i];
-        outBuf.push(line);
-
         if (line === "    public void onCreate(Bundle savedInstanceState) {") {
 
-            // also write next line, the super call.
-            i++;
-            line = lines[i];
-            outBuf.push(line);
-
-            // insert setting
-            outBuf.push("        setRemoteDebugging(true);");
+            if (enable) {
+                i = this.insertIfMissing(lines, i, "        setRemoteDebugging(true);", outBuf);
+            } else {
+                i = this.skipIfPresent(lines, i, "        setRemoteDebugging(true);", outBuf);
+            }
         }
+        outBuf.push(lines[i]);
     }
 
     FS.writeFileSync(this._path, outBuf.join("\n"));
+
+    return true;
+};
+
+/**
+ * Insert configuration statement if not already present.
+ * @param {String[]} lines Source input lines
+ * @param {Integer} i Current line counter
+ * @param {String} stmt Statement to insert
+ * @param {String[]} outBuf Output lines
+ * @returns {Integer} New current line counter.
+ * @private
+ */
+JavaActivity.prototype.insertIfMissing =
+function(lines, i, stmt, outBuf) {
+
+    found = false;
+    while (lines[i] !== "    }") {
+        outBuf.push(lines[i]);
+        i++;
+        if (lines[i] === stmt) {
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        outBuf.push(stmt);
+    }
+
+    return i;
+};
+
+/**
+ * Insert configuration statement if not already present.
+ * @param {String[]} lines Source input lines
+ * @param {Integer} i Current line counter
+ * @param {String} stmt Statement to insert
+ * @param {String[]} outBuf Output lines
+ * @returns {Integer} New current line counter.
+ * @private
+ */
+JavaActivity.prototype.skipIfPresent =
+function(lines, i, stmt, outBuf) {
+
+    found = false;
+    while (lines[i] !== "    }") {
+        outBuf.push(lines[i]);
+        i++;
+        if (lines[i] === stmt) {
+            // skip
+            i++;
+            break;
+        }
+    }
+
+    return i;
 };
 
 module.exports = JavaActivity;

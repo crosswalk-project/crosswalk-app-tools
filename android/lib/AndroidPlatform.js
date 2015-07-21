@@ -187,9 +187,7 @@ function(crosswalkPath, platformPath) {
     if (entry) {
 
         // Create path
-        var activityDirPath = Path.join(platformPath,
-                                        "src",
-                                        this.packageId.replace(/\./g, Path.sep));
+        var activityDirPath = JavaActivity.pathForPackage(platformPath, this.packageId);
         ShellJS.mkdir("-p", activityDirPath);
         if (!ShellJS.test("-d", activityDirPath)) {
             output.error("Failed to create activity dir " + activityDirPath);
@@ -696,16 +694,29 @@ function(closure) {
     }.bind(this));
 };
 
-/*
+/**
+ * Update java activity file for build config.
+ * @param {Boolean} release True if release build, false if debug
+ * @returns {Boolean} True if successful, otherwise false.
+ */
 AndroidPlatform.prototype.updateJavaActivity =
 function(release) {
 
     var output = this.application.output;
+    var ret = true;
 
-    var activity = new JavaActivity(output, )
-    TODO
+    var config = release ? "release" : "debug";
+    output.info("Updating java activity for '" + config + "' configuration");
+
+    var dir = JavaActivity.pathForPackage(this.platformPath, this.packageId);
+    var path = Path.join(dir, "MainActivity.java");
+    var activity = new JavaActivity(output, path);
+
+    // Enable remote debugging for debug builds.
+    ret = activity.enableRemoteDebugging(!release);
+
+    return ret;
 };
-*/
 
 /**
  * Implements {@link PlatformBase.build}
@@ -717,6 +728,8 @@ function(configId, args, callback) {
 
     // TODO should we cd back afterwards?
     process.chdir(this.platformPath);
+
+    this.updateJavaActivity(configId === "release");
 
     var closure = {
         abis: ["armeabi-v7a", "x86"], // TODO export option
