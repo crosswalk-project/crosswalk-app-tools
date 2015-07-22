@@ -338,6 +338,13 @@ function(packageId, args, callback) {
                     return;
                 }
 
+                /**
+                 * remove _* from the default set of assets that are ignored
+                 * see sdk/tools/ant/build.xml for more info
+                 * the following is the default, without '_*'
+                 */
+                'aapt.ignore.assets="!.svn:!.git:.*:!CVS:!thumbs.db:!picasa.ini:!*.scc:*~"\n'.toEnd(path + Path.sep + 'ant.properties');
+
                 output.info("Project template created at '" + path + "'");
                 callback(null);
             }.bind(this));
