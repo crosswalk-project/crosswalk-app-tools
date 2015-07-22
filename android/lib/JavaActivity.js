@@ -109,7 +109,7 @@ function(zipEntry, packageId) {
 };
 
 /**
- * Enable remote debugging.
+ * Enable or disable remote debugging.
  * @param {Boolean} enable True if to be enabled, false to disable feature
  * @returns {Boolean} True on success, otherwise false.
  */
@@ -117,6 +117,17 @@ JavaActivity.prototype.enableRemoteDebugging =
 function(enable) {
 
     return this.editOnCreate(enable, "        setRemoteDebugging(true);");
+};
+
+/**
+ * Enable or disable fullscreen.
+ * @param {Boolean} enable True if to be enabled, false to disable feature
+ * @returns {Boolean} True on success, otherwise false.
+ */
+JavaActivity.prototype.enableFullscreen =
+function(enable) {
+
+    return this.editOnCreate(enable, "        setIsFullscreen(true);");
 };
 
 /**

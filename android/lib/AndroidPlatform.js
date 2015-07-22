@@ -12,6 +12,7 @@ var AndroidManifest = require("./AndroidManifest");
 var AndroidSDK = require("./AndroidSDK");
 var CrosswalkZip = require("./CrosswalkZip");
 var JavaActivity = require("./JavaActivity");
+var XmlTheme = require("./XmlTheme");
 
 /**
  * Android project class.
@@ -714,6 +715,18 @@ function(release) {
 
     // Enable remote debugging for debug builds.
     ret = activity.enableRemoteDebugging(!release);
+    if (!ret)
+        return false;
+
+    // Fullscreen
+    ret = activity.enableFullscreen(this.application.manifest.androidFullscreen);
+    if (!ret)
+        return false;
+    var fs = this.application.manifest.androidFullscreen ? "yes" : "no";
+    output.info("Updating theme.xml for fullscreen (" + fs + ")");
+    var theme = new XmlTheme(output,
+                             Path.join(this.platformPath, "res", "values-v14", "theme.xml"));
+    theme.fullscreen = this.application.manifest.androidFullscreen;
 
     return ret;
 };

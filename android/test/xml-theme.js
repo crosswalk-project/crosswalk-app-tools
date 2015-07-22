@@ -50,7 +50,7 @@ exports.tests = {
 
         // change and read back
         theme.fullscreen = true;
-        var theme = new XmlTheme(_output, path);
+        theme = new XmlTheme(_output, path);
         test.equal(theme.fullscreen, true);
 
         ShellJS.rm("-f", path);

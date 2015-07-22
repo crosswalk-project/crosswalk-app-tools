@@ -149,6 +149,23 @@ exports.tests = {
         test.done();
     },
 
+    androidFullscreen: function(test) {
+
+        test.expect(2);
+
+        // Default to "false"
+        var path = produceManifest();
+        var manifest = consumeManifest(path);
+        test.equal(manifest.androidFullscreen, false);
+
+        // Test reading "true"
+        path = produceManifest({"crosswalk_android_fullscreen": true});
+        manifest = new Manifest(_output, path);
+        test.equal(manifest.androidFullscreen, true);
+
+        test.done();
+    },
+
     windowsUpdateId: function(test) {
 
         test.expect(1);

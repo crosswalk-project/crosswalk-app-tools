@@ -81,6 +81,17 @@ function Manifest(output, path) {
         output.error("or similar for platform of choice.");
     }
 
+    // Android fullscreen
+    this._androidFullscreen = false;
+    if (json.crosswalk_android_fullscreen) {
+
+        // Recognise boolean or string true.
+        if (typeof json.crosswalk_android_fullscreen === "boolean" ||
+        json.crosswalk_android_fullscreen === "true") {
+            this._androidFullscreen = true;
+        }
+    }
+
     // Windows update ID
     // Optional field, only check if present.
     this._windowsUpdateId = null;
@@ -152,6 +163,7 @@ function(path, packageId) {
         "short_name": packageId.split(".").pop(),
         "crosswalk_app_version": "1",
         "crosswalk_target_platforms": platformInfo.platformId,
+        "crosswalk_android_fullscreen": false,
         "crosswalk_windows_update_id": windowsUpdateId,
         "crosswalk_windows_vendor": "(Vendor)"  // optional, placeholder
     });
@@ -246,6 +258,18 @@ Object.defineProperty(Manifest.prototype, "shortName", {
                                     this._output.error(errormsg);
                                     throw new IllegalAccessException(errormsg);
                                 }
+                           }
+                      });
+
+/**
+ * Full screen on android
+ * @member {String} androidFullscreen
+ * @instance
+ * @memberOf Manifest
+ */
+Object.defineProperty(Manifest.prototype, "androidFullscreen", {
+                      get: function() {
+                                return this._androidFullscreen;
                            }
                       });
 
