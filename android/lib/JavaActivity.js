@@ -116,6 +116,18 @@ function(zipEntry, packageId) {
 JavaActivity.prototype.enableRemoteDebugging =
 function(enable) {
 
+    return this.editOnCreate(enable, "        setRemoteDebugging(true);");
+};
+
+/**
+ * Edit the onCreate() method inserting or removing config statements.
+ * @param {Boolean} insert If true, insert statement if missing, otherwise remove it
+ * @param {String} stmt Statement to edit
+ * @returns {Boolean} True on success, otherwise false.
+ */
+JavaActivity.prototype.editOnCreate =
+function(insert, stmt) {
+
     // FIXME better error handling
 
     var inBuf = FS.readFileSync(this._path, {"encoding": "utf8"});
@@ -127,10 +139,10 @@ function(enable) {
         var line = lines[i];
         if (line === "    public void onCreate(Bundle savedInstanceState) {") {
 
-            if (enable) {
-                i = this.insertIfMissing(lines, i, "        setRemoteDebugging(true);", outBuf);
+            if (insert) {
+                i = this.insertIfMissing(lines, i, stmt, outBuf);
             } else {
-                i = this.skipIfPresent(lines, i, "        setRemoteDebugging(true);", outBuf);
+                i = this.skipIfPresent(lines, i, stmt, outBuf);
             }
         }
         outBuf.push(lines[i]);
@@ -140,6 +152,7 @@ function(enable) {
 
     return true;
 };
+
 
 /**
  * Insert configuration statement if not already present.
