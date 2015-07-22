@@ -723,6 +723,11 @@ function(release) {
     if (!ret)
         return false;
 
+    // Animatable view
+    ret = activity.enableAnimatableView(this.application.manifest.androidAnimatableView);
+    if (!ret)
+        return false;
+
     // Fullscreen
     ret = activity.enableFullscreen(this.application.manifest.androidFullscreen);
     if (!ret)

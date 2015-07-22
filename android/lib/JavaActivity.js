@@ -109,6 +109,17 @@ function(zipEntry, packageId) {
 };
 
 /**
+ * Enable or disable animatable view.
+ * @param {Boolean} enable True if to be enabled, false to disable feature
+ * @returns {Boolean} True on success, otherwise false.
+ */
+JavaActivity.prototype.enableAnimatableView =
+function(enable) {
+
+    return this.editOnCreate(enable, "        setUseAnimatableView(true);");
+};
+
+/**
  * Enable or disable remote debugging.
  * @param {Boolean} enable True if to be enabled, false to disable feature
  * @returns {Boolean} True on success, otherwise false.

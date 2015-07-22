@@ -149,6 +149,23 @@ exports.tests = {
         test.done();
     },
 
+    androidAnimatableView: function(test) {
+
+        test.expect(2);
+
+        // Default to "false"
+        var path = produceManifest();
+        var manifest = consumeManifest(path);
+        test.equal(manifest.androidAnimatableView, false);
+
+        // Test reading "true"
+        path = produceManifest({"crosswalk_android_animatable_view": true});
+        manifest = new Manifest(_output, path);
+        test.equal(manifest.androidAnimatableView, true);
+
+        test.done();
+    },
+
     androidFullscreen: function(test) {
 
         test.expect(2);

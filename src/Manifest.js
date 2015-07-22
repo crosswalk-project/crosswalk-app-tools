@@ -81,6 +81,17 @@ function Manifest(output, path) {
         output.error("or similar for platform of choice.");
     }
 
+    // Android animatable view
+    this._androidAnimatableView = false;
+    if (json.crosswalk_android_animatable_view) {
+
+        // Recognise boolean or string true.
+        if (typeof json.crosswalk_android_animatable_view === "boolean" ||
+        json.crosswalk_android_animatable_view === "true") {
+            this._androidAnimatableView = true;
+        }
+    }
+
     // Android fullscreen
     this._androidFullscreen = false;
     if (json.crosswalk_android_fullscreen) {
@@ -163,6 +174,7 @@ function(path, packageId) {
         "short_name": packageId.split(".").pop(),
         "crosswalk_app_version": "1",
         "crosswalk_target_platforms": platformInfo.platformId,
+        "crosswalk_android_animatable_view": false,
         "crosswalk_android_fullscreen": false,
         "crosswalk_windows_update_id": windowsUpdateId,
         "crosswalk_windows_vendor": "(Vendor)"  // optional, placeholder
@@ -239,7 +251,7 @@ Object.defineProperty(Manifest.prototype, "name", {
                       });
 
 /**
- * Application short name
+ * Application short name.
  * @member {String} shortName
  * @throws {IllegalAccessException} If name is not a string.
  * @instance
@@ -262,7 +274,19 @@ Object.defineProperty(Manifest.prototype, "shortName", {
                       });
 
 /**
- * Full screen on android
+ * Animatable view on android.
+ * @member {String} androidAnimatableView
+ * @instance
+ * @memberOf Manifest
+ */
+Object.defineProperty(Manifest.prototype, "androidAnimatableView", {
+                      get: function() {
+                                return this._androidAnimatableView;
+                           }
+                      });
+
+/**
+ * Full screen on android.
  * @member {String} androidFullscreen
  * @instance
  * @memberOf Manifest
