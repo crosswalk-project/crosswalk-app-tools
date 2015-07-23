@@ -80,6 +80,13 @@ function Manifest(output, path) {
         }
     }
 
+    // Start URL
+    // TODO check value
+    if (json.start_url &&
+        typeof json.start_url === "string") {
+        this._startUrl = json.start_url;
+    }
+
     // Target platforms
     if (json.crosswalk_target_platforms &&
         typeof json.crosswalk_target_platforms === "string") {
@@ -185,6 +192,7 @@ function(path, packageId) {
         "name": packageId,
         "short_name": packageId.split(".").pop(),
         "display": "standalone",
+        "start_url": "index.html",
         "crosswalk_app_version": "1",
         "crosswalk_target_platforms": platformInfo.platformId,
         "crosswalk_android_animatable_view": false,
@@ -296,6 +304,19 @@ Object.defineProperty(Manifest.prototype, "shortName", {
 Object.defineProperty(Manifest.prototype, "display", {
                       get: function() {
                                 return this._display;
+                           }
+                      });
+
+/**
+ * Start URL
+ * @member {String} startUrl
+ * @instance
+ * @memberOf Manifest
+ * @see http://www.w3.org/TR/appmanifest/#start_url-member
+ */
+Object.defineProperty(Manifest.prototype, "startUrl", {
+                      get: function() {
+                                return this._startUrl;
                            }
                       });
 

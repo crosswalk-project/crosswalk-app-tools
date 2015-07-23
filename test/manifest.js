@@ -151,6 +151,24 @@ exports.tests = {
         test.done();
     },
 
+    startUrl: function(test) {
+
+        test.expect(2);
+
+        var path = produceManifest();
+
+        // read default
+        var manifest = new Manifest(_output, path);
+        test.equal(manifest.startUrl, "index.html");
+
+        // Test reading "start.html"
+        path = produceManifest({"start_url": "start.html"});
+        manifest = new Manifest(_output, path);
+        test.equal(manifest.startUrl, "start.html");
+
+        test.done();
+    },
+
     targetPlatforms: function(test) {
 
         test.expect(2);

@@ -73,6 +73,10 @@ function(zipEntry, packageId) {
     }
     templateData = templateData.replace(templateClass, "MainActivity");
 
+    // Always load app from manifest instead of index.html
+    templateData = templateData.replace('loadAppFromUrl("file:///android_asset/www/index.html")',
+                                        'loadAppFromManifest("file:///android_asset/www/manifest.json")');
+
     // Do not overwrite activity file because it may contain app-specific code
     // FIXME we should be smarter about this:
     // 1 - check if file is different from new content
