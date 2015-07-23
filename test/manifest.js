@@ -183,6 +183,23 @@ exports.tests = {
         test.done();
     },
 
+    androidKeepScreenOn: function(test) {
+
+        test.expect(2);
+
+        // Default to "false"
+        var path = produceManifest();
+        var manifest = consumeManifest(path);
+        test.equal(manifest.androidKeepScreenOn, false);
+
+        // Test reading "true"
+        path = produceManifest({"crosswalk_android_keep_screen_on": true});
+        manifest = new Manifest(_output, path);
+        test.equal(manifest.androidKeepScreenOn, true);
+
+        test.done();
+    },
+
     windowsUpdateId: function(test) {
 
         test.expect(1);

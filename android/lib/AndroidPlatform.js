@@ -738,6 +738,11 @@ function(release) {
                              Path.join(this.platformPath, "res", "values-v14", "theme.xml"));
     theme.fullscreen = this.application.manifest.androidFullscreen;
 
+    // "Keep screen on"
+    ret = activity.enableKeepScreenOn(this.application.manifest.androidKeepScreenOn);
+    if (!ret)
+        return false;
+
     return ret;
 };
 

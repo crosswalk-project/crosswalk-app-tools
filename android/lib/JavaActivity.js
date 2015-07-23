@@ -142,6 +142,17 @@ function(enable) {
 };
 
 /**
+ * Enable or disable "keep screen on".
+ * @param {Boolean} enable True if to be enabled, false to disable feature
+ * @returns {Boolean} True on success, otherwise false.
+ */
+JavaActivity.prototype.enableKeepScreenOn =
+function(enable) {
+
+    return this.editOnCreate(enable, "        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);");
+};
+
+/**
  * Edit the onCreate() method inserting or removing config statements.
  * @param {Boolean} insert If true, insert statement if missing, otherwise remove it
  * @param {String} stmt Statement to edit

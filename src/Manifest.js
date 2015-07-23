@@ -103,6 +103,17 @@ function Manifest(output, path) {
         }
     }
 
+    // Android "keep screen on"
+    this._androidKeepScreenOn = false;
+    if (json.crosswalk_android_keep_screen_on) {
+
+        // Recognise boolean or string true.
+        if (typeof json.crosswalk_android_keep_screen_on === "boolean" ||
+        json.crosswalk_android_keep_screen_on === "true") {
+            this._androidKeepScreenOn = true;
+        }
+    }
+
     // Windows update ID
     // Optional field, only check if present.
     this._windowsUpdateId = null;
@@ -176,6 +187,7 @@ function(path, packageId) {
         "crosswalk_target_platforms": platformInfo.platformId,
         "crosswalk_android_animatable_view": false,
         "crosswalk_android_fullscreen": false,
+        "crosswalk_android_keep_screen_on": false,
         "crosswalk_windows_update_id": windowsUpdateId,
         "crosswalk_windows_vendor": "(Vendor)"  // optional, placeholder
     });
@@ -294,6 +306,18 @@ Object.defineProperty(Manifest.prototype, "androidAnimatableView", {
 Object.defineProperty(Manifest.prototype, "androidFullscreen", {
                       get: function() {
                                 return this._androidFullscreen;
+                           }
+                      });
+
+/**
+ * "Keep screen on" on android.
+ * @member {String} androidKeepScreenOn
+ * @instance
+ * @memberOf Manifest
+ */
+Object.defineProperty(Manifest.prototype, "androidKeepScreenOn", {
+                      get: function() {
+                                return this._androidKeepScreenOn;
                            }
                       });
 
