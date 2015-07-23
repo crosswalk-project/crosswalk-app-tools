@@ -7,6 +7,7 @@ var Path = require("path");
 var ShellJS = require("shelljs");
 
 var AndroidTargets = require("./AndroidTargets");
+var JavaActivity = require("./JavaActivity");
 
 
 
@@ -169,6 +170,15 @@ function(path, packageId, apiTarget, callback) {
         if (errlog && !errmsg) {
             // Pass back errlog output as error message.
             errmsg = errlog;
+        }
+
+        // Delete stub activity, we extract the crosswalk one later on.
+        var javaActivityPath = Path.join(JavaActivity.pathForPackage(path, packageId),
+                                        "MainActivity.java");
+        if (ShellJS.test("-f", javaActivityPath)) {
+            ShellJS.rm("-f", javaActivityPath);
+        } else {
+            output.warning("File not found: " + javaActivityPath);
         }
 
         indicator.done();
