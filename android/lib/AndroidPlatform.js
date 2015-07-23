@@ -729,14 +729,14 @@ function(release) {
         return false;
 
     // Fullscreen
-    ret = activity.enableFullscreen(this.application.manifest.androidFullscreen);
+    var fullscreen = this.application.manifest.display === "fullscreen";
+    ret = activity.enableFullscreen(fullscreen);
     if (!ret)
         return false;
-    var fs = this.application.manifest.androidFullscreen ? "yes" : "no";
-    output.info("Updating theme.xml for fullscreen (" + fs + ")");
+    output.info("Updating theme.xml for display mode (fullscreen: " + (fullscreen ? "yes" : "no") + ")");
     var theme = new XmlTheme(output,
                              Path.join(this.platformPath, "res", "values-v14", "theme.xml"));
-    theme.fullscreen = this.application.manifest.androidFullscreen;
+    theme.fullscreen = fullscreen;
 
     // "Keep screen on"
     ret = activity.enableKeepScreenOn(this.application.manifest.androidKeepScreenOn);

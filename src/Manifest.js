@@ -68,6 +68,18 @@ function Manifest(output, path) {
         this._shortName= json.short_name;
     }
 
+    // Display
+    this._display = "standalone";
+    if (json.display) {
+
+        if (["fullscreen", "standalone"].indexOf(json.display) > -1) {
+            // supported mode
+            this._display = json.display;
+        } else {
+            output.warning("Unsupported value '" + json.display + "' in manifest.json");
+        }
+    }
+
     // Target platforms
     if (json.crosswalk_target_platforms &&
         typeof json.crosswalk_target_platforms === "string") {
@@ -89,17 +101,6 @@ function Manifest(output, path) {
         if (typeof json.crosswalk_android_animatable_view === "boolean" ||
         json.crosswalk_android_animatable_view === "true") {
             this._androidAnimatableView = true;
-        }
-    }
-
-    // Android fullscreen
-    this._androidFullscreen = false;
-    if (json.crosswalk_android_fullscreen) {
-
-        // Recognise boolean or string true.
-        if (typeof json.crosswalk_android_fullscreen === "boolean" ||
-        json.crosswalk_android_fullscreen === "true") {
-            this._androidFullscreen = true;
         }
     }
 
@@ -183,10 +184,10 @@ function(path, packageId) {
     var buffer = JSON.stringify({
         "name": packageId,
         "short_name": packageId.split(".").pop(),
+        "display": "standalone",
         "crosswalk_app_version": "1",
         "crosswalk_target_platforms": platformInfo.platformId,
         "crosswalk_android_animatable_view": false,
-        "crosswalk_android_fullscreen": false,
         "crosswalk_android_keep_screen_on": false,
         "crosswalk_windows_update_id": windowsUpdateId,
         "crosswalk_windows_vendor": "(Vendor)"  // optional, placeholder
@@ -286,6 +287,19 @@ Object.defineProperty(Manifest.prototype, "shortName", {
                       });
 
 /**
+ * Display
+ * @member {String} display
+ * @instance
+ * @memberOf Manifest
+ * @see http://www.w3.org/TR/appmanifest/#display-member
+ */
+Object.defineProperty(Manifest.prototype, "display", {
+                      get: function() {
+                                return this._display;
+                           }
+                      });
+
+/**
  * Animatable view on android.
  * @member {String} androidAnimatableView
  * @instance
@@ -294,18 +308,6 @@ Object.defineProperty(Manifest.prototype, "shortName", {
 Object.defineProperty(Manifest.prototype, "androidAnimatableView", {
                       get: function() {
                                 return this._androidAnimatableView;
-                           }
-                      });
-
-/**
- * Full screen on android.
- * @member {String} androidFullscreen
- * @instance
- * @memberOf Manifest
- */
-Object.defineProperty(Manifest.prototype, "androidFullscreen", {
-                      get: function() {
-                                return this._androidFullscreen;
                            }
                       });
 

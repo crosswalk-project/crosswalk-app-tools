@@ -129,6 +129,28 @@ exports.tests = {
         test.done();
     },
 
+    display: function(test) {
+
+        test.expect(3);
+
+        // Default to "false"
+        var path = produceManifest();
+        var manifest = consumeManifest(path);
+        test.equal(manifest.display, "standalone");
+
+        // Test reading "fullscreen"
+        path = produceManifest({"display": "fullscreen"});
+        manifest = new Manifest(_output, path);
+        test.equal(manifest.display, "fullscreen");
+
+        // Test reading bogus value "foo", default to "standalone"
+        path = produceManifest({"display": "foo"});
+        manifest = new Manifest(_output, path);
+        test.equal(manifest.display, "standalone");
+
+        test.done();
+    },
+
     targetPlatforms: function(test) {
 
         test.expect(2);
@@ -162,23 +184,6 @@ exports.tests = {
         path = produceManifest({"crosswalk_android_animatable_view": true});
         manifest = new Manifest(_output, path);
         test.equal(manifest.androidAnimatableView, true);
-
-        test.done();
-    },
-
-    androidFullscreen: function(test) {
-
-        test.expect(2);
-
-        // Default to "false"
-        var path = produceManifest();
-        var manifest = consumeManifest(path);
-        test.equal(manifest.androidFullscreen, false);
-
-        // Test reading "true"
-        path = produceManifest({"crosswalk_android_fullscreen": true});
-        manifest = new Manifest(_output, path);
-        test.equal(manifest.androidFullscreen, true);
 
         test.done();
     },
