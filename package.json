@@ -49,6 +49,7 @@
     "Gruntfile.js",
     "LICENSE-APACHE-V2",
     "package.json",
+    "manifest.md",
     "README.md",
     "src",
     "test",
