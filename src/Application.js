@@ -55,7 +55,7 @@ function Application(cwd, packageId) {
         ShellJS.mkdir(this._prjPath);
 
         // Create Manifest
-        Manifest.create(Path.join(this._rootPath, "manifest.json"), packageId);
+        Manifest.create(Path.join(this._appPath, "manifest.json"), packageId);
 
     } else {
         
@@ -95,7 +95,7 @@ function Application(cwd, packageId) {
 
     this._output = new OutputTee(this._logfileOutput, TerminalOutput.getInstance());
 
-    this._manifest = new Manifest(this._output, Path.join(this._rootPath, "manifest.json"));
+    this._manifest = new Manifest(this._output, Path.join(this._appPath, "manifest.json"));
 }
 
 function initMembers(basePath) {
