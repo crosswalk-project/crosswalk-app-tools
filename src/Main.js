@@ -389,10 +389,11 @@ function(callback) {
 
     case "build":
         var type = parser.buildGetType();
+        var rootDir = parser.buildGetDir();
 
         try {
             // Chain up the constructor.
-            Application.call(app, process.cwd(), null);
+            Application.call(app, rootDir, null);
             app.build(type, extraArgs, callback);
         } catch (e) {
             output.error("Failed to initialize");

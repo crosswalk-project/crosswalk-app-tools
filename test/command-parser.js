@@ -2,6 +2,8 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var Path = require("path");
+
 // Run tests silently to avoid spew from tests failing on purpose.
 require("../src/Config").getInstance().setSilentConsole(true);
 var CommandParser = require("../src/CommandParser");
@@ -194,14 +196,45 @@ exports.tests = {
         var type3 = cp3.buildGetType();
         test.equal(type3, "release");
 
-        // Bad test, unknown type
+        // Test dir
         var argv4 = ["node", "foo", "build", "foo"];
         var cp4 = new CommandParser(_output, argv4);
 
-        test.equal(cp4.getCommand(), null);
+        test.equal(cp4.getCommand(), "build");
 
         var type4 = cp4.buildGetType();
-        test.equal(type4, null);
+        test.equal(type4, "debug");
+
+        test.done();
+    },
+
+    buildGetDir: function(test) {
+
+        test.expect(6);
+
+        // Test default "debug"
+        var argv = ["node", "foo", "build", "foo"];
+        var cp = new CommandParser(_output, argv);
+
+        test.equal(cp.getCommand(), "build");
+
+        var type = cp.buildGetType();
+        test.equal(type, "debug");
+
+        var dir = cp.buildGetDir();
+        test.equal(Path.basename(dir), "foo");
+
+        // Test "release"
+        var argv1 = ["node", "foo", "build", "release", "foo"];
+        var cp1 = new CommandParser(_output, argv1);
+
+        test.equal(cp1.getCommand(), "build");
+
+        var type1 = cp1.buildGetType();
+        test.equal(type1, "release");
+
+        var dir1 = cp1.buildGetDir();
+        test.equal(Path.basename(dir1), "foo");
 
         test.done();
     }

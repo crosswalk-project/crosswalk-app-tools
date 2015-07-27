@@ -2,6 +2,8 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var Path = require("path");
+
 var Minimist = require("minimist");
 
 /**
@@ -20,7 +22,6 @@ function CommandParser(output, argv) {
     }
 
     this._argv = argv;
-    this._createOptions = null;
 }
 
 /**
@@ -36,8 +37,9 @@ function() {
 "    crosswalk-app create <package-id>           Create project <package-id>\n" +
 "                  --platforms=<target>          Optional, e.g. \"windows\"\n" +
 "\n" +
-"    crosswalk-app build [release|debug]         Build project to create packages\n" +
-"                                                Defaults to debug when not given\n" +
+"    crosswalk-app build [release|debug] [<dir>] Build project to create packages\n" +
+"                                                Defaults to \"debug\" when not given\n" +
+"                                                Tries to build in current dir by default\n" +
 "\n" +
 "    crosswalk-app update <channel>|<version>    Update Crosswalk to latest in named\n" +
 "                                                channel, or specific version\n" +
@@ -125,11 +127,6 @@ function() {
 
     var packageId = CommandParser.validatePackageId(this._argv[3], this._output);
 
-    if (this._argv.length > 4) {
-        var options = this._argv.slice(4);
-        this._createOptions = Minimist(options);
-    }
-
     return packageId;
 };
 
@@ -189,6 +186,35 @@ function() {
     var type = this._argv[3];
     if (["debug", "release"].indexOf(type) > -1) {
         return type;
+    } else {
+        return "debug";
+    }
+
+    return null;
+};
+
+/**
+ * Get project directory to build
+ * @returns {String} Absolute path to project directory
+ */
+CommandParser.prototype.buildGetDir =
+function() {
+
+    // Default to current dir when no type given.
+    if (this._argv.length < 4) {
+        return Path.resolve(".");
+    }
+
+    if (this._argv.length === 4) {
+        if (["debug", "release"].indexOf(this._argv[3]) > -1) {
+            return Path.resolve(".");
+        } else {
+            return Path.resolve(this._argv[3]);
+        }
+    }
+
+    if (this._argv.length > 4) {
+        return Path.resolve(this._argv[4]);
     }
 
     return null;
