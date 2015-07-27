@@ -766,7 +766,10 @@ function(configId, args, callback) {
         apks: [],
         callback: function(errormsg) {
 
-            if (!errormsg) {
+            if (!errormsg &&
+                closure.apks.length > 0) {
+
+                output.highlight("  * Built package(s):");
 
                 for (var i = 0; i < closure.apks.length; i++) {
 
@@ -774,7 +777,7 @@ function(configId, args, callback) {
                     var packagePath = Path.join(this.platformPath, "bin", closure.apks[i]);
                     this.exportPackage(packagePath);
 
-                    output.highlight("  pkg/" + closure.apks[i]);
+                    output.highlight("    + " + closure.apks[i]);
                 }
             }
             callback(errormsg);

@@ -107,7 +107,8 @@ function initMembers(basePath) {
 
     this._logPath = Path.join(OS.tmpdir(), "crosswalk-app-tools-" + this._packageId);
 
-    this._pkgPath = this._rootPath + Path.sep + "pkg";
+    // Packages end up in working dir
+    this._pkgPath = process.cwd();
 
     this._prjPath = this._rootPath + Path.sep + "prj";
 }
