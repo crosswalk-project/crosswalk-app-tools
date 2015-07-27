@@ -30,23 +30,23 @@ function CommandParser(output, argv) {
 CommandParser.prototype.help =
 function() {
     return "" +
-        "\n" +
-        "Crosswalk Application Project and Packaging Tool\n" +
-        "\n" +
-        "    crosswalk-app create <package-id>\t\tCreate project <package-id>\n" +
-        "                  --platforms=<targetPlatform>\tOptional, e.g. \"windows\"\n" +
-        "\n" +
-        "    crosswalk-app build [release|debug]\t\tBuild project to create packages\n" +
-        "                                       \t\tDefaults to debug when not given\n" +
-        "\n" +
-        "    crosswalk-app update <channel>|<version>    Update Crosswalk to latest in named\n" +
-        "                                                channel, or specific version\n" +
-        "\n" +
-        "    crosswalk-app platforms\t\t\tList available target platforms\n" +
-        "\n" +
-        "    crosswalk-app help\t\t\t\tDisplay usage information\n" +
-        "\n" +
-        "    crosswalk-app version\t\t\tDisplay version information\n";
+"\n" +
+"Crosswalk Project Application Packaging Tool\n" +
+"\n" +
+"    crosswalk-app create <package-id>           Create project <package-id>\n" +
+"                  --platforms=<target>          Optional, e.g. \"windows\"\n" +
+"\n" +
+"    crosswalk-app build [release|debug]         Build project to create packages\n" +
+"                                                Defaults to debug when not given\n" +
+"\n" +
+"    crosswalk-app update <channel>|<version>    Update Crosswalk to latest in named\n" +
+"                                                channel, or specific version\n" +
+"\n" +
+"    crosswalk-app platforms                     List available target platforms\n" +
+"\n" +
+"    crosswalk-app help                          Display usage information\n" +
+"\n" +
+"    crosswalk-app version                       Display version information\n";
 };
 
 /**
