@@ -158,13 +158,14 @@ function(packageId, extraArgs, callback) {
 
         if (errormsg) {
             output.error(errormsg);
+            output.info("Logfiles at " + this.logPath);
             callback(MAIN_EXIT_CODE_ERROR);
             return;
         } else {
             callback(MAIN_EXIT_CODE_OK);
             return;
         }
-    });
+    }.bind(this));
 };
 
 /**
@@ -196,13 +197,14 @@ function(version, extraArgs, callback) {
 
         if (errormsg) {
             output.error(errormsg);
+            output.info("Logfiles at " + this.logPath);
             callback(MAIN_EXIT_CODE_ERROR);
             return;
         } else {
             callback(MAIN_EXIT_CODE_OK);
             return;
         }
-    });
+    }.bind(this));
 };
 
 /**
@@ -244,13 +246,14 @@ function(configId, extraArgs, callback) {
 
         if (errormsg) {
             output.error(errormsg);
+            output.info("Logfiles at " + this.logPath);
             callback(MAIN_EXIT_CODE_ERROR);
             return;
         } else {
             callback(MAIN_EXIT_CODE_OK);
             return;
         }
-    });
+    }.bind(this));
 };
 
 /**
@@ -337,10 +340,11 @@ function(callback) {
     // Temporary output object because of static method here
     var output = TerminalOutput.getInstance();
     var parser = new CommandParser(output, process.argv);
+    var app = new Main();
 
     if (process.argv.length < 3) {
         // No command given, print help and exit without error code.
-        this.printHelp(parser, output);
+        app.printHelp(parser, output);
         callback(MAIN_EXIT_CODE_OK);
         return;
     }
@@ -360,8 +364,8 @@ function(callback) {
 
         try {
             // Chain up the constructor.
-            Application.call(this, process.cwd(), packageId);
-            this.create(packageId, extraArgs, callback);
+            Application.call(app, process.cwd(), packageId);
+            app.create(packageId, extraArgs, callback);
         } catch (e) {
             output.error("Failed to initialize");
             output.error("Ensure directory '" + packageId + "' does not already exist");
@@ -374,8 +378,8 @@ function(callback) {
 
         try {
             // Chain up the constructor.
-            Application.call(this, process.cwd(), null);
-            this.update(version, extraArgs, callback);
+            Application.call(app, process.cwd(), null);
+            app.update(version, extraArgs, callback);
         } catch (e) {
             output.error("Failed to initialize");
             output.error("Ensure to invoke 'crosswalk-app-tools' from a toplevel project directory");
@@ -388,8 +392,8 @@ function(callback) {
 
         try {
             // Chain up the constructor.
-            Application.call(this, process.cwd(), null);
-            this.build(type, extraArgs, callback);
+            Application.call(app, process.cwd(), null);
+            app.build(type, extraArgs, callback);
         } catch (e) {
             output.error("Failed to initialize");
             output.error("Ensure to invoke 'crosswalk-app-tools' from a toplevel project directory");
@@ -398,15 +402,15 @@ function(callback) {
         break;
 
     case "platforms":
-        this.listPlatforms(output);
+        app.listPlatforms(output);
         break;
 
     case "help":
-        this.printHelp(parser, output);
+        app.printHelp(parser, output);
         break;
 
     case "version":
-        this.printVersion(output);
+        app.printVersion(output);
         break;
 
     default:

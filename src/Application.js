@@ -2,6 +2,7 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var OS = require("os");
 var Path = require('path');
 
 var ShellJS = require("shelljs");
@@ -104,7 +105,7 @@ function initMembers(basePath) {
 
     this._appPath = this._rootPath + Path.sep + "app";
 
-    this._logPath = this._rootPath + Path.sep + "log";
+    this._logPath = Path.join(OS.tmpdir(), "crosswalk-app-tools-" + this._packageId);
 
     this._pkgPath = this._rootPath + Path.sep + "pkg";
 
