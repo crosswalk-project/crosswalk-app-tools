@@ -4,6 +4,7 @@
 
 var FS = require("fs");
 
+var CommandParser = require("./CommandParser");
 var IllegalAccessException = require("./util/exceptions").IllegalAccessException;
 
 /**
@@ -85,6 +86,14 @@ function Manifest(output, path) {
     if (json.start_url &&
         typeof json.start_url === "string") {
         this._startUrl = json.start_url;
+    }
+
+    // Package ID
+    if (json.crosswalk_package_id &&
+        CommandParser.validatePackageId(json.crosswalk_package_id, this._output)) {
+        this._packageId = json.crosswalk_package_id;
+    } else {
+        throw new Error("manifest.json: Invalid package ID '" + json.crosswalk_package_id + "'");
     }
 
     // Target platforms
@@ -189,14 +198,19 @@ function(path, packageId) {
                           digits.substring(20, 32);
 
     var buffer = JSON.stringify({
+        // Standard fields
         "name": packageId,
         "short_name": packageId.split(".").pop(),
         "display": "standalone",
         "start_url": "index.html",
+        // Crosswalk fields
         "crosswalk_app_version": "1",
+        "crosswalk_package_id": packageId,
         "crosswalk_target_platforms": platformInfo.platformId,
+        // Android fields
         "crosswalk_android_animatable_view": false,
         "crosswalk_android_keep_screen_on": false,
+        // Windows fields
         "crosswalk_windows_update_id": windowsUpdateId,
         "crosswalk_windows_vendor": "(Vendor)"  // optional, placeholder
     });
@@ -317,6 +331,18 @@ Object.defineProperty(Manifest.prototype, "display", {
 Object.defineProperty(Manifest.prototype, "startUrl", {
                       get: function() {
                                 return this._startUrl;
+                           }
+                      });
+
+/**
+ * Package ID
+ * @member {String} packageId
+ * @instance
+ * @memberOf Manifest
+ */
+Object.defineProperty(Manifest.prototype, "packageId", {
+                      get: function() {
+                                return this._packageId;
                            }
                       });
 

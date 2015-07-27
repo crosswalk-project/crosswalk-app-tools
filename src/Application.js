@@ -33,19 +33,19 @@ function Application(cwd, packageId) {
         throw new InvalidPathException("Path not absolute: " + cwd);
     }
     if (!ShellJS.test("-d", cwd)) {
-        throw new InvalidPathException("Path does not exist: " + cwd);        
+        throw new InvalidPathException("Path does not exist: " + cwd);
     }
-    
+
     // PackageId is only passed when a new project is created.
     if (packageId) {
 
         this._packageId = CommandParser.validatePackageId(packageId, this.output);
 
-        initMembers.call(this, cwd);
+        initMembers.call(this, Path.join(cwd, this._packageId));
 
         // Check that dir not already exists
         if (ShellJS.test("-d", this._rootPath)) {
-            throw new InvalidPathException("Failed to create project, path already exists: " + this._rootPath);        
+            throw new InvalidPathException("Failed to create project, path already exists: " + this._rootPath);
         }
 
         // Initialise project skeleton
@@ -59,32 +59,32 @@ function Application(cwd, packageId) {
         Manifest.create(Path.join(this._appPath, "manifest.json"), packageId);
 
     } else {
-        
-        // Get packageId from current directory
-        var basename = Path.basename(cwd);
-        this._packageId = CommandParser.validatePackageId(basename, this.output);
+
+        // Get packageId from manifest
+        var manifest = new Manifest(this._output, Path.join(cwd, "app", "manifest.json"));
+        this._packageId = manifest.packageId;
         if (!this._packageId) {
-            throw new InvalidPathException("Path does not seem to be a project toplevel: " + cwd);                    
+            throw new InvalidPathException("Path does not seem to be a project toplevel: " + cwd);
         }
 
-        initMembers.call(this, Path.dirname(cwd));
+        initMembers.call(this, cwd);
     }
 
     // Check all paths exist.
     if (!ShellJS.test("-d", this._rootPath)) {
-        throw new InvalidPathException("Failed to load, invalid path: " + this._rootPath);        
+        throw new InvalidPathException("Failed to load, invalid path: " + this._rootPath);
     }
     if (!ShellJS.test("-d", this._appPath)) {
-        throw new InvalidPathException("Failed to load, invalid path: " + this._appPath);        
+        throw new InvalidPathException("Failed to load, invalid path: " + this._appPath);
     }
     if (!ShellJS.test("-d", this._logPath)) {
-        throw new InvalidPathException("Failed to load, invalid path: " + this._logPath);        
+        throw new InvalidPathException("Failed to load, invalid path: " + this._logPath);
     }
     if (!ShellJS.test("-d", this._pkgPath)) {
-        throw new InvalidPathException("Failed to load, invalid path: " + this._pkgPath);        
+        throw new InvalidPathException("Failed to load, invalid path: " + this._pkgPath);
     }
     if (!ShellJS.test("-d", this._prjPath)) {
-        throw new InvalidPathException("Failed to load, invalid path: " + this._prjPath);        
+        throw new InvalidPathException("Failed to load, invalid path: " + this._prjPath);
     }
 
     // Set up logging, always start a new file for each time the app is run.
@@ -99,9 +99,9 @@ function Application(cwd, packageId) {
     this._manifest = new Manifest(this._output, Path.join(this._appPath, "manifest.json"));
 }
 
-function initMembers(basePath) {
+function initMembers(rootPath) {
 
-    this._rootPath = basePath + Path.sep + this._packageId;        
+    this._rootPath = rootPath;
 
     this._appPath = this._rootPath + Path.sep + "app";
 
@@ -231,21 +231,21 @@ Object.defineProperty(Application.prototype, "platformLogfileOutput", {
                                 return this._platformLogfileOutput;
                            },
                       set: function(platformLogfileOutput) {
-                        
+
                                 if (platformLogfileOutput instanceof LogfileOutput) {
 
                                     // Route output to platform logfile.
                                     this._platformLogfileOutput = platformLogfileOutput;
                                     this.output.logfileOutput = platformLogfileOutput;
-                                
+
                                 } else if (platformLogfileOutput === null) {
-                                
+
                                     // Reset output to common logfile.
                                     this._platformLogfileOutput = null;
                                     this.output.logfileOutput = this._logfileOutput;
-                                
+
                                 } else {
-                                    
+
                                     throw new IllegalAccessException("Attempting invalid write to property Application.platformLogfileOutput");
                                 }
                            }

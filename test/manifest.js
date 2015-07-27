@@ -169,6 +169,29 @@ exports.tests = {
         test.done();
     },
 
+    packageId: function(test) {
+
+        test.expect(2);
+
+        var path = produceManifest({"crosswalk_package_id": "com.example.foo"});
+
+        // read
+        var manifest = consumeManifest(path);
+        test.equal(manifest.packageId, "com.example.foo");
+
+        // bad case
+        path = produceManifest({"crosswalk_package_id": "foo"});
+        try {
+            manifest = new Manifest(_output, path);
+        } catch (error) {
+            ShellJS.rm("-rf", path);
+            // Just make sure we pass by here.
+            test.equal(true, true);
+        }
+
+        test.done();
+    },
+
     targetPlatforms: function(test) {
 
         test.expect(2);
