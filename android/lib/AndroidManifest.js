@@ -20,8 +20,14 @@ function AndroidManifest(output, path) {
     this._versionCode = doc.documentElement.getAttribute("android:versionCode");
     this._versionName = doc.documentElement.getAttribute("android:versionName");
 
-    this._applicationLabel = null;
+    this._applicationIcon = null;
     var node = this.findApplicationNode(doc);
+    if (node) {
+        this._applicationIcon = node.getAttribute("android:icon");
+    }
+
+    this._applicationLabel = null;
+    node = this.findApplicationNode(doc);
     if (node) {
         this._applicationLabel = node.getAttribute("android:label");
     }
@@ -62,6 +68,31 @@ Object.defineProperty(AndroidManifest.prototype, "versionName", {
                                 var doc = this.read();
                                 doc.documentElement.setAttribute("android:versionName", versionName);
                                 this.write(doc);
+                           }
+                      });
+
+/**
+ * Application icon
+ * @member {String} applicationIcon Value for <application android:icon= in the android manifest
+ * @instance
+ * @memberOf AndroidManifest
+ */
+Object.defineProperty(AndroidManifest.prototype, "applicationIcon", {
+                      get: function() {
+                                return this._applicationIcon;
+                           },
+                      set: function(applicationIcon) {
+                                // Look up <application> node
+                                var doc = this.read();
+                                var node = this.findApplicationNode(doc);
+                                // Test and set
+                                if (node) {
+                                    this._applicationIcon = applicationIcon;
+                                    node.setAttribute("android:icon", applicationIcon);
+                                    this.write(doc);
+                                } else {
+                                    this._output.warning("Did not find <application> element in AndroidManifest.xml");
+                                }
                            }
                       });
 

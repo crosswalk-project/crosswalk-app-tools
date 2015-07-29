@@ -601,10 +601,6 @@ function(abi) {
     output.info("Using android:versionCode '" + versionCode + "'");
     manifest.versionCode = versionCode;
 
-    // TODO HACK this should be done only once per build
-    manifest.versionName = this.application.manifest.appVersion;
-    manifest.applicationLabel = this.application.manifest.name;
-
     return true;
 };
 
@@ -701,6 +697,79 @@ function(closure) {
 };
 
 /**
+ * Update icons from the manifest.
+ */
+AndroidPlatform.prototype.updateManifest =
+function() {
+
+    var output = this.application.output;
+
+    var manifest = new AndroidManifest(output,
+                                       Path.join(this.platformPath, "AndroidManifest.xml"));
+
+    manifest.versionName = this.application.manifest.appVersion;
+    manifest.applicationLabel = this.application.manifest.name;
+
+    // Update icons
+    var sizes = {
+        "ldpi": 35,
+        "mdpi": 71,
+        "hdpi": 95,
+        "xhdpi": 119,
+        "xxhdpi": 143,
+        "xxxhdpi": 167,
+        match: function(size) {
+
+            // Default to "hdpi", android will scale.
+            if (size === "any")
+                return "hdpi";
+
+            // Match size as per categories above.
+            for (var prop in this) {
+                if (this[prop] >= size) {
+                    return prop;
+                }
+            }
+            return "xxxhdpi";
+        }
+    };
+
+    var iconFilename = "crosswalk_icon";
+
+    // Add icons from manifest
+    var icons = this.application.manifest.icons;
+    if (icons && icons.length > 0) {
+
+        // Remove existing icons, so we don't have stale ones around
+        // FIXME check that no icon was added manually.
+        ShellJS.rm("-rf", Path.join(this.platformPath, "res", "mipmap-*"));
+
+        for (var i = 0; i < icons.length; i++) {
+
+            var icon = icons[i];
+            var size = icon.sizes ? +icon.sizes.split("x")[0] : "any";
+            var density = sizes.match(size);
+
+            // Copy icon into place
+            // Icon will always be named crosswalk-icon.<ext>
+            // Because android:icon has no way to refer to different sizes.
+            var src = Path.join(this.appPath, icon.src);
+            var dstPath = Path.join(this.platformPath, "res", "mipmap-" + density);
+            var dst = Path.join(dstPath, iconFilename + Path.extname(icon.src));
+            ShellJS.mkdir(dstPath);
+            ShellJS.cp(src, dst);
+        }
+
+        manifest.applicationIcon = "@mipmap/" + iconFilename;
+
+    } else {
+        output.warning("No icons found in manifest.json");
+        // Fall back to the default icon
+        manifest.applicationIcon = "@drawable/crosswalk";
+    }
+};
+
+/**
  * Update java activity file for build config.
  * @param {Boolean} release True if release build, false if debug
  * @returns {Boolean} True if successful, otherwise false.
@@ -711,6 +780,7 @@ function(release) {
     var output = this.application.output;
     var ret = true;
 
+    // Update java
     var config = release ? "release" : "debug";
     output.info("Updating java activity for '" + config + "' configuration");
 
@@ -758,6 +828,7 @@ function(configId, args, callback) {
     process.chdir(this.platformPath);
 
     this.updateJavaActivity(configId === "release");
+    this.updateManifest();
 
     var closure = {
         abis: ["armeabi-v7a", "x86"], // TODO export option

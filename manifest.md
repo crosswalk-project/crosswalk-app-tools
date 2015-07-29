@@ -1,13 +1,25 @@
 Manifest.json fields
 ====================
 
+## Standard fields
+
+(In alphabetical order.)
+
+* Field `display`: http://www.w3.org/TR/appmanifest/#display-member
+
+* Field `icons`: http://www.w3.org/TR/appmanifest/#icons-member
+
+Basic implementation only.
+
 * Field `name`: http://www.w3.org/TR/appmanifest/#name-member
 
 * Field `short_name`: http://www.w3.org/TR/appmanifest/#short_name-member
 
-* Field `display`: http://www.w3.org/TR/appmanifest/#display-member
-
 * Field `start_url`: http://www.w3.org/TR/appmanifest/#start_url-member
+
+## Extension fields
+
+(In alphabetical order.)
 
 * Extension field `crosswalk_app_version`: Version number, between 1 and 99.99.999
 

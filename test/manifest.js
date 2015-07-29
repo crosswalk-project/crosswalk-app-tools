@@ -140,13 +140,36 @@ exports.tests = {
 
         // Test reading "fullscreen"
         path = produceManifest({"display": "fullscreen"});
-        manifest = new Manifest(_output, path);
+        manifest = consumeManifest(path);
         test.equal(manifest.display, "fullscreen");
 
         // Test reading bogus value "foo", default to "standalone"
         path = produceManifest({"display": "foo"});
-        manifest = new Manifest(_output, path);
+        manifest = consumeManifest(path);
         test.equal(manifest.display, "standalone");
+
+        test.done();
+    },
+
+    icons: function(test) {
+
+        test.expect(3);
+
+        // Default to empty
+        var path = produceManifest();
+        var manifest = consumeManifest(path);
+        // Default icon, so length 1
+        test.equal(manifest.icons.length, 1);
+
+        // Test reading "fullscreen"
+        var icon = {
+            src: "icon.png",
+            sizes: "32x32"
+        };
+        path = produceManifest({"icons": [ icon ]});
+        manifest = consumeManifest(path);
+        test.equal(manifest.icons[0].src, "icon.png");
+        test.equal(manifest.icons[0].sizes, "32x32");
 
         test.done();
     },
@@ -158,12 +181,12 @@ exports.tests = {
         var path = produceManifest();
 
         // read default
-        var manifest = new Manifest(_output, path);
+        var manifest = consumeManifest(path);
         test.equal(manifest.startUrl, "index.html");
 
         // Test reading "start.html"
         path = produceManifest({"start_url": "start.html"});
-        manifest = new Manifest(_output, path);
+        manifest = consumeManifest(path);
         test.equal(manifest.startUrl, "start.html");
 
         test.done();
@@ -223,7 +246,7 @@ exports.tests = {
 
         // Test reading "true"
         path = produceManifest({"crosswalk_android_animatable_view": true});
-        manifest = new Manifest(_output, path);
+        manifest = consumeManifest(path);
         test.equal(manifest.androidAnimatableView, true);
 
         test.done();
@@ -240,7 +263,7 @@ exports.tests = {
 
         // Test reading "true"
         path = produceManifest({"crosswalk_android_keep_screen_on": true});
-        manifest = new Manifest(_output, path);
+        manifest = consumeManifest(path);
         test.equal(manifest.androidKeepScreenOn, true);
 
         test.done();

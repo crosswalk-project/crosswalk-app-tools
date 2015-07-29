@@ -88,6 +88,13 @@ function Manifest(output, path) {
         this._startUrl = json.start_url;
     }
 
+    // Icons
+    this._icons = [];
+    if (json.icons) {
+        // TODO validate
+        this._icons = json.icons;
+    }
+
     // Package ID
     if (json.crosswalk_package_id &&
         CommandParser.validatePackageId(json.crosswalk_package_id, this._output)) {
@@ -182,6 +189,12 @@ function(path, packageId) {
     var mgr = new PlatformsManager(require("./TerminalOutput").getInstance());
     var platformInfo = mgr.loadDefault();
 
+    // Default icon
+    var icon = {
+        src: "icon.png",
+        sizes: "72x72"
+    };
+
     // Create windows update id
     // Format is: 12345678-1234-1234-1234-111111111111
     // So we create 32+ random digits, then insert dashes.
@@ -202,6 +215,7 @@ function(path, packageId) {
         "name": packageId,
         "short_name": packageId.split(".").pop(),
         "display": "standalone",
+        "icons": [ icon ],
         "start_url": "index.html",
         // Crosswalk fields
         "crosswalk_app_version": "1",
@@ -318,6 +332,19 @@ Object.defineProperty(Manifest.prototype, "shortName", {
 Object.defineProperty(Manifest.prototype, "display", {
                       get: function() {
                                 return this._display;
+                           }
+                      });
+
+/**
+ * Icons
+ * @member {String} icons
+ * @instance
+ * @memberOf Manifest
+ * @see https://w3c.github.io/manifest/#icons-member
+ */
+Object.defineProperty(Manifest.prototype, "icons", {
+                      get: function() {
+                                return this._icons;
                            }
                       });
 
