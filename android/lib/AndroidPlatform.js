@@ -700,24 +700,32 @@ function(closure) {
  * Update icons from the manifest.
  */
 AndroidPlatform.prototype.updateManifest =
-function() {
+function(callback) {
 
     var output = this.application.output;
 
     var manifest = new AndroidManifest(output,
                                        Path.join(this.platformPath, "AndroidManifest.xml"));
 
+    // Renaming package is not supported.
+    if (manifest.package !== this.application.manifest.packageId) {
+        callback("Renaming of package not supported (" +
+                 manifest.package + "/" + this.application.manifest.packageId + ")");
+        return;
+    }
+
     manifest.versionName = this.application.manifest.appVersion;
     manifest.applicationLabel = this.application.manifest.name;
 
     // Update icons
+    // See http://iconhandbook.co.uk/reference/chart/android/
     var sizes = {
-        "ldpi": 35,
+        "ldpi": 47,
         "mdpi": 71,
         "hdpi": 95,
-        "xhdpi": 119,
-        "xxhdpi": 143,
-        "xxxhdpi": 167,
+        "xhdpi": 143,
+        "xxhdpi": 191,
+        "xxxhdpi": 511, // whatever, this is default for even bigger icons.
         match: function(size) {
 
             // Default to "hdpi", android will scale.
@@ -827,8 +835,8 @@ function(configId, args, callback) {
     // TODO should we cd back afterwards?
     process.chdir(this.platformPath);
 
+    this.updateManifest(callback);
     this.updateJavaActivity(configId === "release");
-    this.updateManifest();
 
     var closure = {
         abis: ["armeabi-v7a", "x86"], // TODO export option

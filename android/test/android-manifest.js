@@ -51,6 +51,20 @@ function createManifest() {
 
 exports.tests = {
 
+    package: function(test) {
+
+        test.expect(1);
+
+        var manifest;
+        var path = createManifest();
+        manifest = new AndroidManifest(_output, path);
+        test.equal(manifest.package, "com.example.foo");
+
+        ShellJS.rm("-f", path);
+
+        test.done();
+    },
+
     versionCode: function(test) {
 
         test.expect(1);

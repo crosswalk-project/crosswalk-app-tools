@@ -17,6 +17,7 @@ function AndroidManifest(output, path) {
     this._path = path;
 
     var doc = this.read();
+    this._package = doc.documentElement.getAttribute("package");
     this._versionCode = doc.documentElement.getAttribute("android:versionCode");
     this._versionName = doc.documentElement.getAttribute("android:versionName");
 
@@ -32,6 +33,18 @@ function AndroidManifest(output, path) {
         this._applicationLabel = node.getAttribute("android:label");
     }
 }
+
+/**
+ * Android package name
+ * @member {String} package
+ * @instance
+ * @memberOf AndroidManifest
+ */
+Object.defineProperty(AndroidManifest.prototype, "package", {
+                      get: function() {
+                                return this._package;
+                           },
+                      });
 
 /**
  * Application version a.b.c where a,b < 100, c < 1000

@@ -41,19 +41,13 @@ function Application(cwd, packageId) {
 
         this._packageId = CommandParser.validatePackageId(packageId, this.output);
 
-        initMembers.call(this, Path.join(cwd, this._packageId));
-
-        // Check that dir not already exists
-        if (ShellJS.test("-d", this._rootPath)) {
-            throw new InvalidPathException("Failed to create project, path already exists: " + this._rootPath);
+        // Check that project dir not already exists
+        var rootPath = Path.join(cwd, this._packageId);
+        if (ShellJS.test("-d", rootPath)) {
+            throw new InvalidPathException("Failed to create project, path already exists: " + rootPath);
         }
 
-        // Initialise project skeleton
-        ShellJS.mkdir(this._rootPath);
-        ShellJS.mkdir(this._appPath);
-        ShellJS.mkdir(this._logPath);
-        ShellJS.mkdir(this._pkgPath);
-        ShellJS.mkdir(this._prjPath);
+        initMembers.call(this, rootPath);
 
         // Create Manifest
         Manifest.create(Path.join(this._appPath, "manifest.json"), packageId);
@@ -102,15 +96,19 @@ function Application(cwd, packageId) {
 function initMembers(rootPath) {
 
     this._rootPath = rootPath;
+    ShellJS.mkdir(this._rootPath);
 
     this._appPath = this._rootPath + Path.sep + "app";
+    ShellJS.mkdir(this._appPath);
 
     this._logPath = Path.join(OS.tmpdir(), "crosswalk-app-tools-" + this._packageId);
+    ShellJS.mkdir(this._logPath);
 
     // Packages end up in working dir
     this._pkgPath = process.cwd();
 
     this._prjPath = this._rootPath + Path.sep + "prj";
+    ShellJS.mkdir(this._prjPath);
 }
 
 /**
