@@ -32,28 +32,32 @@ sudo npm install -g crosswalk-app-tools
 ### Usage
 
 ```
-Crosswalk Application Project and Packaging Tool
+Crosswalk Project Application Packaging Tool
 
-    crosswalk-app create <package-id>		    Create project <package-id>
+    crosswalk-app create <package-id>           Create project <package-id>
+                  --platforms=<target>          Optional, e.g. "windows"
 
-    crosswalk-app build [release|debug]		    Build project to create packages
-                                       		    Defaults to debug when not given
+    crosswalk-app build [release|debug] [<dir>] Build project to create packages
+                                                Defaults to "debug" when not given
+                                                Tries to build in current dir by default
 
     crosswalk-app update <channel>|<version>    Update Crosswalk to latest in named
                                                 channel, or specific version
 
-    crosswalk-app help				            Display usage information
+    crosswalk-app platforms                     List available target platforms
 
-    crosswalk-app version			            Display version information
+    crosswalk-app help                          Display usage information
+
+    crosswalk-app version                       Display version information
 
 Options for platform 'android'
 
     For command 'create'
-        --android-crosswalk    			        Channel name (stable/beta/canary)
-						                        or version number (w.x.y.z)
-Environment Variables
+        --android-crosswalk    	                Channel name (stable/beta/canary)
+                                                or version number (w.x.y.z)
+Environment variables for platform 'android'
 
-    CROSSWALK_APP_TOOLS_CACHE_DIR		        Keep downloaded files in this dir
+    CROSSWALK_APP_TOOLS_CACHE_DIR               Keep downloaded files in this dir
 ```
 #### Example: Create App
 `crosswalk-app create com.example.foo`: This sets up a skeleton project in directory com.example.foo/, downloads and imports Crosswalk, and puts a sample "hello world" web app under com.example.foo/app/.
