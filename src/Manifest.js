@@ -22,11 +22,11 @@ function Manifest(output, path) {
 
     // App version is [major.][minor.]micro
     // Major and minor need to be < 100, micro < 1000
-    if (json.crosswalk_app_version &&
-        json.crosswalk_app_version.match("^([0-9]+\.){0,2}[0-9]+$")) {
+    if (json.xwalk_app_version &&
+        json.xwalk_app_version.match("^([0-9]+\.){0,2}[0-9]+$")) {
 
         var valid = true;
-        var numbers = json.crosswalk_app_version.split(".");
+        var numbers = json.xwalk_app_version.split(".");
         for (var i = 0; i < numbers.length; i++) {
             if (i == numbers.length - 1 &&
                 numbers[i] >= 1000) {
@@ -44,12 +44,12 @@ function Manifest(output, path) {
         }
 
         if (valid) {
-            this._appVersion = json.crosswalk_app_version;
+            this._appVersion = json.xwalk_app_version;
         }
     }
 
     if (!this._appVersion) {
-        output.error("Invalid app version '" + json.crosswalk_app_version + "' in the manifest");
+        output.error("Invalid app version '" + json.xwalk_app_version + "' in the manifest");
         // TODO maybe exception
     }
 
@@ -96,44 +96,44 @@ function Manifest(output, path) {
     }
 
     // Package ID
-    if (json.crosswalk_package_id &&
-        CommandParser.validatePackageId(json.crosswalk_package_id, this._output)) {
-        this._packageId = json.crosswalk_package_id;
+    if (json.xwalk_package_id &&
+        CommandParser.validatePackageId(json.xwalk_package_id, this._output)) {
+        this._packageId = json.xwalk_package_id;
     } else {
-        throw new Error("manifest.json: Invalid package ID '" + json.crosswalk_package_id + "'");
+        throw new Error("manifest.json: Invalid package ID '" + json.xwalk_package_id + "'");
     }
 
     // Target platforms
-    if (json.crosswalk_target_platforms &&
-        typeof json.crosswalk_target_platforms === "string") {
-        this._targetPlatforms = json.crosswalk_target_platforms;
+    if (json.xwalk_target_platforms &&
+        typeof json.xwalk_target_platforms === "string") {
+        this._targetPlatforms = json.xwalk_target_platforms;
     }
 
     if (!this._targetPlatforms) {
         output.error("Missing or invalid target platforms in the manifest");
         output.error("Try adding");
-        output.error('    "crosswalk_target_platforms": "android"');
+        output.error('    "xwalk_target_platforms": "android"');
         output.error("or similar for platform of choice.");
     }
 
     // Android animatable view
     this._androidAnimatableView = false;
-    if (json.crosswalk_android_animatable_view) {
+    if (json.xwalk_android_animatable_view) {
 
         // Recognise boolean or string true.
-        if (typeof json.crosswalk_android_animatable_view === "boolean" ||
-        json.crosswalk_android_animatable_view === "true") {
+        if (typeof json.xwalk_android_animatable_view === "boolean" ||
+        json.xwalk_android_animatable_view === "true") {
             this._androidAnimatableView = true;
         }
     }
 
     // Android "keep screen on"
     this._androidKeepScreenOn = false;
-    if (json.crosswalk_android_keep_screen_on) {
+    if (json.xwalk_android_keep_screen_on) {
 
         // Recognise boolean or string true.
-        if (typeof json.crosswalk_android_keep_screen_on === "boolean" ||
-        json.crosswalk_android_keep_screen_on === "true") {
+        if (typeof json.xwalk_android_keep_screen_on === "boolean" ||
+        json.xwalk_android_keep_screen_on === "true") {
             this._androidKeepScreenOn = true;
         }
     }
@@ -141,9 +141,9 @@ function Manifest(output, path) {
     // Windows update ID
     // Optional field, only check if present.
     this._windowsUpdateId = null;
-    if (json.crosswalk_windows_update_id) {
+    if (json.xwalk_windows_update_id) {
 
-        var parts = json.crosswalk_windows_update_id.split("-");
+        var parts = json.xwalk_windows_update_id.split("-");
         if (parts.length === 5 &&
             parts[0].length === 8 && parts[0].match("^[0-9]*$") &&
             parts[1].length === 4 && parts[1].match("^[0-9]*$") &&
@@ -151,22 +151,22 @@ function Manifest(output, path) {
             parts[3].length === 4 && parts[3].match("^[0-9]*$") &&
             parts[4].length === 12 && parts[4].match("^[0-9]*$")) {
 
-            this._windowsUpdateId = json.crosswalk_windows_update_id;
+            this._windowsUpdateId = json.xwalk_windows_update_id;
 
         } else {
 
-            output.error("Invalid Windows Update ID + '" + json.crosswalk_windows_update_id + "'");
+            output.error("Invalid Windows Update ID + '" + json.xwalk_windows_update_id + "'");
         }
     }
 
     // Windows vendor field
     // Optional field, only check if present.
     this._windowsVendor = null;
-    if (json.crosswalk_windows_vendor) {
-        if (typeof json.crosswalk_windows_vendor === "string") {
-            this._windowsVendor = json.crosswalk_windows_vendor;
+    if (json.xwalk_windows_vendor) {
+        if (typeof json.xwalk_windows_vendor === "string") {
+            this._windowsVendor = json.xwalk_windows_vendor;
         } else {
-            output.error("Windows target: Invalid vendor field + '" + json.crosswalk_windows_vendor + "'");
+            output.error("Windows target: Invalid vendor field + '" + json.xwalk_windows_vendor + "'");
         }
     }
 }
@@ -218,15 +218,15 @@ function(path, packageId) {
         "icons": [ icon ],
         "start_url": "index.html",
         // Crosswalk fields
-        "crosswalk_app_version": "1",
-        "crosswalk_package_id": packageId,
-        "crosswalk_target_platforms": platformInfo.platformId,
+        "xwalk_app_version": "1",
+        "xwalk_package_id": packageId,
+        "xwalk_target_platforms": platformInfo.platformId,
         // Android fields
-        "crosswalk_android_animatable_view": false,
-        "crosswalk_android_keep_screen_on": false,
+        "xwalk_android_animatable_view": false,
+        "xwalk_android_keep_screen_on": false,
         // Windows fields
-        "crosswalk_windows_update_id": windowsUpdateId,
-        "crosswalk_windows_vendor": "(Vendor)"  // optional, placeholder
+        "xwalk_windows_update_id": windowsUpdateId,
+        "xwalk_windows_vendor": "(Vendor)"  // optional, placeholder
     });
     FS.writeFileSync(path, buffer);
 };
@@ -414,7 +414,7 @@ Object.defineProperty(Manifest.prototype, "targetPlatforms", {
                                 if (typeof targetPlatforms === "string" &&
                                     mgr.load(targetPlatforms)) {
                                     this._targetPlatforms = targetPlatforms;
-                                    this.update({"crosswalk_target_platforms": this._targetPlatforms});
+                                    this.update({"xwalk_target_platforms": this._targetPlatforms});
                                 } else {
                                     var errormsg = "Target platform '" + targetPlatforms + "' not available";
                                     this._output.error(errormsg);
