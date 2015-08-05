@@ -51,39 +51,39 @@ exports.tests = {
         test.expect(9);
 
         version = "2";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(version, consumeManifest(path).appVersion);
 
         version = "2.2";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(version, consumeManifest(path).appVersion);
 
         version = "2.2.2";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(version, consumeManifest(path).appVersion);
 
         version = "2.";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(false, version == consumeManifest(path).appVersion);
 
         version = "2.2.";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(false, version == consumeManifest(path).appVersion);
 
         version = "2.2.2.";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(false, version == consumeManifest(path).appVersion);
 
         version = "3333";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(false, version == consumeManifest(path).appVersion);
 
         version = "333.333";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(false, version == consumeManifest(path).appVersion);
 
         version = "33.333.333";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(false, version == consumeManifest(path).appVersion);
 
         test.done();
@@ -196,14 +196,14 @@ exports.tests = {
 
         test.expect(2);
 
-        var path = produceManifest({"crosswalk_package_id": "com.example.foo"});
+        var path = produceManifest({"xwalk_package_id": "com.example.foo"});
 
         // read
         var manifest = consumeManifest(path);
         test.equal(manifest.packageId, "com.example.foo");
 
         // bad case
-        path = produceManifest({"crosswalk_package_id": "foo"});
+        path = produceManifest({"xwalk_package_id": "foo"});
         try {
             manifest = new Manifest(_output, path);
         } catch (error) {
@@ -219,7 +219,7 @@ exports.tests = {
 
         test.expect(2);
 
-        var path = produceManifest({"crosswalk_target_platforms": "android"});
+        var path = produceManifest({"xwalk_target_platforms": "android"});
 
         // read
         var manifest = new Manifest(_output, path);
@@ -245,7 +245,7 @@ exports.tests = {
         test.equal(manifest.androidAnimatableView, false);
 
         // Test reading "true"
-        path = produceManifest({"crosswalk_android_animatable_view": true});
+        path = produceManifest({"xwalk_android_animatable_view": true});
         manifest = consumeManifest(path);
         test.equal(manifest.androidAnimatableView, true);
 
@@ -262,7 +262,7 @@ exports.tests = {
         test.equal(manifest.androidKeepScreenOn, false);
 
         // Test reading "true"
-        path = produceManifest({"crosswalk_android_keep_screen_on": true});
+        path = produceManifest({"xwalk_android_keep_screen_on": true});
         manifest = consumeManifest(path);
         test.equal(manifest.androidKeepScreenOn, true);
 
