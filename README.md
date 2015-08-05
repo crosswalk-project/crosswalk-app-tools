@@ -9,7 +9,7 @@ Crosswalk-app-tools is our forthcoming packaging tool for creating Crosswalk app
 
 ### Installation
 
-Crosswalk-app-tools is cross-platform by virtue of being based on Node.js. However at this point most testing is done on Linux, so we expect the least number of hickups there. In any case we have seen reports of successful runs on Apple OS X, and are looking forward to hearing about adventurous individuals giving it a spin on Microsoft Windows as well. (But be warned that there are known problems with proxy support on Windows, for starters)
+Crosswalk-app-tools is cross-platform by virtue of being based on Node.js. We are supporting Microsoft Windows, Apple OS X and Linux (testing is mostly done on Fedora and Ubuntu distributions).
 
 The following components are required
   1. Android SDK with 5.0 (target-21) installed
