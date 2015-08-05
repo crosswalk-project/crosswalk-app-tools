@@ -4,6 +4,8 @@
 
 var FS = require("fs");
 
+var FormatJson = require("format-json");
+
 var CommandParser = require("./CommandParser");
 var IllegalAccessException = require("./util/exceptions").IllegalAccessException;
 
@@ -210,7 +212,7 @@ function(path, packageId) {
                           digits.substring(16, 20) + "-" +
                           digits.substring(20, 32);
 
-    var buffer = JSON.stringify({
+    var buffer = FormatJson.plain({
         // Standard fields
         "name": packageId,
         "short_name": packageId.split(".").pop(),
@@ -258,7 +260,7 @@ function(data) {
     }
 
     // Write back
-    buffer = JSON.stringify(json);
+    buffer = FormatJson.plain(json);
     FS.writeFileSync(this._path, buffer);
 
     return true;
