@@ -21,16 +21,16 @@ Basic implementation only.
 
 (In alphabetical order.)
 
-* Extension field `crosswalk_app_version`: Version number, between 1 and 99.99.999
+* Extension field `xwalk_app_version`: Version number, between 1 and 99.99.999
 
-* Extension field `crosswalk_package_id`: Unique package identifier, e.g. `com.example.foo`.
+* Extension field `xwalk_package_id`: Unique package identifier, e.g. `com.example.foo`.
 
-* Extension field `crosswalk_target_platforms`: Target platform, e.g. `android`. At the moment only a single value is supported.
+* Extension field `xwalk_target_platforms`: Target platform, e.g. `android`. At the moment only a single value is supported.
 
-* Extension field `crosswalk_android_animatable_view`: Whether to allow zooming the browser view (`true`/`false`).
+* Extension field `xwalk_android_animatable_view`: Whether to allow zooming the browser view (`true`/`false`).
 
-* Extension field `crosswalk_android_keep_screen_on`: Whether to keep the screen on while the app is in front (`true`/`false`).
+* Extension field `xwalk_android_keep_screen_on`: Whether to keep the screen on while the app is in front (`true`/`false`).
 
-* Extension field `crosswalk_windows_update_id`: Automatically generated identifier for native windows support (work in progress).
+* Extension field `xwalk_windows_update_id`: Automatically generated identifier for native windows support (work in progress).
 
-* Extension field `crosswalk_windows_vendor`: Vendor string for native windows support (work in progress).
+* Extension field `xwalk_windows_vendor`: Vendor string for native windows support (work in progress).
