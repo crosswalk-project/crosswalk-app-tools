@@ -10,6 +10,7 @@ var xmldom = require("xmldom");
  * Wrapper for theme.xml.
  * @param {OutputIface} output Output implementation
  * @param {String} path Path to manifest.json
+ * @constructor
  */
 function XmlTheme(output, path) {
 

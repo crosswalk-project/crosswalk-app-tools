@@ -11,6 +11,7 @@ var ShellJS = require("shelljs");
  * JavaActivity wrapper.
  * @param {OutputIface} output Output implementation
  * @param {String} path Path to android app's main java activity file
+ * @constructor
  */
 function JavaActivity(output, path) {
 

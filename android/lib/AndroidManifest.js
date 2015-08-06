@@ -10,6 +10,7 @@ var xmldom = require("xmldom");
  * AndroidManifest wrapper.
  * @param {OutputIface} output Output implementation
  * @param {String} path Path to manifest.json
+ * @constructor
  */
 function AndroidManifest(output, path) {
 

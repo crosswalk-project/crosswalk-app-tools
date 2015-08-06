@@ -13,6 +13,7 @@ var IllegalAccessException = require("./util/exceptions").IllegalAccessException
  * Manifest wrapper.
  * @param {OutputIface} output Output implementation
  * @param {String} path Path to manifest.json
+ * @constructor
  */
 function Manifest(output, path) {
 
