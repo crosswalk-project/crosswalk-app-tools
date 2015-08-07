@@ -697,35 +697,85 @@ function(closure) {
 };
 
 /**
- * Update icons from the manifest.
+ * Apply icon if none yet, or source has higher quality
+ * @param {String} srcPath Icon to apply
+ * @param {String} dstDir Path to destination directory
+ * @param {String} iconFilename Destination icon filename without extension
+ * @param {Function} callback Error callback
+ * @returns {Boolean} True if applied, otherwise false.
  */
-AndroidPlatform.prototype.updateManifest =
-function(callback) {
+AndroidPlatform.prototype.applyIcon =
+function(srcPath, dstDir, iconFilename, callback) {
 
     var output = this.application.output;
 
-    var manifest = new AndroidManifest(output,
-                                       Path.join(this.platformPath, "AndroidManifest.xml"));
+    // Different image types get different priorities.
+    var score = {
+        "png": 3,
+        "jpeg": 2,
+        "jpg": 2,
+        "gif": 1
+    };
 
-    // Renaming package is not supported.
-    if (manifest.package !== this.application.manifest.packageId) {
-        callback("Renaming of package not supported (" +
-                 manifest.package + "/" + this.application.manifest.packageId + ")");
-        return;
+    // extname() includes the ".", so strip it
+    var srcExt = Path.extname(srcPath);
+    if (srcExt && srcExt[0] === ".")
+        srcExt = srcExt.substring(1);
+
+    var srcScore = score[srcExt.toLowerCase()];
+    if (!srcScore) {
+        output.warning("Image type not supported: " + srcPath);
+        return false;
     }
 
-    manifest.versionName = this.application.manifest.appVersion;
-    manifest.applicationLabel = this.application.manifest.name;
+    // Replace existing icon if we have a better one.
+    var curPath = null;
+    var curScore = -1;
+    var ls = ShellJS.ls(Path.join(dstDir, iconFilename + "*"));
+    if (ls.length > 1) {
+        output.warning("Unexpected extra files in " + dstDir);
+    }
+    if (ls.length > 0) {
 
-    // Update icons
+        // extname() includes the ".", so strip it
+        curPath = ls[0];
+        var curExt = Path.extname(curPath);
+        if (curExt && curExt[0] === ".")
+            curExt = curExt.substring(1);
+
+        curScore = +score[curExt.toLowerCase()];
+    }
+
+    if (srcScore >= curScore) {
+        if (curPath) {
+            // We have found a better quality icon
+            ShellJS.rm(curPath);
+        }
+        var dstPath = Path.join(dstDir, iconFilename + Path.extname(srcPath));
+        ShellJS.cp(srcPath, dstPath);
+    }
+
+    return true;
+};
+
+/**
+ * Update launcher icons.
+ * @param {AndroidManifest} androidManifest
+ * @param {Function} callback Error callback
+ */
+AndroidPlatform.prototype.updateIcons =
+function(androidManifest, callback) {
+
+    var output = this.application.output;
+
     // See http://iconhandbook.co.uk/reference/chart/android/
     var sizes = {
-        "ldpi": 47,
-        "mdpi": 71,
-        "hdpi": 95,
-        "xhdpi": 143,
-        "xxhdpi": 191,
-        "xxxhdpi": 511, // whatever, this is default for even bigger icons.
+        "ldpi": 36,
+        "mdpi": 48,
+        "hdpi": 72,
+        "xhdpi": 96,
+        "xxhdpi": 144,
+        "xxxhdpi": 192,
         match: function(size) {
 
             // Default to "hdpi", android will scale.
@@ -734,7 +784,7 @@ function(callback) {
 
             // Match size as per categories above.
             for (var prop in this) {
-                if (this[prop] >= size) {
+                if (this[prop] <= size) {
                     return prop;
                 }
             }
@@ -763,18 +813,44 @@ function(callback) {
             // Because android:icon has no way to refer to different sizes.
             var src = Path.join(this.appPath, icon.src);
             var dstPath = Path.join(this.platformPath, "res", "mipmap-" + density);
-            var dst = Path.join(dstPath, iconFilename + Path.extname(icon.src));
             ShellJS.mkdir(dstPath);
-            ShellJS.cp(src, dst);
+
+            this.applyIcon(src, dstPath, iconFilename, callback);
         }
 
-        manifest.applicationIcon = "@mipmap/" + iconFilename;
+        androidManifest.applicationIcon = "@mipmap/" + iconFilename;
 
     } else {
         output.warning("No icons found in manifest.json");
         // Fall back to the default icon
-        manifest.applicationIcon = "@drawable/crosswalk";
+        androidManifest.applicationIcon = "@drawable/crosswalk";
     }
+};
+
+/**
+ * Update android manifest.
+ * @param {Function} callback Error callback
+ */
+AndroidPlatform.prototype.updateManifest =
+function(callback) {
+
+    var output = this.application.output;
+
+    var manifest = new AndroidManifest(output,
+                                       Path.join(this.platformPath, "AndroidManifest.xml"));
+
+    // Renaming package is not supported.
+    if (manifest.package !== this.application.manifest.packageId) {
+        callback("Renaming of package not supported (" +
+                 manifest.package + "/" + this.application.manifest.packageId + ")");
+        return;
+    }
+
+    manifest.versionName = this.application.manifest.appVersion;
+    manifest.applicationLabel = this.application.manifest.name;
+
+    // Update icons
+    this.updateIcons(manifest, callback);
 };
 
 /**
