@@ -498,13 +498,13 @@ function(abi, release) {
 
     var apkInPattern;
     if (release) {
-        apkInPattern = "*-release-unsigned.apk";
+        apkInPattern = "-release-unsigned.apk";
     } else {
-        apkInPattern = "*-debug.apk";
+        apkInPattern = "-debug.apk";
     }
 
     ShellJS.pushd("bin");
-    var apkInName = ShellJS.ls(apkInPattern)[0];
+    var apkInName = ShellJS.ls("*" + apkInPattern)[0];
     ShellJS.popd();
 
     if (!ShellJS.test("-f", "bin" + Path.sep + apkInName)) {
@@ -512,8 +512,11 @@ function(abi, release) {
         return null;
     }
 
-    var base = apkInName.substring(0, apkInName.length - ".apk".length);
-    var apkOutName = base + "." + abi + ".apk";
+    var base = apkInName.substring(0, apkInName.length - apkInPattern.length);
+    var apkOutName = base + "-" +
+                     this.application.manifest.appVersion + "-" +
+                     (release ? "release-unsigned" : "debug") + "." +
+                     abi + ".apk";
     ShellJS.mv("bin" + Path.sep + apkInName,
                "bin" + Path.sep + apkOutName);
 
