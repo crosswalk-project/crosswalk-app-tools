@@ -341,6 +341,7 @@ function(callback) {
     var output = TerminalOutput.getInstance();
     var parser = new CommandParser(output, process.argv);
     var app = new Main();
+    var rootDir = null;
 
     if (process.argv.length < 3) {
         // No command given, print help and exit without error code.
@@ -375,10 +376,11 @@ function(callback) {
 
     case "update":
         var version = parser.updateGetVersion();
+        rootDir = parser.updateGetDir();
 
         try {
             // Chain up the constructor.
-            Application.call(app, process.cwd(), null);
+            Application.call(app, rootDir, null);
             app.update(version, extraArgs, callback);
         } catch (e) {
             output.error("Failed to initialize");
@@ -389,7 +391,7 @@ function(callback) {
 
     case "build":
         var type = parser.buildGetType();
-        var rootDir = parser.buildGetDir();
+        rootDir = parser.buildGetDir();
 
         try {
             // Chain up the constructor.

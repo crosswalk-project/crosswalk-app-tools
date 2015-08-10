@@ -5,6 +5,7 @@
 var Path = require("path");
 
 var Minimist = require("minimist");
+var ShellJS = require("shelljs");
 
 /**
  * Parsing and validation of command-line arguments.
@@ -41,8 +42,9 @@ function() {
 "                                                Defaults to \"debug\" when not given\n" +
 "                                                Tries to build in current dir by default\n" +
 "\n" +
-"    crosswalk-app update <channel>|<version>    Update Crosswalk to latest in named\n" +
+"    crosswalk-app update [<version>] [<dir>]    Update Crosswalk to latest in named\n" +
 "                                                channel, or specific version\n" +
+"                                                Version is \"stable\" when not given" +
 "\n" +
 "    crosswalk-app platforms                     List available target platforms\n" +
 "\n" +
@@ -66,7 +68,7 @@ function() {
         return packageId !== null ? cmd : null;
     case "update":
         var version = this.updateGetVersion();
-        if (version === false) {
+        if (!version) {
             // Error: version could not be parsed.
             return null;
         }
@@ -138,32 +140,39 @@ function() {
 CommandParser.prototype.updateGetVersion =
 function() {
 
-    var errormsg = "Version must be channel 'stable', 'beta', 'canary', or format ab.cd.ef.gh";
+    // argv is filled like this:
+    // node crosswalk-app update [version] [dir]
+    // So argv[3] is either version or dir.
 
     if (this._argv.length < 4) {
-        return null;
+        return "stable";
     }
 
     var version = this._argv[3];
-
-    // Recognise channel name for version
-    if (["beta", "canary", "stable"].indexOf(version) > -1) {
+    if (CommandParser.validateVersion(version, null)) {
         return version;
     }
 
-    var match = version.match("[0-9\\.]*");
-    if (match[0] != version) {
-        this._output.error(errormsg);
-        return false;
+    return null;
+};
+
+/**
+ * Get dir when command is "update". Defaults to current dir.
+ */
+CommandParser.prototype.updateGetDir =
+function() {
+
+    // argv is filled like this:
+    // node crosswalk-app update [version] [dir]
+    // Dir can only be specified if version is given, though,
+    // no guessing around here.
+
+    if (this._argv.length < 5) {
+        // Dir not given.
+        return process.cwd();
     }
 
-    var parts = version.split('.');
-    if (parts.length != 4) {
-        this._output.error(errormsg);
-        return false;
-    }
-
-    return version;
+    return Path.normalize(Path.join(process.cwd(), this._argv[4]));
 };
 
 /**
@@ -264,6 +273,39 @@ function(packageId, output) {
     }
 
     return packageId;
+};
+
+/**
+ * Validate crosswalk version.
+ * @param {String} version Version string
+ * @param {OutputIface} [output]
+ * @returns {Boolean} true if valid, otherwise false.
+ */
+CommandParser.validateVersion =
+function(version, output) {
+
+    var errormsg = "Version must be channel 'stable', 'beta', 'canary', or format ab.cd.ef.gh";
+
+    // Recognise channel name for version
+    if (["beta", "canary", "stable"].indexOf(version) > -1) {
+        return true;
+    }
+
+    var match = version.match("[0-9\\.]*");
+    if (match[0] != version) {
+        if (output)
+            output.error(errormsg);
+        return false;
+    }
+
+    var parts = version.split('.');
+    if (parts.length != 4) {
+        if (output)
+            output.error(errormsg);
+        return false;
+    }
+
+    return true;
 };
 
 module.exports = CommandParser;
