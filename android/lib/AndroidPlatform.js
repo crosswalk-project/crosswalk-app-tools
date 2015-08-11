@@ -795,6 +795,7 @@ function(androidManifest, callback) {
         }
     };
 
+    var nUpdated = 0;
     var iconFilename = "crosswalk_icon";
 
     // Add icons from manifest
@@ -818,16 +819,22 @@ function(androidManifest, callback) {
             var dstPath = Path.join(this.platformPath, "res", "mipmap-" + density);
             ShellJS.mkdir(dstPath);
 
-            this.applyIcon(src, dstPath, iconFilename, callback);
+            var ret = this.applyIcon(src, dstPath, iconFilename, callback);
+            if (ret)
+                nUpdated++;
         }
+    }
 
+    if (nUpdated > 0) {
         androidManifest.applicationIcon = "@mipmap/" + iconFilename;
-
     } else {
-        output.warning("No icons found in manifest.json");
+        output.warning("No usable icons found in manifest.json");
+        output.warning("Using builtin default icon");
         // Fall back to the default icon
         androidManifest.applicationIcon = "@drawable/crosswalk";
     }
+
+    return nUpdated;
 };
 
 /**
