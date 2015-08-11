@@ -156,6 +156,19 @@ function() {
     return null;
 };
 
+// FIXME require node 0.12 and use Path.isAbsolute
+CommandParser.prototype.isAbsolute =
+function(path) {
+
+    if (Path.sep === "/" &&
+        path[0] === Path.sep) {
+        return true;
+    }
+
+    // Windows
+    return path.match(/^[a-zA-z]:/) !== null;
+};
+
 /**
  * Get dir when command is "update". Defaults to current dir.
  */
@@ -172,7 +185,12 @@ function() {
         return process.cwd();
     }
 
-    return Path.resolve(Path.normalize(Path.join(process.cwd(), this._argv[4])));
+    var path = this._argv[4];
+    if (this.isAbsolute(path)) {
+        return Path.resolve(Path.normalize(path));
+    }
+
+    return Path.resolve(Path.normalize(Path.join(process.cwd(), path)));
 };
 
 /**
