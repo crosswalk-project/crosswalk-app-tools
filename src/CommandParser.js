@@ -172,7 +172,7 @@ function() {
         return process.cwd();
     }
 
-    return Path.normalize(Path.join(process.cwd(), this._argv[4]));
+    return Path.resolve(Path.normalize(Path.join(process.cwd(), this._argv[4])));
 };
 
 /**
