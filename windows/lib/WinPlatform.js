@@ -2,6 +2,8 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var ShellJS = require("shelljs");
+
 /**
  * Interface for project implementations.
  * @constructor
@@ -48,8 +50,24 @@ WinPlatform.getArgs = function() {
 WinPlatform.prototype.create =
 function(packageId, args, callback) {
 
-    // TODO implement generation of project.
-    this.output.write("WinPlatform: Generating " + this.packageId + "\n");
+    // Namespace util
+    var util = this.application.util;
+
+    var crosswalkPath = args.crosswalk;
+    if (!crosswalkPath) {
+        callback("Use --windows-crosswalk=<path> to pass crosswalk zip");
+        return;
+    } else if (!ShellJS.test("-f", crosswalkPath)) {
+        callback("Crosswalk zip could not be found: " + crosswalkPath);
+        return;
+    }
+
+    var zip = new util.CrosswalkZip(crosswalkPath);
+    zip.extractEntryTo(zip.root, this.platformPath);
+    if (!ShellJS.test("-d", this.platformPath)) {
+        callback("Failed to extract crosswalk zip");
+        return;
+    }
 
     // Null means success, error string means failure.
     callback(null);
