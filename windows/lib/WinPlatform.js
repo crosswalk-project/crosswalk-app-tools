@@ -4,6 +4,8 @@
 
 var ShellJS = require("shelljs");
 
+var WixSDK = require("./WixSDK");
+
 /**
  * Interface for project implementations.
  * @constructor
@@ -81,7 +83,7 @@ function(versionSpec, args, callback) {
 
     // TODO implement updating of project to new Crosswalk version.
     // This function is not supported yet.
-    this.output.log("WinPlatform: Updating project\n");
+    this.output.log("WinPlatform: TODO Updating project\n");
 
     // Null means success, error string means failure.
     callback(null);
@@ -92,7 +94,7 @@ function(callback) {
 
     // TODO implement updating of project to new Crosswalk version.
     // Maybe this function will be not needed, and removed in the future.
-    this.output.log("WinPlatform: Refreshing project\n");
+    this.output.log("WinPlatform: TODO Refreshing project\n");
 
     // Null means success, error string means failure.
     callback(null);
@@ -104,9 +106,28 @@ function(callback) {
 WinPlatform.prototype.build =
 function(configId, args, callback) {
 
-    // TODO implement updating of project to new Crosswalk version.
-    this.output.log("WinPlatform: Building project\n");
+    var sdk = new WixSDK();
+/*
+const kAppSourceDir = './app';  // Path to the application root directory having 'manifest.json'.
+const kCrosswalkDir = './crosswalk-windows-14.43.343.0';  // Path to the directory with Crosswalk binaries.
+const kProductIcon = './crosswalk.ico';   // Icon for shortcut and for program list in Control Panel.
+const kAppName = 'Hello_app';
+const kCompanyName = 'Hello_company';
+const kProductName = 'Hello_product';
+const kProductVersion = '0.0.0.1';
+const kUpgradeCode = '12345678-1234-1234-1234-111111111111';  // Has to be the same for all product versions.
+const kIs64Bit = true;
 
+GenerateMSI(kAppSourceDir, kCrosswalkDir, {
+    app_name: kAppName,
+    upgrade_id: kUpgradeCode,
+    manufacturer: kCompanyName,
+    version: kProductVersion,
+    is_64_bit: true,
+    icon: kProductIcon,
+    extensions: 'tests/extension/echo_extension'
+});
+*/
     // Null means success, error string means failure.
     callback(null);
 };

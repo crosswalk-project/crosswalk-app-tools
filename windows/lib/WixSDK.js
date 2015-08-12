@@ -1,9 +1,23 @@
+
+// The node.js modules used.
+var fs = require('fs');
+var path = require('path');
+var child_process = require('child_process');
+
+var builder = require('xmlbuilder');
+var uuid = require('node-uuid');
+var readDir = require('readdir');
+
+function WixSDK() {
+
+}
+
 /**
  * This function generates Windows installer file (.msi) for the given Crosswalk-based application
  *
  * @param {String} app_path Path to the folder containing the application manifest.json file
  * @param {String} xwalk_path Path to the folder containing the Crosswalk build output (e.g. out/Release)
- * @param {Object} meta_data The data used for .msi generation. 
+ * @param {Object} meta_data The data used for .msi generation.
  *                           Mandatory fields:
  *                              'app_name' - application name
  *                              'upgrade_id' - package upgrade Id (GUID)
@@ -15,7 +29,8 @@
  *                              'is_64_bit' {Bool} - 64 bit arch. flag, 'false' by default
  *                              'extensions' - path to the Crosswalk C++ extensions to be used by the app
  */
-function GenerateMSI(app_path, xwalk_path, meta_data) {
+WixSDK.prototype.generateMSI =
+function(app_path, xwalk_path, meta_data) {
     if (!app_path)
         throw "Path to the application is missing";
     if (!xwalk_path)
@@ -34,14 +49,6 @@ function GenerateMSI(app_path, xwalk_path, meta_data) {
         meta_data.product_name = meta_data.app_name;
     if (!meta_data.hasOwnProperty('version'))
         meta_data.version = '0.0.0.0';
-
-    // The node.js modules used.
-    var builder = require('xmlbuilder');
-    var fs = require('fs');
-    var path = require('path');
-    var readDir = require('readdir');
-    var uuid = require('node-uuid');
-    var child_process = require('child_process');
 
     function HasProductIcon() { return meta_data.hasOwnProperty('icon'); }
     function Is64Bit() { return ('is_64_bit' in meta_data) ? meta_data.is_64_bit : false; }
@@ -206,24 +213,6 @@ function GenerateMSI(app_path, xwalk_path, meta_data) {
         fs.unlink(kProductName + '.wixobj', function (err) { });
         fs.unlink(kProductName + '.wixpdb', function (err) { });
     }
-}
+};
 
-const kAppSourceDir = './app';  // Path to the application root directory having 'manifest.json'.
-const kCrosswalkDir = './crosswalk-windows-14.43.343.0';  // Path to the directory with Crosswalk binaries.
-const kProductIcon = './crosswalk.ico';   // Icon for shortcut and for program list in Control Panel.
-const kAppName = 'Hello_app';
-const kCompanyName = 'Hello_company';
-const kProductName = 'Hello_product';
-const kProductVersion = '0.0.0.1';
-const kUpgradeCode = '12345678-1234-1234-1234-111111111111';  // Has to be the same for all product versions.
-const kIs64Bit = true;
-
-GenerateMSI(kAppSourceDir, kCrosswalkDir, {
-    app_name: kAppName,
-    upgrade_id: kUpgradeCode,
-    manufacturer: kCompanyName,
-    version: kProductVersion,
-    is_64_bit: true,
-    icon: kProductIcon,
-    extensions: 'tests/extension/echo_extension'
-});
+module.exports = WixSDK;
