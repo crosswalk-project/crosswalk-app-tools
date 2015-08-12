@@ -8,8 +8,9 @@ var builder = require('xmlbuilder');
 var uuid = require('node-uuid');
 var readDir = require('readdir');
 
-function WixSDK() {
+function WixSDK(output) {
 
+    this._output = output;
 }
 
 /**
@@ -217,7 +218,7 @@ function(app_path, xwalk_path, meta_data) {
     });
     component.ele('RegistryValue', {
         Root: 'HKCU',
-        Key: 'Software\\' + kCompanyName + '\\' + kProductName,
+        Key: 'Software\\' + meta_data.manufacturer + '\\' + meta_data.product,
         Name: 'installed',
         Type: 'integer',
         Value: '1',
@@ -232,14 +233,14 @@ function(app_path, xwalk_path, meta_data) {
 
     try {
         //console.log(xml_str);
-        fs.writeFileSync(kProductName + '.wxs', xml_str);
-        console.log(kProductName + '.wxs is created. Generating ' + kProductName + '.msi..');
-        child_process.execSync('candle ' + kProductName + '.wxs');
-        child_process.execSync('light ' + kProductName + '.wixobj');
+        fs.writeFileSync(meta_data.product + '.wxs', xml_str);
+        console.log(meta_data.product + '.wxs is created. Generating ' + meta_data.product + '.msi..');
+        child_process.execSync('candle ' + meta_data.product + '.wxs');
+        child_process.execSync('light ' + meta_data.product + '.wixobj');
     } finally {
-        // fs.unlink(kProductName + '.wxs', function (err) { });
-        fs.unlink(kProductName + '.wixobj', function (err) { });
-        fs.unlink(kProductName + '.wixpdb', function (err) { });
+        // fs.unlink(meta_data.product + '.wxs', function (err) { });
+        fs.unlink(meta_data.product + '.wixobj', function (err) { });
+        fs.unlink(meta_data.product + '.wixpdb', function (err) { });
     }
 };
 

@@ -2,6 +2,8 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var Path = require("path");
+
 var ShellJS = require("shelljs");
 
 var WixSDK = require("./WixSDK");
@@ -109,28 +111,19 @@ function(callback) {
 WinPlatform.prototype.build =
 function(configId, args, callback) {
 
-    var sdk = new WixSDK();
-/*
-const kAppSourceDir = './app';  // Path to the application root directory having 'manifest.json'.
-const kCrosswalkDir = './crosswalk-windows-14.43.343.0';  // Path to the directory with Crosswalk binaries.
-const kProductIcon = './crosswalk.ico';   // Icon for shortcut and for program list in Control Panel.
-const kAppName = 'Hello_app';
-const kCompanyName = 'Hello_company';
-const kProductName = 'Hello_product';
-const kProductVersion = '0.0.0.1';
-const kUpgradeCode = '12345678-1234-1234-1234-111111111111';  // Has to be the same for all product versions.
-const kIs64Bit = true;
+    var manifest = this.application.manifest;
+    var sdk = new WixSDK(this.output);
+    sdk.generateMSI(this.appPath, this.platformPath, {
+        app_name: manifest.name,
+        upgrade_id: manifest.windowsUpdateId,
+        manufacturer: manifest.windowsVendor,
+        version: manifest.appVersion,
+        is_64_bit: true,
+        icon: Path.join(this.appPath, "crosswalk.ico"),
+        product: manifest.packageId
+        //extensions: 'tests/extension/echo_extension'
+    });
 
-GenerateMSI(kAppSourceDir, kCrosswalkDir, {
-    app_name: kAppName,
-    upgrade_id: kUpgradeCode,
-    manufacturer: kCompanyName,
-    version: kProductVersion,
-    is_64_bit: true,
-    icon: kProductIcon,
-    extensions: 'tests/extension/echo_extension'
-});
-*/
     // Null means success, error string means failure.
     callback(null);
 };
