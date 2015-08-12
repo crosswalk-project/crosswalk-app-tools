@@ -122,7 +122,7 @@ function(configId, args, callback) {
     sdk.generateMSI(this.appPath, this.platformPath, {
         app_name: manifest.name,
         upgrade_id: manifest.windowsUpdateId,
-        manufacturer: manifest.windowsVendor,
+        manufacturer: manifest.packageId, // TODO use first 2 parts of packageId
         version: manifest.appVersion + versionPadding,
         is_64_bit: true,
         icon: Path.join(this.appPath, "crosswalk.ico"),
