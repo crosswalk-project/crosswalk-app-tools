@@ -10,7 +10,6 @@ var ShellJS = require("shelljs");
 var AndroidDependencies = require("./AndroidDependencies");
 var AndroidManifest = require("./AndroidManifest");
 var AndroidSDK = require("./AndroidSDK");
-var CrosswalkZip = require("./CrosswalkZip");
 var JavaActivity = require("./JavaActivity");
 var XmlTheme = require("./XmlTheme");
 
@@ -117,6 +116,9 @@ function(apiTarget, platformPath) {
 AndroidPlatform.prototype.importCrosswalkFromZip =
 function(crosswalkPath, platformPath) {
 
+    // Namespace util
+    var util = this.application.util;
+
     var output = this.application.output;
 
     var indicator = output.createFiniteProgress("Extracting " + crosswalkPath);
@@ -124,7 +126,7 @@ function(crosswalkPath, platformPath) {
     // Extract contents
     var zip = null;
     try {
-        zip = new CrosswalkZip(crosswalkPath);
+        zip = new util.CrosswalkZip(crosswalkPath);
     } catch (e) {
         // HACK we're in the midst of a progress display, force line break
         ShellJS.rm("-f", crosswalkPath);

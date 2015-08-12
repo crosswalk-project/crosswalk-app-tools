@@ -6,6 +6,8 @@
  * @namespace util
  */
 var util = {
+    /** {@link CrosswalkZip} */
+    CrosswalkZip: require("./CrosswalkZip"),
     /** {@link Downloader} */
     Downloader: require("./Downloader"),
     /** {@link DownloadHandler} */
