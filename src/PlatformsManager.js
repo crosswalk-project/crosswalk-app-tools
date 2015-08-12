@@ -37,7 +37,8 @@ function() {
 
     for (var platformId in PlatformsManager._implementations) {
 
-        platformInfo = this.load(platformId);
+        // Silent error callback because we just try loading all.
+        platformInfo = this.load(platformId, function (errormsg) {});
         if (platformInfo) {
             break;
         } else {
@@ -68,7 +69,8 @@ function() {
 
     for (var platformId in PlatformsManager._implementations) {
 
-        platformInfo = this.load(platformId);
+        // Silent error callback because we just try loading all.
+        platformInfo = this.load(platformId, function (errormsg) {});
         if (platformInfo) {
             backends.push(platformInfo);
         }
@@ -86,8 +88,7 @@ function() {
 PlatformsManager.prototype.load =
 function(platformId, callback) {
 
-    if (!callback)
-        callback = function(errormsg) {};
+    var output = this._output;
 
     var platformInfo = null;
 
@@ -99,7 +100,11 @@ function(platformId, callback) {
 
     } catch (e) {
 
-        callback(e.message);
+        if (callback)
+            callback(e.message);
+        else
+            output.error(e.message);
+        return null;
     }
 
     return platformInfo;

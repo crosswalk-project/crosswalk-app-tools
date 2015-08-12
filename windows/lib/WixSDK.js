@@ -13,6 +13,17 @@ function WixSDK() {
 }
 
 /**
+ * The WiX toolkit works with forward slashes. Convert input paths.
+ * @param {String} path Input path
+ * @returns {String} Converted output path.
+ */
+WixSDK.prototype.convertPath =
+function(path) {
+
+    return path.replace("\\\\", "/").replace("\\", "/");
+};
+
+/**
  * This function generates Windows installer file (.msi) for the given Crosswalk-based application
  *
  * @param {String} app_path Path to the folder containing the application manifest.json file
@@ -31,24 +42,41 @@ function WixSDK() {
  */
 WixSDK.prototype.generateMSI =
 function(app_path, xwalk_path, meta_data) {
-    if (!app_path)
+
+    if (app_path) {
+        app_path = this.convertPath(app_path);
+    } else {
         throw "Path to the application is missing";
-    if (!xwalk_path)
+    }
+
+    if (xwalk_path) {
+        xwalk_path = this.convertPath(xwalk_path);
+    } else {
         throw "Path to xwalk binaries is missing";
+    }
+
     if (!meta_data)
         throw "No meta data object is provided";
+
     // Check the mandatory properties.
     if (!meta_data.hasOwnProperty('app_name'))
         throw "Application name must be provided";
+
     if (!meta_data.hasOwnProperty('upgrade_id'))
         throw "Package upgrade ID must be provided";
+
     if (!meta_data.hasOwnProperty('manufacturer'))
         throw "Manufacturer must be provided";
 
     if (!meta_data.hasOwnProperty('product_name'))
         meta_data.product_name = meta_data.app_name;
+
     if (!meta_data.hasOwnProperty('version'))
         meta_data.version = '0.0.0.0';
+
+    if (meta_data.hasOwnProperty("icon")) {
+        meta_data.icon = this.convertPath(meta_data.icon);
+    }
 
     function HasProductIcon() { return meta_data.hasOwnProperty('icon'); }
     function Is64Bit() { return ('is_64_bit' in meta_data) ? meta_data.is_64_bit : false; }

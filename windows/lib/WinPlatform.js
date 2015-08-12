@@ -54,7 +54,8 @@ function(packageId, args, callback) {
 
     // Namespace util
     var util = this.application.util;
-
+    var output = this.output;
+    
     var crosswalkPath = args.crosswalk;
     if (!crosswalkPath) {
         callback("Use --windows-crosswalk=<path> to pass crosswalk zip");
@@ -70,6 +71,8 @@ function(packageId, args, callback) {
         callback("Failed to extract crosswalk zip");
         return;
     }
+
+    output.info("Successfully imported " + crosswalkPath);
 
     // Null means success, error string means failure.
     callback(null);
