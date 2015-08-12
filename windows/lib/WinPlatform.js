@@ -112,12 +112,18 @@ WinPlatform.prototype.build =
 function(configId, args, callback) {
 
     var manifest = this.application.manifest;
+
+    // WiX wants 4 component version numbers, so append as many ".0" as needed.
+    // Manifest versions are restricted to 4 parts max.
+    var nComponents = manifest.appVersion.split(".").length;
+    var versionPadding = new Array(4 - nComponents + 1).join(".0");
+
     var sdk = new WixSDK(this.output);
     sdk.generateMSI(this.appPath, this.platformPath, {
         app_name: manifest.name,
         upgrade_id: manifest.windowsUpdateId,
         manufacturer: manifest.windowsVendor,
-        version: manifest.appVersion,
+        version: manifest.appVersion + versionPadding,
         is_64_bit: true,
         icon: Path.join(this.appPath, "crosswalk.ico"),
         product: manifest.packageId
