@@ -7,6 +7,7 @@ var child_process = require('child_process');
 var builder = require('xmlbuilder');
 var uuid = require('node-uuid');
 var readDir = require('readdir');
+var ShellJS = require("shelljs");
 
 function WixSDK(output) {
 
@@ -230,18 +231,65 @@ function(app_path, xwalk_path, meta_data) {
     feature.ele('ComponentRef', { Id: "ApplicationShortcut" });
 
     var xml_str = root.end({ pretty: true });
+    fs.writeFileSync(meta_data.product + '.wxs', xml_str);
+    this.runWix(meta_data.product, function(success) {
+        if (success) {
+            // Only delete on success, for debugging reasons.
+            ShellJS.rm("-f", meta_data.product + ".wxs");
+            ShellJS.rm("-f", meta_data.product + ".wixobj");
+            ShellJS.rm("-f", meta_data.product + ".wixpdb");
+        }
+    });
+};
 
-    try {
-        //console.log(xml_str);
-        fs.writeFileSync(meta_data.product + '.wxs', xml_str);
-        console.log(meta_data.product + '.wxs is created. Generating ' + meta_data.product + '.msi..');
-        child_process.execSync('candle ' + meta_data.product + '.wxs');
-        child_process.execSync('light ' + meta_data.product + '.wixobj');
-    } finally {
-        // fs.unlink(meta_data.product + '.wxs', function (err) { });
-        fs.unlink(meta_data.product + '.wixobj', function (err) { });
-        fs.unlink(meta_data.product + '.wixpdb', function (err) { });
-    }
+WixSDK.prototype.runWix =
+function(basename, callback) {
+
+    var candle = "candle -v " + basename + ".wxs";
+    this._output.info("Running '" + candle + "'");
+    var child = child_process.exec(candle);
+
+    child.stdout.on("data", function(data) {
+        this.onData(data);
+    }.bind(this));
+
+    child.stderr.on("data", function(data) {
+        this._output.warning(data);
+    }.bind(this));
+
+    child.on("exit", function(code, signal) {
+        if (code)
+            callback(code);
+        else
+            this.runWixLight(basename, callback);
+        return;
+    }.bind(this));
+};
+
+WixSDK.prototype.runWixLight =
+function(basename, callback) {
+
+    var light = "light -v " + basename + ".wixobj";
+    this._output.info("Running '" + light + "'");
+    var child = child_process.exec(light);
+
+    child.stdout.on("data", function(data) {
+        this.onData(data);
+    }.bind(this));
+
+    child.stderr.on("data", function(data) {
+        this._output.warning(data);
+    }.bind(this));
+
+    child.on("exit", function(code, signal) {
+        callback(code === 0);
+        return;
+    });
+};
+
+WixSDK.prototype.onData =
+function(data) {
+
 };
 
 module.exports = WixSDK;

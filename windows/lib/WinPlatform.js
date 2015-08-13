@@ -119,6 +119,9 @@ function(configId, args, callback) {
     var versionPadding = new Array(4 - nComponents + 1).join(".0");
 
     var sdk = new WixSDK(this.output);
+    sdk.onData = function(data) {
+        this.logOutput.write(data);
+    }.bind(this);
     sdk.generateMSI(this.appPath, this.platformPath, {
         app_name: manifest.name,
         upgrade_id: manifest.windowsUpdateId,
