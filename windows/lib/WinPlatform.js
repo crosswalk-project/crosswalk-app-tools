@@ -57,7 +57,7 @@ function(packageId, args, callback) {
     // Namespace util
     var util = this.application.util;
     var output = this.output;
-    
+
     var crosswalkPath = args.crosswalk;
     if (!crosswalkPath) {
         callback("Use --windows-crosswalk=<path> to pass crosswalk zip");
@@ -106,6 +106,39 @@ function(callback) {
 };
 
 /**
+ * Pick windows icon (.ico) from web manifest.
+ * @returns {String} Manifest icon or fallback default icon if not found.
+ */
+WinPlatform.prototype.selectIcon =
+function() {
+
+    var output = this.output;
+
+    var icons = this.application.manifest.icons;
+    var winIcon = null;
+    if (icons && icons.length > 0) {
+        for (var i = 0; i < icons.length; i++) {
+            var icon = icons[i];
+            var ext = Path.extname(icon.src).toLowerCase();
+            if (ext === ".ico") {
+                winIcon = icon.src;
+                break;
+            }
+        }
+    }
+
+    if (winIcon) {
+        winIcon = Path.join(this.appPath, winIcon);
+    } else {
+        output.warning("No icon in '.ico' format found in the manifest");
+        output.warning("Using default crosswalk.ico");
+        winIcon = Path.join(this.appPath, "crosswalk.ico");
+    }
+
+    return winIcon;
+};
+
+/**
  * Implements {@link PlatformBase.build}
  */
 WinPlatform.prototype.build =
@@ -130,7 +163,7 @@ function(configId, args, callback) {
         manufacturer: manifest.packageId, // TODO use first 2 parts of packageId
         version: manifest.appVersion + versionPadding,
         is_64_bit: true,
-        icon: Path.join(this.appPath, "crosswalk.ico"),
+        icon: this.selectIcon(),
         product: manifest.packageId
         //extensions: 'tests/extension/echo_extension'
     };
