@@ -43,32 +43,50 @@ function(path) {
  *                              'extensions' - path to the Crosswalk C++ extensions to be used by the app
  */
 WixSDK.prototype.generateMSI =
-function(app_path, xwalk_path, meta_data) {
+function(app_path, xwalk_path, meta_data, callback) {
+
+    var output = this._output;
 
     if (app_path) {
         app_path = this.convertPath(app_path);
     } else {
-        throw "Path to the application is missing";
+        output.error("Path to the application is missing");
+        callback(false);
+        return;
     }
 
     if (xwalk_path) {
         xwalk_path = this.convertPath(xwalk_path);
     } else {
-        throw "Path to xwalk binaries is missing";
+        output.error("Path to xwalk binaries is missing");
+        callback(false);
+        return;
     }
 
-    if (!meta_data)
-        throw "No meta data object is provided";
+    if (!meta_data) {
+        output.error("No meta data object is provided");
+        callback(false);
+        return;
+    }
 
     // Check the mandatory properties.
-    if (!meta_data.hasOwnProperty('app_name'))
-        throw "Application name must be provided";
+    if (!meta_data.hasOwnProperty('app_name')) {
+        output.error("Application name must be provided");
+        callback(false);
+        return;
+    }
 
-    if (!meta_data.hasOwnProperty('upgrade_id'))
-        throw "Package upgrade ID must be provided";
+    if (!meta_data.hasOwnProperty('upgrade_id')) {
+        output.error("Package upgrade ID must be provided");
+        callback(false);
+        return;
+    }
 
-    if (!meta_data.hasOwnProperty('manufacturer'))
-        throw "Manufacturer must be provided";
+    if (!meta_data.hasOwnProperty('manufacturer')) {
+        output.error("Manufacturer must be provided");
+        callback(false);
+        return;
+    }
 
     if (!meta_data.hasOwnProperty('product_name'))
         meta_data.product_name = meta_data.app_name;
@@ -234,11 +252,14 @@ function(app_path, xwalk_path, meta_data) {
     fs.writeFileSync(meta_data.product + '.wxs', xml_str);
     this.runWix(meta_data.product, function(success) {
         if (success) {
+            // Pass back built package
+            meta_data.msi = meta_data.product + ".msi";
             // Only delete on success, for debugging reasons.
             ShellJS.rm("-f", meta_data.product + ".wxs");
             ShellJS.rm("-f", meta_data.product + ".wixobj");
             ShellJS.rm("-f", meta_data.product + ".wixpdb");
         }
+        callback(success);
     });
 };
 

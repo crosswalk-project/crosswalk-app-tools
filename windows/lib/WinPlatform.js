@@ -111,6 +111,7 @@ function(callback) {
 WinPlatform.prototype.build =
 function(configId, args, callback) {
 
+    var output = this.output;
     var manifest = this.application.manifest;
 
     // WiX wants 4 component version numbers, so append as many ".0" as needed.
@@ -122,7 +123,8 @@ function(configId, args, callback) {
     sdk.onData = function(data) {
         this.logOutput.write(data);
     }.bind(this);
-    sdk.generateMSI(this.appPath, this.platformPath, {
+
+    var metaData = {
         app_name: manifest.name,
         upgrade_id: manifest.windowsUpdateId,
         manufacturer: manifest.packageId, // TODO use first 2 parts of packageId
@@ -131,7 +133,20 @@ function(configId, args, callback) {
         icon: Path.join(this.appPath, "crosswalk.ico"),
         product: manifest.packageId
         //extensions: 'tests/extension/echo_extension'
-    });
+    };
+    sdk.generateMSI(this.appPath, this.platformPath, metaData,
+                    function (success) {
+
+        if (success) {
+            // TODO rename so they include version number
+            output.highlight("  * Built package(s):");
+            output.highlight("    + " + metaData.msi);
+            callback(null);
+        } else {
+            callback("Building " + this.packageId + " failed");
+        }
+        return;
+    }.bind(this));
 
     // Null means success, error string means failure.
     callback(null);
