@@ -30,6 +30,8 @@ PlatformsManager._implementations = {
 PlatformsManager.prototype.loadDefault =
 function() {
 
+    function silentCb(errormsg) {}
+
     var output = this._output;
 
     var platformInfo = null;
@@ -38,7 +40,7 @@ function() {
     for (var platformId in PlatformsManager._implementations) {
 
         // Silent error callback because we just try loading all.
-        platformInfo = this.load(platformId, function (errormsg) {});
+        platformInfo = this.load(platformId, silentCb);
         if (platformInfo) {
             break;
         } else {
@@ -63,6 +65,8 @@ function() {
 PlatformsManager.prototype.loadAll =
 function() {
 
+    function silentCb(errormsg) {}
+
     var output = this._output;
 
     var backends = [];
@@ -70,7 +74,7 @@ function() {
     for (var platformId in PlatformsManager._implementations) {
 
         // Silent error callback because we just try loading all.
-        platformInfo = this.load(platformId, function (errormsg) {});
+        platformInfo = this.load(platformId, silentCb);
         if (platformInfo) {
             backends.push(platformInfo);
         }
