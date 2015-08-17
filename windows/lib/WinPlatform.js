@@ -153,8 +153,26 @@ function(configId, args, callback) {
     var versionPadding = new Array(4 - nComponents + 1).join(".0");
 
     var sdk = new WixSDK(this.output);
+    var indicator = output.createInfiniteProgress("Building package");
     sdk.onData = function(data) {
         this.logOutput.write(data);
+        var keys = [
+            "Updating",
+            "Creating",
+            "Generating",
+            "Merging",
+            "Validating",
+            "ICE"
+        ];
+        keys.forEach(function (key) {
+            if (data.substring(0, key.length) === key) {
+                var endIdx = key === "ICE" ?
+                    data.indexOf(":") :
+                    key.length;
+                var tag = data.substring(0, endIdx);
+                indicator.update(tag);
+            }
+        });
     }.bind(this);
 
     var metaData = {
@@ -170,6 +188,7 @@ function(configId, args, callback) {
     sdk.generateMSI(this.appPath, this.platformPath, metaData,
                     function (success) {
 
+        indicator.done();
         if (success) {
             // TODO rename so they include version number
             output.highlight("  * Built package(s):");
