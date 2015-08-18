@@ -211,13 +211,14 @@ function(configId, args, callback) {
     sdk.generateMSI(this.appPath, this.platformPath, metaData,
                     function (success) {
 
-        indicator.done();
         if (success) {
+            indicator.done();
             // TODO rename so they include version number
             output.highlight("  * Built package(s):");
             output.highlight("    + " + metaData.msi);
             callback(null);
         } else {
+            indicator.update("error");
             callback("Building " + this.packageId + " failed");
         }
         return;

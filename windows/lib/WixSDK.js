@@ -279,10 +279,12 @@ function(basename, callback) {
     }.bind(this));
 
     child.on("exit", function(code, signal) {
-        if (code)
-            callback(code);
-        else
+        if (code) {
+            this._output.error("Unhandled error " + code);
+            callback(false);
+        } else {
             this.runWixLight(basename, callback);
+        }
         return;
     }.bind(this));
 };
@@ -303,6 +305,9 @@ function(basename, callback) {
     }.bind(this));
 
     child.on("exit", function(code, signal) {
+        if (code) {
+            this._output.error("Unhandled error " + code);
+        }
         callback(code === 0);
         return;
     });
