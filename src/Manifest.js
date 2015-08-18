@@ -228,8 +228,7 @@ function(path, packageId) {
         "xwalk_android_animatable_view": false,
         "xwalk_android_keep_screen_on": false,
         // Windows fields
-        "xwalk_windows_update_id": windowsUpdateId,
-        "xwalk_windows_vendor": "(Vendor)"  // optional, placeholder
+        "xwalk_windows_update_id": windowsUpdateId
     });
     FS.writeFileSync(path, buffer);
 };

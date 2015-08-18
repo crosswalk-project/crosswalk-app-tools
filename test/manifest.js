@@ -285,12 +285,16 @@ exports.tests = {
 
     windowsVendor: function(test) {
 
-        test.expect(1);
+        test.expect(2);
 
-        var path3 = produceManifest();
-        var m3 = consumeManifest(path3);
+        var path1 = produceManifest();
+        var m1 = consumeManifest(path1);
+        test.equal(m1.windowsVendor, null);
 
-        test.equal(typeof m3.windowsVendor === "string", true);
+        var path2 = produceManifest({"xwalk_windows_vendor": "foo"});
+        var m2 = consumeManifest(path2);
+        test.equal(m2.windowsVendor, "foo");
+
         test.done();
     }
 };

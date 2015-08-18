@@ -139,6 +139,27 @@ function() {
 };
 
 /**
+ * Get vendor name from manifest. Fall back to namespace when missing.
+ * @returns {String} Vendor name.
+ */
+WinPlatform.prototype.getVendor =
+function() {
+
+    var manifest = this.application.manifest;
+
+    var vendor = manifest.windowsVendor;
+    if (!vendor) {
+        // Use 2 leading parts of package ID
+        // this will go wrong for namespaces like co.uk.foo,
+        // but it's a start.
+        var parts = manifest.packageId.split(".");
+        vendor = parts[0] + "." + parts[1];
+    }
+
+    return vendor;
+};
+
+/**
  * Implements {@link PlatformBase.build}
  */
 WinPlatform.prototype.build =
@@ -180,7 +201,7 @@ function(configId, args, callback) {
     var metaData = {
         app_name: manifest.name,
         upgrade_id: manifest.windowsUpdateId,
-        manufacturer: manifest.packageId, // TODO use first 2 parts of packageId
+        manufacturer: this.getVendor(),
         version: manifest.appVersion + versionPadding,
         is_64_bit: true,
         icon: this.selectIcon(),
