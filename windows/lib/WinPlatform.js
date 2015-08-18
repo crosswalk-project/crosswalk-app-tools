@@ -164,13 +164,15 @@ function(configId, args, callback) {
             "Validating",
             "ICE"
         ];
+        // If a line begins with a key, then update the
+        // indicator with it.
         keys.forEach(function (key) {
             if (data.substring(0, key.length) === key) {
                 var endIdx = key === "ICE" ?
                     data.indexOf(":") :
                     key.length;
                 var tag = data.substring(0, endIdx);
-                indicator.update(tag);
+                indicator.update(tag.toLowerCase());
             }
         });
     }.bind(this);
