@@ -151,6 +151,10 @@ function(app_path, xwalk_path, meta_data, callback) {
         // Only ASCII, digits, '.', '_' are allowed.
         return path.replace(new RegExp('[^A-Za-z0-9_.]', 'g'), '_');
     }
+    // To be used for cmd line arguments.
+    function InQuotes(arg) {
+        return "\"" + arg + "\"";
+    }
 
     function AddFileComponent(node, base_path, relative_path) {
         var file_id = MakeIdFromPath(relative_path);
@@ -217,7 +221,7 @@ function(app_path, xwalk_path, meta_data, callback) {
 
     var program_menu_folder_ref = product.ele('DirectoryRef', { Id: 'ApplicationProgramsFolder' });
     var component = program_menu_folder_ref.ele('Component', { Id: 'ApplicationShortcut', Guid: uuid.v1() });
-    var cmd_line_args = path.join(meta_data.app_name, 'manifest.json');
+    var cmd_line_args = InQuotes(path.join(meta_data.app_name, 'manifest.json'));
     if (HasExtensions())
         cmd_line_args += ' --external-extensions-path=extensions';
     var shortcut = component.ele('Shortcut', {
@@ -250,7 +254,7 @@ function(app_path, xwalk_path, meta_data, callback) {
 
     var xml_str = root.end({ pretty: true });
     fs.writeFileSync(meta_data.product + '.wxs', xml_str);
-    this.runWix(meta_data.product, function(success) {
+    this.runWix(InQuotes(meta_data.product), function(success) {
         if (success) {
             // Pass back built package
             meta_data.msi = meta_data.product + ".msi";
