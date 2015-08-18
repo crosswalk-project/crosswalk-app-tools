@@ -12,7 +12,20 @@ function FiniteProgress(output, label) {
 
     this._output = output;
     this._label = label;
+    this._active = false;
 }
+
+/**
+ * Whether the indicator has already been activated (first update() call)
+ * @member {Boolean} isActive
+ * @instance
+ * @memberOf FiniteProgress
+ */
+Object.defineProperty(FiniteProgress.prototype, "isActive", {
+                      get: function() {
+                                return this._active;
+                           }
+                      });
 
 /**
  * Update progress indicator.
@@ -20,6 +33,8 @@ function FiniteProgress(output, label) {
  */
 FiniteProgress.prototype.update =
 function(progress) {
+
+    this._active = true;
 
     // Clamp
     progress = progress < 0 ? 0 :
@@ -58,6 +73,9 @@ function(message) {
 
     // Also prints \r\n so we're ready for the next output.
     this._output.write(" " + message + "\n");
+
+    this._output.endProgress();
+    this._active = false;
 };
 
 module.exports = FiniteProgress;
