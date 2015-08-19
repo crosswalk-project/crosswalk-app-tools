@@ -253,15 +253,16 @@ function(app_path, xwalk_path, meta_data, callback) {
     feature.ele('ComponentRef', { Id: "ApplicationShortcut" });
 
     var xml_str = root.end({ pretty: true });
-    fs.writeFileSync(meta_data.product + '.wxs', xml_str);
-    this.runWix(InQuotes(meta_data.product), function(success) {
+    var basename = meta_data.product + "-" + meta_data.version;
+    fs.writeFileSync(basename + '.wxs', xml_str);
+    this.runWix(InQuotes(basename), function(success) {
         if (success) {
             // Pass back built package
-            meta_data.msi = meta_data.product + ".msi";
+            meta_data.msi = basename + ".msi";
             // Only delete on success, for debugging reasons.
-            ShellJS.rm("-f", meta_data.product + ".wxs");
-            ShellJS.rm("-f", meta_data.product + ".wixobj");
-            ShellJS.rm("-f", meta_data.product + ".wixpdb");
+            ShellJS.rm("-f", basename + ".wxs");
+            ShellJS.rm("-f", basename + ".wixobj");
+            ShellJS.rm("-f", basename + ".wixpdb");
         }
         callback(success);
     });
