@@ -221,7 +221,7 @@ function(path, packageId) {
         "icons": [ icon ],
         "start_url": "index.html",
         // Crosswalk fields
-        "xwalk_app_version": "1",
+        "xwalk_app_version": "0.1",
         "xwalk_package_id": packageId,
         "xwalk_target_platforms": platformInfo.platformId,
         // Android fields

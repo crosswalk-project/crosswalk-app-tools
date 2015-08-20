@@ -87,7 +87,7 @@ exports.tests = {
         var application = Util.createTmpApplication("com.example.foo");
         var manifest = application.manifest;
         test.equal(manifest instanceof Manifest, true);
-        test.equal(manifest.appVersion, "1");
+        test.equal(manifest.appVersion, "0.1");
         Util.deleteTmpApplication(application);
         test.done();
     },
