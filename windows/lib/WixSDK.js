@@ -315,7 +315,7 @@ function(basename, callback) {
         }
         callback(code === 0);
         return;
-    });
+    }.bind(this));
 };
 
 WixSDK.prototype.onData =
