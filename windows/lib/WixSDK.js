@@ -200,7 +200,7 @@ function(app_path, xwalk_path, meta_data, callback) {
     if (fs.existsSync(locales_path)) {
         var locales = fs.readdirSync(locales_path);
         locales.forEach(function (locale) {
-            AddFileComponent(GetFolderNode('locales', app_root_folder), xwalk_path, path.join(locales_path, locale));
+            AddFileComponent(GetFolderNode('locales', app_root_folder), locales_path, locale);
         });
     } else {
         // TODO maybe error or warning
