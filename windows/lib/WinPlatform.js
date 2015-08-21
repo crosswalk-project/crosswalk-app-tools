@@ -41,24 +41,25 @@ WinPlatform.getArgs = function() {
     return {
         create: { // Extra options for command "create"
             crosswalk: "\t\t\tPath to crosswalk zip"
-        }/*,
+        },
         update: { // Extra options for command "update"
-            baz: "Another option added by the backend"
-        }*/
+            crosswalk: "\t\t\tPath to crosswalk zip"
+        }
     };
 };
 
 /**
- * Implements {@link PlatformBase.create}
+ * Import Crosswalk libraries and auxiliary files into the project.
+ * @param {String} crosswalkPath Location of unpacked Crosswalk distribution
+ * @returns {String} Imported version on success, otherwise null.
  */
-WinPlatform.prototype.create =
-function(packageId, args, callback) {
+WinPlatform.prototype.importCrosswalkFromZip =
+function(crosswalkPath, callback) {
 
     // Namespace util
     var util = this.application.util;
     var output = this.output;
 
-    var crosswalkPath = args.crosswalk;
     if (!crosswalkPath) {
         callback("Use --windows-crosswalk=<path> to pass crosswalk zip");
         return;
@@ -70,14 +71,30 @@ function(packageId, args, callback) {
     var zip = new util.CrosswalkZip(crosswalkPath);
     zip.extractEntryTo(zip.root, this.platformPath);
     if (!ShellJS.test("-d", this.platformPath)) {
-        callback("Failed to extract crosswalk zip");
+        callback("Failed to extract " + crosswalkPath);
         return;
     }
 
-    output.info("Successfully imported " + crosswalkPath);
-
-    // Null means success, error string means failure.
     callback(null);
+};
+
+/**
+ * Implements {@link PlatformBase.create}
+ */
+WinPlatform.prototype.create =
+function(packageId, args, callback) {
+
+    var output = this.output;
+
+    var crosswalkPath = args.crosswalk;
+    this.importCrosswalkFromZip(crosswalkPath,
+                                function (errormsg) {
+
+        if (!errormsg) {
+            output.info("Successfully imported " + crosswalkPath);
+        }
+        callback(errormsg);
+    }.bind(this));
 };
 
 /**
@@ -86,12 +103,27 @@ function(packageId, args, callback) {
 WinPlatform.prototype.update =
 function(versionSpec, args, callback) {
 
-    // TODO implement updating of project to new Crosswalk version.
-    // This function is not supported yet.
-    this.output.log("WinPlatform: TODO Updating project\n");
+    var output = this.output;
 
-    // Null means success, error string means failure.
-    callback(null);
+    // Rename current dir for backup.
+    var oldPath = this.platformPath + ".bak";
+    ShellJS.mv(this.platformPath, oldPath);
+
+    var crosswalkPath = args.crosswalk;
+    this.importCrosswalkFromZip(crosswalkPath,
+                                function (errormsg) {
+
+        if (errormsg) {
+            // Restore previous project
+            ShellJS.rm("-rf", this.platformPath);
+            ShellJS.mv(oldPath, this.platformPath);
+        } else {
+            // Delete old project
+            ShellJS.rm("-rf", oldPath);
+            output.info("Successfully imported " + crosswalkPath);
+        }
+        callback(errormsg);
+    }.bind(this));
 };
 
 WinPlatform.prototype.refresh =
