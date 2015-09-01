@@ -5,6 +5,7 @@
 var FS = require("fs");
 var Path = require('path');
 
+var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
 
 var AndroidDependencies = require("./AndroidDependencies");
@@ -70,16 +71,113 @@ function() {
 /**
  * Check host setup.
  * @param {OutputIface} output Output to write to
- * @returns {Boolean} True if ok, otherwise false.
+ * @param {Function} callback Function(success) to be called when done
  * @static
  */
 AndroidPlatform.check =
 AndroidPlatform.prototype.check =
-function(output) {
+function(output, callback) {
 
-    output.info("AndroidPlatform.check");
+    // Checking deps
+    var deps = [
+        "android",
+        "ant",
+        "java"
+    ];
 
-    return true;
+    var found = true;
+    deps.forEach(function (dep) {
+        var path = ShellJS.which(dep);
+        var msg = "Checking for " + dep + "... " + path;
+        if (path) {
+            output.info(msg);
+        } else {
+            found = false;
+            output.error(msg);
+        }
+    });
+
+    if (!found) {
+        callback(false);
+        return;
+    }
+
+    // Build dummy project
+    var app = {
+        output: output
+    };
+
+    ShellJS.pushd(ShellJS.tempdir());
+    var dir = MkTemp.createDirSync("XXXXXX");
+    // Delete dir right after, just allocate name.
+    ShellJS.rm("-rf", dir);
+    ShellJS.popd();
+
+    var path = Path.join(ShellJS.tempdir(), dir);
+    output.info("Testing dummy project in " + path);
+
+    var dummyPackageId = "com.example.foo";
+    var dummyLog = "";
+    var sdk = new AndroidSDK(app);
+    // Progress display
+    var indicator = output.createInfiniteProgress("Building " + dummyPackageId);
+    sdk.onData = function(data) {
+
+        dummyLog += data;
+
+        // Scan first 7 chars if data starts with a [tag]
+        var tag = null;
+        for (var i = 0; i < 7 && i < data.length; i++) {
+            if (data[i] === '[') {
+
+                // Scan on a bit if there's a closing ']'
+                for (j = i+1; j < i+15; j++) {
+                    if (data[j] === ']') {
+                        tag = data.substring(i+1, j);
+                        indicator.update(tag);
+                        return;
+                    }
+                }
+            } else if (data[i] != ' ') {
+                break;
+            }
+        }
+    };
+    sdk.generateProjectSkeleton(path, dummyPackageId, "android-21",
+                                function (path, logmsg, errormsg) {
+
+        dummyLog += logmsg;
+
+        if (!path || errormsg) {
+            output.error(errormsg);
+            ShellJS.rm("-rf", path);
+            output.error("Generating project failed");
+            if (dummyLog) {
+                FS.writeFileSync(path, dummyLog);
+                output.error("Consult logfile " + path);
+            }
+            callback(false);
+            return;
+        }
+
+        // Build
+        ShellJS.pushd(path);
+        sdk.buildProject(false,
+                         function(success) {
+
+            ShellJS.popd();
+            ShellJS.rm("-rf", path);
+            indicator.done();
+            if (!success) {
+                output.error("Building project failed");
+                if (dummyLog) {
+                    FS.writeFileSync(path, dummyLog);
+                    output.error("Consult logfile " + path);
+                }
+            }
+            callback(success);
+        });
+    });
 };
 
 /**

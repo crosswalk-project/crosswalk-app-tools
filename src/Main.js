@@ -12,6 +12,7 @@ var CommandParser = require("./CommandParser");
 var PlatformBase = require("./PlatformBase");
 var PlatformsManager = require("./PlatformsManager");
 var TerminalOutput = require("./TerminalOutput");
+var util = require("./util/index.js");
 
 var MAIN_EXIT_CODE_OK = 0;
 var MAIN_EXIT_CODE_ERROR = 127;
@@ -125,16 +126,25 @@ function(platformIds, output, callback) {
         return;
     }
 
-    platforms.forEach(function (platformInfo) {
+    function checkPlatform(platformInfo, next) {
 
         if (platformInfo.Ctor.check) {
-            platformInfo.Ctor.check(output);
+            platformInfo.Ctor.check(output,
+                                    function(success) {
+                next();
+            });
+
         } else {
             output.warning("Skipping '" + platformInfo.platformId + "': 'check' not implemented");
+            next();
         }
-    });
+    }
 
-    callback(MAIN_EXIT_CODE_OK);
+    util.iterate(platforms, checkPlatform,
+                 function () {
+
+        callback(MAIN_EXIT_CODE_OK);
+    });
 };
 
 /**
