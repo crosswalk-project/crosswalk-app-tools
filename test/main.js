@@ -31,10 +31,52 @@ exports.tests = {
         });
     },
 
+    check0: function(test) {
+
+        test.expect(1);
+
+        // Good test.
+        // Run check without platforms
+        var tmpdir = Util.createTmpDir();
+        ShellJS.pushd(tmpdir);
+
+        var app = require("../src/Main");
+        app.check([], TerminalOutput.getInstance(), function(errno) {
+
+            test.equal(errno, 0);
+
+            ShellJS.popd();
+            ShellJS.rm("-rf", tmpdir);
+
+            test.done();
+        });
+    },
+
+    check1: function(test) {
+
+        test.expect(1);
+
+        // Good test.
+        // Run check "android"
+        var tmpdir = Util.createTmpDir();
+        ShellJS.pushd(tmpdir);
+
+        var app = require("../src/Main");
+        app.check(["android"], TerminalOutput.getInstance(), function(errno) {
+
+            test.equal(errno, 0);
+
+            ShellJS.popd();
+            ShellJS.rm("-rf", tmpdir);
+
+            test.done();
+        });
+    },
+
     create: function(test) {
 
         test.expect(1);
-        
+
         // Good test.
         var tmpdir = Util.createTmpDir();
         ShellJS.pushd(tmpdir);

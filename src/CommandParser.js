@@ -35,6 +35,9 @@ function() {
 "\n" +
 "Crosswalk Project Application Packaging Tool\n" +
 "\n" +
+"    crosswalk-app check [<platforms>]           Check host setup\n" +
+"                                                Check all platforms if none given\n" +
+"\n" +
 "    crosswalk-app create <package-id>           Create project <package-id>\n" +
 "                  --platforms=<target>          Optional, e.g. \"windows\"\n" +
 "\n" +
@@ -63,6 +66,8 @@ function() {
 
     var cmd = this.peekCommand();
     switch (cmd) {
+    case "check":
+        return cmd;
     case "create":
         var packageId = this.createGetPackageId();
         return packageId !== null ? cmd : null;
@@ -108,11 +113,25 @@ function() {
         return "help";
     }
 
-    if (["create", "update", "refresh", "build", "platforms"].indexOf(command) > -1) {
+    if (["check", "create", "update", "refresh", "build", "platforms"].indexOf(command) > -1) {
         return command;
     }
 
     return null;
+};
+
+/**
+ * Get platforms to check the host configuration for.
+ * @returns {String[]} Array of platform IDs or empty array to check all available platforms.
+ */
+CommandParser.prototype.checkGetPlatforms =
+function() {
+
+    // Command goes like this
+    // node crosswalk-app create platforms*
+    // So we take everything from the third index
+    var platforms = this._argv.slice(3);
+    return platforms;
 };
 
 /**

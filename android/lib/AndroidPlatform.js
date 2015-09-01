@@ -44,6 +44,7 @@ function AndroidPlatform(PlatformBase, baseData) {
 
 /**
  * Accessor function for platform-specific command-line argument spec.
+ * @static
  */
 AndroidPlatform.getArgs =
 function() {
@@ -57,12 +58,28 @@ function() {
 
 /**
  * Accessor function for platform-specific environment variables spec.
+ * @static
  */
 AndroidPlatform.getEnv =
 function() {
     return {
         CROSSWALK_APP_TOOLS_CACHE_DIR: "Keep downloaded files in this dir"
     };
+};
+
+/**
+ * Check host setup.
+ * @param {OutputIface} output Output to write to
+ * @returns {Boolean} True if ok, otherwise false.
+ * @static
+ */
+AndroidPlatform.check =
+AndroidPlatform.prototype.check =
+function(output) {
+
+    output.info("AndroidPlatform.check");
+
+    return true;
 };
 
 /**

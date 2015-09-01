@@ -68,6 +68,18 @@ Object.defineProperty(PlatformInfo.prototype, "envSpec", {
                       });
 
 /**
+ * Module constructor.
+ * @member {Function} Ctor
+ * @instance
+ * @memberOf PlatformInfo
+ */
+Object.defineProperty(PlatformInfo.prototype, "Ctor", {
+                      get: function() {
+                                return this._Ctor;
+                           }
+                      });
+
+/**
  * Instantiate platform backend.
  * @param {Application} application Application instance
  * @returns {PlatformBase} subclass implementing the actual platform, or null on error

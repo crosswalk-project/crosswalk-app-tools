@@ -59,7 +59,7 @@ function() {
 };
 
 /**
- * Load default backend.
+ * Load all installed backends.
  * @returns {PlatformInfo} Metadata object for loaded platform.
  */
 PlatformsManager.prototype.loadAll =

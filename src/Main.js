@@ -85,6 +85,59 @@ function() {
 };
 
 /**
+ * Have platform implementations check the host setup.
+ * @param {String[]} platformIds Platforms to check, null or empty array checks all.
+ * @param {OutputIface} output Output to write to
+ * @param {Main~mainOperationCb} callback Callback function
+ * @static
+ */
+Main.prototype.check =
+function(platformIds, output, callback) {
+
+    var mgr = new PlatformsManager(output);
+
+    var platforms = [];
+    if (platformIds && platformIds.length > 0) {
+
+        platformIds.forEach(function (platformId) {
+            var errormsg = null;
+            var platformInfo = mgr.load(platformId,
+                                        function (errormsg_) {
+                errormsg = errormsg_;
+            });
+            if (platformInfo) {
+                platforms.push(platformInfo);
+            } else {
+                output.error(errormsg);
+                output.error("Failed to load platform '" + platformId + "'");
+                callback(MAIN_EXIT_CODE_ERROR);
+                return;
+            }
+        });
+
+    } else {
+        platforms = mgr.loadAll();
+    }
+
+    if (!platforms || platforms.length === 0) {
+        output.error("Failed to load platform modules");
+        callback(MAIN_EXIT_CODE_ERROR);
+        return;
+    }
+
+    platforms.forEach(function (platformInfo) {
+
+        if (platformInfo.Ctor.check) {
+            platformInfo.Ctor.check(output);
+        } else {
+            output.warning("Skipping '" + platformInfo.platformId + "': 'check' not implemented");
+        }
+    });
+
+    callback(MAIN_EXIT_CODE_OK);
+};
+
+/**
  * Collect arguments
  */
 Main.prototype.collectArgs =
@@ -360,6 +413,11 @@ function(callback) {
 
     var extraArgs = Minimist(process.argv.slice(2));
     switch (cmd) {
+    case "check":
+        var platforms = parser.checkGetPlatforms();
+        app.check(platforms, output, callback);
+        break;
+
     case "create":
         var packageId = parser.createGetPackageId();
 
