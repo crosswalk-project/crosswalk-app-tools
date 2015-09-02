@@ -49,6 +49,37 @@ WinPlatform.getArgs = function() {
 };
 
 /**
+ * Check host setup.
+ * @param {OutputIface} output Output to write to
+ * @param {Function} callback Function(success) to be called when done
+ * @static
+ */
+WinPlatform.check =
+WinPlatform.prototype.check =
+function(output, callback) {
+
+    // Checking deps
+    var deps = [
+        "candle",
+        "light"
+    ];
+
+    var found = true;
+    deps.forEach(function (dep) {
+        var path = ShellJS.which(dep);
+        var msg = "Checking for " + dep + "... " + path;
+        if (path) {
+            output.info(msg);
+        } else {
+            found = false;
+            output.error(msg);
+        }
+    });
+
+    callback(found);
+};
+
+/**
  * Import Crosswalk libraries and auxiliary files into the project.
  * @param {String} crosswalkPath Location of unpacked Crosswalk distribution
  * @returns {String} Imported version on success, otherwise null.

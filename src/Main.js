@@ -129,6 +129,7 @@ function(platformIds, output, callback) {
     function checkPlatform(platformInfo, next) {
 
         if (platformInfo.Ctor.check) {
+            output.info("Checking host setup for target " + platformInfo.platformId);
             platformInfo.Ctor.check(output,
                                     function(success) {
                 next();
