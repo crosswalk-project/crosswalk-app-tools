@@ -40,6 +40,7 @@ function AndroidPlatform(PlatformBase, baseData) {
 
     instance._sdk = new AndroidSDK(instance.application);
     instance._channel = "stable";
+    instance._shared = false;
 
     return instance;
 }
@@ -53,7 +54,8 @@ function() {
     return {
         create: {
             "crosswalk": "\t\t\tChannel name (stable/beta/canary)\n" +
-                         "\t\t\t\t\t\tor version number (w.x.y.z)"
+                         "\t\t\t\t\t\tor version number (w.x.y.z)",
+            "shared": "                    Depend on shared crosswalk installation"
         },
         build: {
             "webp": "                      Webp conversion e.g. \"80 80 100\"\n" +
@@ -202,7 +204,8 @@ function(apiTarget, platformPath) {
     var data = {
         "packageId" : this.packageId,
         "packageName" : this.packageId,
-        "apiTarget" : apiTarget
+        "apiTarget" : apiTarget,
+        "xwalkLibrary" : this._shared ? "xwalk_shared_library" : "xwalk_core_library"
     };
 
     // AndroidManifest.xml
@@ -272,12 +275,15 @@ function(crosswalkPath, platformPath) {
 
     indicator.update(0.4);
 
-    // Extract xwalk_core_library
+    // Extract xwalk_core_library or xwalk_shared_library
     var path;
-    var name = zip.root + "xwalk_core_library/";
+    var xwalkLibrary = this._shared ?
+                            "xwalk_shared_library/" :
+                            "xwalk_core_library/";
+    var name = zip.root + xwalkLibrary;
     entry = zip.getEntry(name);
     if (entry) {
-        path = platformPath + Path.sep + "xwalk_core_library";
+        path = Path.join(platformPath, xwalkLibrary);
         // Remove existing dir to prevent stale files when updating crosswalk
         ShellJS.rm("-rf", path);
         ShellJS.mkdir(path);
@@ -409,6 +415,10 @@ AndroidPlatform.prototype.create =
 function(packageId, args, callback) {
 
     var output = this.application.output;
+
+    if (args.shared) {
+        this._shared = true;
+    }
 
     var minApiLevel = 21;
     this._sdk.queryTarget(minApiLevel,
@@ -569,12 +579,19 @@ function(abi) {
 
     var output = this.application.output;
 
-    if (!ShellJS.test("-d", "xwalk_core_library/libs")) {
+    // There is no need to enable/disable various ABIS when building shared.
+    // Only one APK is being built.
+    if (this._shared) {
+        return true;
+    }
+
+    var libsDir = "xwalk_core_library/libs";
+    if (!ShellJS.test("-d", libsDir)) {
         output.error("This does not appear to be the root of a Crosswalk project.");
         return false;
     }
 
-    ShellJS.pushd("xwalk_core_library/libs");
+    ShellJS.pushd(libsDir);
 
     var abiMatched = false;
     var list = ShellJS.ls(".");
@@ -668,6 +685,7 @@ function(output, appVersion, abi) {
     }
 
     var abiCodes = {
+        "shared": 2, // use same as ARM, TODO check if correct.
         "armeabi-v7a": 2,
 //        "arm64": 3, TODO check name
         "x86": 6
@@ -1126,6 +1144,11 @@ function(configId, args, callback) {
     // TODO should we cd back afterwards?
     process.chdir(this.platformPath);
 
+    // Embedded or shared build?
+    if (ShellJS.test("-d", Path.join(this.platformPath, "xwalk_shared_library"))) {
+        this._shared = true;
+    }
+
     this.updateManifest(callback);
     this.updateJavaActivity(configId === "release");
     if (args.webp) {
@@ -1136,7 +1159,7 @@ function(configId, args, callback) {
     }
 
     var closure = {
-        abis: ["armeabi-v7a", "x86"], // TODO export option
+        abis: this._shared ? ["shared"] : ["armeabi-v7a", "x86"], // TODO export option
         abiIndex : 0,
         release: configId == "release", // TODO verify above
         apks: [],

@@ -11,7 +11,7 @@
 #proguard.config=${sdk.dir}/tools/proguard/proguard-android.txt:proguard-project.txt
 
 # Extra libraries.
-android.library.reference.1=xwalk_core_library
+android.library.reference.1={{ xwalkLibrary }}
 
 # Project target.
 target={{ apiTarget }}
