@@ -370,7 +370,7 @@ function(parser, output) {
 
         // Print environment variables
         if (Object.keys(platformInfo.envSpec).length > 0) {
-            output.write("Environment variables for platform '" + platformInfo.platformId + "'\n\n");
+            output.write("\nEnvironment variables for platform '" + platformInfo.platformId + "'\n\n");
             for (var env in platformInfo.envSpec) {
                 output.write("    " + env + "               " + platformInfo.envSpec[env] + "\n");
             }

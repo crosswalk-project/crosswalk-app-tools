@@ -2,6 +2,7 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var ChildProcess = require("child_process");
 var FS = require("fs");
 var Path = require('path');
 
@@ -53,6 +54,10 @@ function() {
         create: {
             "crosswalk": "\t\t\tChannel name (stable/beta/canary)\n" +
                          "\t\t\t\t\t\tor version number (w.x.y.z)"
+        },
+        build: {
+            "webp": "                      Webp conversion e.g. \"(80 80 100)\"\n" +
+                    "                                                (jpeg png alpha) quality parameters"
         }
     };
 };
@@ -213,10 +218,9 @@ function(apiTarget, platformPath) {
     tpl.render(data, platformPath + Path.sep + "project.properties");
 
     // Make html5 app dir and copy sample content
-    var assetsPath = Path.join(platformPath, "assets");
-    ShellJS.mkdir("-p", assetsPath);
-    var wwwPath = Path.join(assetsPath, "www");
-    ShellJS.ln("-s", this.appPath, wwwPath);
+    var wwwPath = Path.join(platformPath, "assets", "www");
+    ShellJS.mkdir("-p", wwwPath);
+    ShellJS.cp("-r", this.appPath + Path.sep + "*", wwwPath);
 
     // TODO check for errors
     return true;
@@ -1028,6 +1032,90 @@ function(release) {
 };
 
 /**
+ * Convert assets to Webp
+ * @param {String} params Webp quality parameters
+ * @returns {Boolean} True on success, falso otherwise.
+ */
+AndroidPlatform.prototype.convertWebp =
+function(params) {
+
+    var output = this.application.output;
+
+    output.info("Converting image assets to webp format (" + params + ")");
+
+    // Check for conversion tool
+    var cwebp = ShellJS.which("cwebp");
+    output.info("Checking for cwebp ... " + cwebp);
+    if (!cwebp) {
+        output.error("Webp conversion tool not found, install from http://downloads.webmproject.org/releases/webp");
+        return false;
+    }
+
+    // Copy over the app tree before conversion
+    var wwwPath = Path.join(this.platformPath, "assets", "www");
+    ShellJS.rm("-rf", wwwPath + Path.sep + "*");
+    output.info("Copying app to " + wwwPath);
+    ShellJS.cp("-r", this.appPath + Path.sep + "*", wwwPath);
+
+    // Quality parameters
+    var jpegQuality = 80;
+    var pngQuality = 80;
+    var pngAlphaQuality = 80;
+    var argsList = [];
+    if (typeof params === "string")
+        argsList = params.split(/[ ,]+/);
+    if (argsList && argsList.length > 0)
+        jpegQuality = argsList[0];
+    if (argsList && argsList.length > 1)
+        pngQuality = argsList[1];
+    if (argsList && argsList.length > 2)
+        pngAlphaQuality = argsList[2];
+
+    // Directory traversal function
+    function walk(dir) {
+        var results = [];
+        var list = FS.readdirSync(dir);
+        list.forEach(function(file) {
+            file = dir + "/" + file;
+            var stat = FS.statSync(file);
+            if (stat && stat.isDirectory())
+                results = results.concat(walk(file));
+            else
+                results.push(file);
+        })
+        return results;
+    }
+
+    // Do conversion
+    var fileList = walk(wwwPath);
+    for (var i in fileList) {
+        if (FS.lstatSync(fileList[i]).isFile()) {
+            var filePath = fileList[i];
+            var tmpFilePath = filePath + ".webp";
+            var ext = Path.extname(filePath);
+            if (".jpeg" == ext || ".jpg" == ext) {
+                ChildProcess.execSync(cwebp +
+                                      " " + filePath +
+                                      " -q " + jpegQuality +
+                                      " -o " + tmpFilePath,
+                                      {stdio:[]});
+                ShellJS.mv("-f", tmpFilePath, filePath);
+            } else if (".png" == ext) {
+                ChildProcess.execSync(cwebp +
+                                      " " + filePath +
+                                      " -q " + pngQuality +
+                                      " -alpha_q " + pngAlphaQuality +
+                                      " -o " + tmpFilePath,
+                                      {stdio:[]});
+                ShellJS.mv("-f", tmpFilePath, filePath);
+            }
+        }
+    }
+
+    return true;
+};
+
+/**
  * Implements {@link PlatformBase.build}
  */
 AndroidPlatform.prototype.build =
@@ -1040,6 +1128,12 @@ function(configId, args, callback) {
 
     this.updateManifest(callback);
     this.updateJavaActivity(configId === "release");
+    if (args.webp) {
+        var ret = this.convertWebp(args.webp);
+        if (!ret) {
+            output.warning("Webp conversion failed, packaging unconverted assets");
+        }
+    }
 
     var closure = {
         abis: ["armeabi-v7a", "x86"], // TODO export option
