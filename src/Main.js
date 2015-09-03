@@ -3,9 +3,12 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var Path = require("path");
+var FS = require("fs");
+var OS = require("os");
 
 var Minimist = require("minimist");
 var ShellJS = require("shelljs");
+var ChildProcess = require("child_process");
 
 var Application = require("./Application");
 var CommandParser = require("./CommandParser");
@@ -272,6 +275,82 @@ function(version, extraArgs, callback) {
 };
 
 /**
+ * Check if webp convert tool exists. 
+ * @static
+ */
+Main.prototype.checkWebp =
+function() {
+
+    var platform = OS.platform();
+
+    if (platform == "windows")
+        cwebpName = "cwebp.exe";
+    else
+        cwebpName = "cwebp";
+
+    var webpPath = Path.join(__dirname, "cwebp");
+    if (ShellJS.test("-e", webpPath))
+        return true;
+
+    this.output.write("Please download webp convert tool from: http://downloads.webmproject.org/releases/webp\n");
+    return false;
+}
+
+/**
+ * Convert png/jpeg images to webp. 
+ * @param {String} path Images under this path will be converted
+ * @static
+ */
+Main.prototype.convertWebP =
+function(path, args) {
+    argsList = args.split(/[ ,]+/);
+    jpegQuality = argsList[0];
+    pngQuality = argsList[1];
+    pngAlphaQuality = argsList[2];
+
+    var walk = function(dir) {
+        var results = [];
+        var list = FS.readdirSync(dir);
+        list.forEach(function(file) {
+            file = dir + "/" + file;
+            var stat = FS.statSync(file);
+            if (stat && stat.isDirectory())
+                results = results.concat(walk(file));
+            else
+                results.push(file);
+        })
+        return results;
+    }
+
+    var fileList = walk(path);
+    var webpPath = Path.join(__dirname, "cwebp");
+    for (var i in fileList) {
+        if (FS.lstatSync(fileList[i]).isFile()) {
+            var filePath = fileList[i];
+            var tmpFilePath = filePath + ".webp";
+            var ext = Path.extname(filePath);
+            if (".jpeg" == ext || ".jpg" == ext) {
+                ChildProcess.execSync(webpPath +
+                                      " " + filePath +
+                                      " -q " + jpegQuality +
+                                      " -o " + tmpFilePath,
+                                      {stdio:[]});
+                ShellJS.mv("-f", tmpFilePath, filePath);
+            } else if (".png" == ext) {
+                ChildProcess.execSync(webpPath +
+                                      " " + filePath +
+                                      " -q " + pngQuality +
+                                      " -alpha_q " + pngAlphaQuality + 
+                                      " -o " + tmpFilePath,
+                                      {stdio:[]});
+                ShellJS.mv("-f", tmpFilePath, filePath);
+            }
+        }
+    }
+  
+}
+
+/**
  * Build application package.
  * @param {String} configId Build "debug" or "release" configuration
  * @param {Object} extraArgs Unparsed extra arguments passed by command-line
@@ -279,7 +358,7 @@ function(version, extraArgs, callback) {
  * @static
  */
 Main.prototype.build =
-function(configId, extraArgs, callback) {
+function(configId, args, callback) {
 
     var output = this.output;
 
@@ -298,26 +377,54 @@ function(configId, extraArgs, callback) {
         return;
     }
 
-    // Collect args for this command
-    var buildArgs = {};
-    var argSpec = project.argSpec;
-    if (argSpec && argSpec.build) {
-        buildArgs = this.collectArgs(project.platformId, extraArgs, argSpec.build);
+    if (2 == args._.length) {
+        var target = args._[args._.length-1];
+        if ("release" == target)
+            target = "release";
     }
 
-    // Build
-    project.build(configId, buildArgs, function(errormsg) {
+    var _build = function() {
+        // Build
+        project.build(configId, {}, function(errormsg) {
 
-        if (errormsg) {
-            output.error(errormsg);
-            output.info("Logfiles at " + this.logPath);
-            callback(MAIN_EXIT_CODE_ERROR);
-            return;
-        } else {
-            callback(MAIN_EXIT_CODE_OK);
-            return;
+            if (errormsg) {
+                output.error(errormsg);
+                callback(MAIN_EXIT_CODE_ERROR);
+                return;
+            } else {
+                callback(MAIN_EXIT_CODE_OK);
+                return;
+            }
+        });
+    }
+
+    var appPath = Path.join(Path.dirname(Path.dirname(project.platformPath)), "app");
+    var wwwPath = Path.join(Path.join(project.platformPath, "assets"), "www");
+
+    if (args["android-webp"]) {
+        if (ShellJS.test("-e", wwwPath)) {
+            if (ShellJS.test("-L", wwwPath)) {
+                ShellJS.rm("-f", wwwPath)
+            } else {
+                ShellJS.rm("-r", wwwPath)
+            }
         }
-    }.bind(this));
+        ShellJS.mkdir("-p", wwwPath)
+        ShellJS.cp("-R", appPath+"/*", wwwPath)
+        if (this.checkWebp()) {
+            this.convertWebP(wwwPath, args["android-webp"])
+            _build();
+        }
+
+    } else {
+        if (ShellJS.test("-e", wwwPath)) {
+            if (!ShellJS.test("-L", wwwPath)) {
+                ShellJS.rm("-r", wwwPath)
+                ShellJS.ln("-s", appPath, wwwPath);
+            } 
+        }
+        _build();
+    }
 };
 
 /**
