@@ -579,7 +579,7 @@ function(abi) {
 
     var output = this.application.output;
 
-    // There is no need to enable/disable various ABIS when building shared.
+    // There is no need to enable/disable various ABIs when building shared.
     // Only one APK is being built.
     if (this._shared) {
         return true;
