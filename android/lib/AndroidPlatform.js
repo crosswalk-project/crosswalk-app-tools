@@ -56,7 +56,7 @@ function() {
                          "\t\t\t\t\t\tor version number (w.x.y.z)"
         },
         build: {
-            "webp": "                      Webp conversion e.g. \"(80 80 100)\"\n" +
+            "webp": "                      Webp conversion e.g. \"80 80 100\"\n" +
                     "                                                (jpeg png alpha) quality parameters"
         }
     };
