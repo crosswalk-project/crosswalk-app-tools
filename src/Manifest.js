@@ -141,6 +141,18 @@ function Manifest(output, path) {
         }
     }
 
+    // Android webp
+    this._androidWebp = false;
+    if (json.xwalk_android_webp) {
+
+        if (typeof json.xwalk_android_webp === "string") {
+            // TODO better check
+            this._androidWebp = json.xwalk_android_webp;
+        } else {
+            output.warning("Invalid webp parameters '" + json.xwalk_android_webp + "'");
+        }
+    }
+
     // Windows update ID
     // Optional field, only check if present.
     this._windowsUpdateId = null;
@@ -396,6 +408,18 @@ Object.defineProperty(Manifest.prototype, "androidAnimatableView", {
 Object.defineProperty(Manifest.prototype, "androidKeepScreenOn", {
                       get: function() {
                                 return this._androidKeepScreenOn;
+                           }
+                      });
+
+/**
+ * Android webp conversion.
+ * @member {String} androidWebp
+ * @instance
+ * @memberOf Manifest
+ */
+Object.defineProperty(Manifest.prototype, "androidWebp", {
+                      get: function() {
+                                return this._androidWebp;
                            }
                       });
 

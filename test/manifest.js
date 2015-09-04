@@ -269,6 +269,23 @@ exports.tests = {
         test.done();
     },
 
+    androidWebp: function(test) {
+
+        test.expect(2);
+
+        // Default to "false"
+        var path = produceManifest();
+        var manifest = consumeManifest(path);
+        test.equal(!manifest.androidWebp, true);
+
+        // Test reading "true"
+        path = produceManifest({"xwalk_android_webp": "80 80 100"});
+        manifest = consumeManifest(path);
+        test.equal(manifest.androidWebp, "80 80 100");
+
+        test.done();
+    },
+
     windowsUpdateId: function(test) {
 
         test.expect(1);

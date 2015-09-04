@@ -56,10 +56,6 @@ function() {
             "crosswalk": "\t\t\tChannel name (stable/beta/canary)\n" +
                          "\t\t\t\t\t\tor version number (w.x.y.z)",
             "shared": "                    Depend on shared crosswalk installation"
-        },
-        build: {
-            "webp": "                      Webp conversion e.g. \"80 80 100\"\n" +
-                    "                                                (jpeg png alpha) quality parameters"
         }
     };
 };
@@ -1050,14 +1046,24 @@ function(release) {
 };
 
 /**
- * Convert assets to Webp
- * @param {String} params Webp quality parameters
- * @returns {Boolean} True on success, falso otherwise.
+ * Convert assets to webp format
  */
-AndroidPlatform.prototype.convertWebp =
-function(params) {
+AndroidPlatform.prototype.updateWebApp =
+function() {
 
     var output = this.application.output;
+
+    // Always copy over the app tree to the android project
+    var wwwPath = Path.join(this.platformPath, "assets", "www");
+    ShellJS.rm("-rf", wwwPath + Path.sep + "*");
+    output.info("Copying app to " + wwwPath);
+    ShellJS.cp("-r", this.appPath + Path.sep + "*", wwwPath);
+
+    var params = this.application.manifest.androidWebp;
+    if (!params) {
+        // No webp conversion needed.
+        return;
+    }
 
     output.info("Converting image assets to webp format (" + params + ")");
 
@@ -1065,15 +1071,10 @@ function(params) {
     var cwebp = ShellJS.which("cwebp");
     output.info("Checking for cwebp ... " + cwebp);
     if (!cwebp) {
-        output.error("Webp conversion tool not found, install from http://downloads.webmproject.org/releases/webp");
-        return false;
+        output.warning("Webp conversion tool not found, install from http://downloads.webmproject.org/releases/webp");
+        output.warning("Webp conversion failed, packaging unconverted assets");
+        return;
     }
-
-    // Copy over the app tree before conversion
-    var wwwPath = Path.join(this.platformPath, "assets", "www");
-    ShellJS.rm("-rf", wwwPath + Path.sep + "*");
-    output.info("Copying app to " + wwwPath);
-    ShellJS.cp("-r", this.appPath + Path.sep + "*", wwwPath);
 
     // Quality parameters
     var jpegQuality = 80;
@@ -1100,7 +1101,7 @@ function(params) {
                 results = results.concat(walk(file));
             else
                 results.push(file);
-        })
+        });
         return results;
     }
 
@@ -1129,8 +1130,6 @@ function(params) {
             }
         }
     }
-
-    return true;
 };
 
 /**
@@ -1151,12 +1150,7 @@ function(configId, args, callback) {
 
     this.updateManifest(callback);
     this.updateJavaActivity(configId === "release");
-    if (args.webp) {
-        var ret = this.convertWebp(args.webp);
-        if (!ret) {
-            output.warning("Webp conversion failed, packaging unconverted assets");
-        }
-    }
+    this.updateWebApp(this.application.manifest.androidWebp);
 
     var closure = {
         abis: this._shared ? ["shared"] : ["armeabi-v7a", "x86"], // TODO export option
