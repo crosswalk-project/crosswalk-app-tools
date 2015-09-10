@@ -131,6 +131,11 @@ Object.defineProperty(AndroidManifest.prototype, "applicationLabel", {
                                     } else {
                                         this._applicationLabel = applicationLabel;
                                         node.setAttribute("android:label", applicationLabel);
+                                        // Also set name on the activity
+                                        var activityNode = this.findChildNode(node, "activity");
+                                        if (activityNode)
+                                            activityNode.setAttribute("android:label", applicationLabel);
+                                        // Save
                                         this.write(doc);
                                     }
                                 } else {
@@ -187,6 +192,28 @@ function(document) {
     }
 
     return node;
+};
+
+/**
+ * Find named child node
+ * @param {xmldom.Node} node
+ * @param {String} name Child name
+ * @returns {xmldom.Node} Node if found or null
+ * @private
+ */
+AndroidManifest.prototype.findChildNode =
+function(node, name) {
+
+    var child = null;
+
+    for (var idx in node.childNodes) {
+        child = node.childNodes[idx];
+        if (child.nodeName === name) {
+            return child;
+        }
+    }
+
+    return null;
 };
 
 module.exports = AndroidManifest;
