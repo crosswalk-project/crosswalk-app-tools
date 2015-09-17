@@ -921,12 +921,17 @@ function(androidManifest, callback) {
                 return "hdpi";
 
             // Match size as per categories above.
-            for (var prop in this) {
-                if (this[prop] <= size) {
+            // Start from the biggest size, and pick the first
+            // one where the icon is bigger or same.
+            var keys = Object.keys(this);
+            for (var k = keys.length - 1; k >= 0; k--) {
+                var prop = keys[k];
+                if (size >= this[prop]) {
                     return prop;
                 }
             }
-            return "xxxhdpi";
+            // Default to smallest size when below 36.
+            return "ldpi";
         }
     };
 
