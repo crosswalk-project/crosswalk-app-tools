@@ -192,6 +192,23 @@ exports.tests = {
         test.done();
     },
 
+    commandLine: function(test) {
+
+        test.expect(2);
+
+        // default
+        var path = produceManifest();
+        var manifest = consumeManifest(path);
+        test.equal(manifest.commandLine, null);
+
+        // custom value
+        path = produceManifest({"xwalk_command_line": "foo"});
+        manifest = consumeManifest(path);
+        test.equal(manifest.commandLine, "foo");
+
+        test.done();
+    },
+
     packageId: function(test) {
 
         test.expect(2);

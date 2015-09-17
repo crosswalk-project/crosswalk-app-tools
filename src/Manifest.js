@@ -98,6 +98,16 @@ function Manifest(output, path) {
         this._icons = json.icons;
     }
 
+    // Command line params
+    this._commandLine = null;
+    if (json.xwalk_command_line) {
+        if (typeof json.xwalk_command_line === "string") {
+            this._commandLine = json.xwalk_command_line;
+        } else {
+            output.warning("Invalid command line '" + json.xwalk_command_line + "'");
+        }
+    }
+
     // Package ID
     if (json.xwalk_package_id &&
         CommandParser.validatePackageId(json.xwalk_package_id, this._output)) {
@@ -234,6 +244,7 @@ function(path, packageId) {
         "start_url": "index.html",
         // Crosswalk fields
         "xwalk_app_version": "0.1",
+        "xwalk_command_line": "",
         "xwalk_package_id": packageId,
         "xwalk_target_platforms": platformInfo.platformId,
         // Android fields
@@ -372,6 +383,18 @@ Object.defineProperty(Manifest.prototype, "icons", {
 Object.defineProperty(Manifest.prototype, "startUrl", {
                       get: function() {
                                 return this._startUrl;
+                           }
+                      });
+
+/**
+ * Command line params
+ * @member {String} commandLine
+ * @instance
+ * @memberOf Manifest
+ */
+Object.defineProperty(Manifest.prototype, "commandLine", {
+                      get: function() {
+                                return this._commandLine;
                            }
                       });
 

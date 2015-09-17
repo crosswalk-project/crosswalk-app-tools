@@ -978,6 +978,28 @@ function(androidManifest, callback) {
 };
 
 /**
+ * Configure crosswalk runtime.
+ */
+AndroidPlatform.prototype.updateEngine =
+function() {
+
+    var output = this.application.output;
+
+    // Write command-line params file.
+    var path = Path.join(this.platformPath, "assets", "xwalk-command-line");
+
+    if (this.application.manifest.commandLine) {
+        // Write file.
+        output.info("Writing command-line parameters file");
+        var commandLine = "xwalk " + this.application.manifest.commandLine;
+        FS.writeFileSync(path, commandLine);
+    } else {
+        // Delete file to make sure there's not a stale one
+        ShellJS.rm(path);
+    }
+};
+
+/**
  * Update android manifest.
  * @param {Function} callback Error callback
  */
@@ -1153,6 +1175,7 @@ function(configId, args, callback) {
         this._shared = true;
     }
 
+    this.updateEngine();
     this.updateManifest(callback);
     this.updateJavaActivity(configId === "release");
     this.updateWebApp(this.application.manifest.androidWebp);
