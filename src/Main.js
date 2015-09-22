@@ -399,15 +399,15 @@ function(output) {
  * @static
  */
 Main.prototype.run =
-function(callback) {
+function(env, callback) {
 
     // Temporary output object because of static method here
     var output = TerminalOutput.getInstance();
-    var parser = new CommandParser(output, process.argv);
+    var parser = new CommandParser(output, env.argv);
     var app = new Main();
     var rootDir = null;
 
-    if (process.argv.length < 3) {
+    if (env.argv.length < 3) {
         // No command given, print help and exit without error code.
         app.printHelp(parser, output);
         callback(MAIN_EXIT_CODE_OK);
@@ -417,12 +417,12 @@ function(callback) {
     // Unknown or bogus command?
     var cmd = parser.getCommand();
     if (!cmd) {
-        output.error("Unhandled command '" + process.argv[2] + "'");
+        output.error("Unhandled command '" + env.argv[2] + "'");
         callback(MAIN_EXIT_CODE_ERROR);
         return;
     }
 
-    var extraArgs = Minimist(process.argv.slice(2));
+    var extraArgs = Minimist(env.argv.slice(2));
     switch (cmd) {
     case "check":
         var platforms = parser.checkGetPlatforms();
@@ -433,7 +433,7 @@ function(callback) {
         var packageId = parser.createGetPackageId();
 
         // Chain up the constructor.
-        Application.call(app, process.cwd(), packageId);
+        Application.call(app, env.cwd, packageId);
         app.create(packageId, extraArgs, callback);
         break;
 

@@ -5,7 +5,11 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var Main = require("./Main.js");
-Main.run(function (errno) {
+var env = {
+  argv: process.argv,
+  cwd: process.cwd()
+};
+Main.run(env, function (errno) {
 
     if (errno)
         process.exit(errno);
