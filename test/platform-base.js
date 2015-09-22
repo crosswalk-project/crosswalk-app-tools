@@ -45,7 +45,7 @@ exports.tests = {
         test.equal(platform.appPath, Path.join(basePath, _packageId, "app"));
         test.equal(platform.logOutput instanceof LogfileOutput, true);
         test.equal(platform.packageId, _packageId);
-        test.equal(platform.pkgPath, Path.join(basePath, _packageId, "pkg"));
+        test.equal(platform.pkgPath, process.cwd());
         test.equal(platform.platformId, _platformId);
         test.equal(platform.platformPath, Path.join(basePath, _packageId, "prj", _platformId));
         test.equal(platform.prjPath, Path.join(basePath, _packageId, "prj"));

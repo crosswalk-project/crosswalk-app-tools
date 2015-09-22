@@ -12,7 +12,20 @@ function InfiniteProgress(output, label) {
 
     this._output = output;
     this._label = label;
+    this._active = false;
 }
+
+/**
+ * Whether the indicator has already been activated (first update() call)
+ * @member {Boolean} isActive
+ * @instance
+ * @memberOf InfiniteProgress
+ */
+Object.defineProperty(InfiniteProgress.prototype, "isActive", {
+                      get: function() {
+                                return this._active;
+                           }
+                      });
 
 /**
  * Update progress indicator.
@@ -20,6 +33,8 @@ function InfiniteProgress(output, label) {
  */
 InfiniteProgress.prototype.update =
 function(tag) {
+
+    this._active = true;
 
     // Clear line
     this._output.write('\033[2K');
@@ -49,6 +64,9 @@ function(message) {
 
     var line = "  * " + this._label + " [done] " + message + "\n";
     this._output.write(line);
+
+    this._output.endProgress();
+    this._active = false;
 };
 
 module.exports = InfiniteProgress;

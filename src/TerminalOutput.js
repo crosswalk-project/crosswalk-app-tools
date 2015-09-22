@@ -2,6 +2,8 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var Os = require("os");
+
 var FiniteProgress = require("./FiniteProgress");
 var InfiniteProgress = require("./InfiniteProgress");
 var OutputIface = require("./OutputIface");
@@ -20,6 +22,8 @@ function TerminalOutput() {
         TerminalOutput._instance = this;
     }
 
+    this._progress = null;
+
     return TerminalOutput._instance;
 }
 
@@ -28,29 +32,49 @@ TerminalOutput.prototype = OutputIface.prototype;
 TerminalOutput.prototype.error =
 function(message) {
 
-    if (!_config.getSilentConsole())
+    if (!_config.getSilentConsole()) {
+        if (this._progress &&
+            this._progress.isActive) {
+            console.log("");
+        }
         console.error("*** ERROR: " + message);
+    }
 };
 
 TerminalOutput.prototype.warning =
 function(message) {
 
-    if (!_config.getSilentConsole())
+    if (!_config.getSilentConsole()) {
+        if (this._progress &&
+            this._progress.isActive) {
+            console.log("");
+        }
         console.error(" ** WARNING: " + message);
+    }
 };
 
 TerminalOutput.prototype.info =
 function(message) {
 
-    if (!_config.getSilentConsole())
+    if (!_config.getSilentConsole()) {
+        if (this._progress &&
+            this._progress.isActive) {
+            console.log("");
+        }
         console.log("  * " + message);
+    }
 };
 
 TerminalOutput.prototype.highlight =
 function(message) {
 
-    if (!_config.getSilentConsole())
+    if (!_config.getSilentConsole()) {
+        if (this._progress &&
+            this._progress.isActive) {
+            console.log("");
+        }
         console.log('\033[1m' + message + '\033[0m');
+    }
 };
 
 TerminalOutput.prototype.write =
@@ -77,8 +101,8 @@ function(label) {
     // is printed while having current context, insert
     // extra newline, so the message is in the correct place.
 
-    var indicator = new FiniteProgress(this, label);
-    return indicator;
+    this._progress = new FiniteProgress(this, label);
+    return this._progress;
 };
 
 /**
@@ -97,8 +121,19 @@ function(label) {
     // is printed while having current context, insert
     // extra newline, so the message is in the correct place.
 
-    var indicator = new InfiniteProgress(this, label);
-    return indicator;
+    this._progress = new InfiniteProgress(this, label);
+    return this._progress;
+};
+
+/**
+ * End progress display and switch back to line mode.
+ * Only to be called from the progress indicator classes.
+ * @private
+ */
+TerminalOutput.prototype.endProgress =
+function() {
+
+    this._progress = null;
 };
 
 /**

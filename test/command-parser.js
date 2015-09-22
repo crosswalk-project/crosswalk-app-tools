@@ -2,6 +2,8 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var Path = require("path");
+
 // Run tests silently to avoid spew from tests failing on purpose.
 require("../src/Config").getInstance().setSilentConsole(true);
 var CommandParser = require("../src/CommandParser");
@@ -118,7 +120,7 @@ exports.tests = {
 
         test.expect(8);
 
-        // No version, good test
+        // No version, good test, default to "stable"
         var argv0 = ["node", "foo", "update"];
         var cp0 = new CommandParser(_output, argv0);
 
@@ -128,7 +130,7 @@ exports.tests = {
         test.equal(cmd0, argv0[2]);
 
         var version0 = cp0.updateGetVersion();
-        test.equal(version0, null);
+        test.equal(version0, "stable");
 
         // Good test
         var argv1 = ["node", "foo", "update", "12.34.56.78"];
@@ -149,7 +151,44 @@ exports.tests = {
         test.equal(cp2.getCommand(), null);
 
         var version2 = cp2.updateGetVersion();
-        test.equal(version2, false);
+        test.equal(version2, null);
+
+        test.done();
+    },
+
+    updateGetDir: function(test) {
+
+        test.expect(8);
+
+        // build inside project
+        var argv0 = ["node", "foo", "update"];
+        var cp0 = new CommandParser(_output, argv0);
+
+        test.equal(cp0.getCommand(), "update");
+
+        var cmd0 = cp0.getCommand();
+        test.equal(cmd0, argv0[2]);
+
+        var version0 = cp0.updateGetVersion();
+        test.equal(version0, "stable");
+
+        var dir0 = cp0.updateGetDir();
+        test.equal(dir0, process.cwd());
+
+        // command-line with dir specified
+        var argv1 = ["node", "foo", "update", "beta", "com.example.foo"];
+        var cp1 = new CommandParser(_output, argv1);
+
+        test.equal(cp1.getCommand(), "update");
+
+        var cmd1 = cp1.getCommand();
+        test.equal(cmd1, argv1[2]);
+
+        var version1 = cp1.updateGetVersion();
+        test.equal(version1, argv1[3]);
+
+        var dir1 = cp1.updateGetDir();
+        test.equal(dir1, Path.join(process.cwd(), argv1[4]));
 
         test.done();
     },
@@ -194,14 +233,45 @@ exports.tests = {
         var type3 = cp3.buildGetType();
         test.equal(type3, "release");
 
-        // Bad test, unknown type
+        // Test dir
         var argv4 = ["node", "foo", "build", "foo"];
         var cp4 = new CommandParser(_output, argv4);
 
-        test.equal(cp4.getCommand(), null);
+        test.equal(cp4.getCommand(), "build");
 
         var type4 = cp4.buildGetType();
-        test.equal(type4, null);
+        test.equal(type4, "debug");
+
+        test.done();
+    },
+
+    buildGetDir: function(test) {
+
+        test.expect(6);
+
+        // Test default "debug"
+        var argv = ["node", "foo", "build", "foo"];
+        var cp = new CommandParser(_output, argv);
+
+        test.equal(cp.getCommand(), "build");
+
+        var type = cp.buildGetType();
+        test.equal(type, "debug");
+
+        var dir = cp.buildGetDir();
+        test.equal(Path.basename(dir), "foo");
+
+        // Test "release"
+        var argv1 = ["node", "foo", "build", "release", "foo"];
+        var cp1 = new CommandParser(_output, argv1);
+
+        test.equal(cp1.getCommand(), "build");
+
+        var type1 = cp1.buildGetType();
+        test.equal(type1, "release");
+
+        var dir1 = cp1.buildGetDir();
+        test.equal(Path.basename(dir1), "foo");
 
         test.done();
     }

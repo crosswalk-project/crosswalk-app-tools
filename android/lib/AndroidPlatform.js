@@ -2,16 +2,18 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var ChildProcess = require("child_process");
 var FS = require("fs");
 var Path = require('path');
 
+var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
 
 var AndroidDependencies = require("./AndroidDependencies");
 var AndroidManifest = require("./AndroidManifest");
 var AndroidSDK = require("./AndroidSDK");
-var CrosswalkZip = require("./CrosswalkZip");
 var JavaActivity = require("./JavaActivity");
+var XmlTheme = require("./XmlTheme");
 
 /**
  * Android project class.
@@ -38,31 +40,147 @@ function AndroidPlatform(PlatformBase, baseData) {
 
     instance._sdk = new AndroidSDK(instance.application);
     instance._channel = "stable";
+    instance._shared = false;
 
     return instance;
 }
 
 /**
  * Accessor function for platform-specific command-line argument spec.
+ * @static
  */
 AndroidPlatform.getArgs =
 function() {
     return {
         create: {
             "crosswalk": "\t\t\tChannel name (stable/beta/canary)\n" +
-                         "\t\t\t\t\t\tor version number (w.x.y.z)"
+                         "\t\t\t\t\t\tor version number (w.x.y.z)",
+            "shared": "                    Depend on shared crosswalk installation"
         }
     };
 };
 
 /**
  * Accessor function for platform-specific environment variables spec.
+ * @static
  */
 AndroidPlatform.getEnv =
 function() {
     return {
         CROSSWALK_APP_TOOLS_CACHE_DIR: "Keep downloaded files in this dir"
     };
+};
+
+/**
+ * Check host setup.
+ * @param {OutputIface} output Output to write to
+ * @param {Function} callback Function(success) to be called when done
+ * @static
+ */
+AndroidPlatform.check =
+AndroidPlatform.prototype.check =
+function(output, callback) {
+
+    // Checking deps
+    var deps = [
+        "android",
+        "ant",
+        "java"
+    ];
+
+    var found = true;
+    deps.forEach(function (dep) {
+        var path = ShellJS.which(dep);
+        var msg = "Checking for " + dep + "... " + path;
+        if (path) {
+            output.info(msg);
+        } else {
+            found = false;
+            output.error(msg);
+        }
+    });
+
+    if (!found) {
+        callback(false);
+        return;
+    }
+
+    // Build dummy project
+    var app = {
+        output: output
+    };
+
+    ShellJS.pushd(ShellJS.tempdir());
+    var dir = MkTemp.createDirSync("XXXXXX");
+    // Delete dir right after, just allocate name.
+    ShellJS.rm("-rf", dir);
+    ShellJS.popd();
+
+    var path = Path.join(ShellJS.tempdir(), dir);
+    output.info("Testing dummy project in " + path);
+
+    var dummyPackageId = "com.example.foo";
+    var dummyLog = "";
+    var sdk = new AndroidSDK(app);
+    // Progress display
+    var indicator = output.createInfiniteProgress("Building " + dummyPackageId);
+    sdk.onData = function(data) {
+
+        dummyLog += data;
+
+        // Scan first 7 chars if data starts with a [tag]
+        var tag = null;
+        for (var i = 0; i < 7 && i < data.length; i++) {
+            if (data[i] === '[') {
+
+                // Scan on a bit if there's a closing ']'
+                for (j = i+1; j < i+15; j++) {
+                    if (data[j] === ']') {
+                        tag = data.substring(i+1, j);
+                        indicator.update(tag);
+                        return;
+                    }
+                }
+            } else if (data[i] != ' ') {
+                break;
+            }
+        }
+    };
+    sdk.generateProjectSkeleton(path, dummyPackageId, "android-21",
+                                function (path, logmsg, errormsg) {
+
+        dummyLog += logmsg;
+
+        if (!path || errormsg) {
+            output.error(errormsg);
+            ShellJS.rm("-rf", path);
+            output.error("Generating project failed");
+            if (dummyLog) {
+                FS.writeFileSync(path, dummyLog);
+                output.error("Consult logfile " + path);
+            }
+            callback(false);
+            return;
+        }
+
+        // Build
+        ShellJS.pushd(path);
+        sdk.buildProject(false,
+                         function(success) {
+
+            ShellJS.popd();
+            ShellJS.rm("-rf", path);
+            indicator.done();
+            if (!success) {
+                output.error("Building project failed");
+                if (dummyLog) {
+                    FS.writeFileSync(path, dummyLog);
+                    output.error("Consult logfile " + path);
+                }
+            }
+            callback(success);
+        });
+    });
 };
 
 /**
@@ -82,7 +200,8 @@ function(apiTarget, platformPath) {
     var data = {
         "packageId" : this.packageId,
         "packageName" : this.packageId,
-        "apiTarget" : apiTarget
+        "apiTarget" : apiTarget,
+        "xwalkLibrary" : this._shared ? "xwalk_shared_library" : "xwalk_core_library"
     };
 
     // AndroidManifest.xml
@@ -98,10 +217,9 @@ function(apiTarget, platformPath) {
     tpl.render(data, platformPath + Path.sep + "project.properties");
 
     // Make html5 app dir and copy sample content
-    var assetsPath = Path.join(platformPath, "assets");
-    ShellJS.mkdir("-p", assetsPath);
-    var wwwPath = Path.join(assetsPath, "www");
-    ShellJS.ln("-s", this.appPath, wwwPath);
+    var wwwPath = Path.join(platformPath, "assets", "www");
+    ShellJS.mkdir("-p", wwwPath);
+    ShellJS.cp("-r", this.appPath + Path.sep + "*", wwwPath);
 
     // TODO check for errors
     return true;
@@ -116,6 +234,9 @@ function(apiTarget, platformPath) {
 AndroidPlatform.prototype.importCrosswalkFromZip =
 function(crosswalkPath, platformPath) {
 
+    // Namespace util
+    var util = this.application.util;
+
     var output = this.application.output;
 
     var indicator = output.createFiniteProgress("Extracting " + crosswalkPath);
@@ -123,7 +244,7 @@ function(crosswalkPath, platformPath) {
     // Extract contents
     var zip = null;
     try {
-        zip = new CrosswalkZip(crosswalkPath);
+        zip = new util.CrosswalkZip(crosswalkPath);
     } catch (e) {
         // HACK we're in the midst of a progress display, force line break
         ShellJS.rm("-f", crosswalkPath);
@@ -150,12 +271,15 @@ function(crosswalkPath, platformPath) {
 
     indicator.update(0.4);
 
-    // Extract xwalk_core_library
+    // Extract xwalk_core_library or xwalk_shared_library
     var path;
-    var name = zip.root + "xwalk_core_library/";
+    var xwalkLibrary = this._shared ?
+                            "xwalk_shared_library/" :
+                            "xwalk_core_library/";
+    var name = zip.root + xwalkLibrary;
     entry = zip.getEntry(name);
     if (entry) {
-        path = platformPath + Path.sep + "xwalk_core_library";
+        path = Path.join(platformPath, xwalkLibrary);
         // Remove existing dir to prevent stale files when updating crosswalk
         ShellJS.rm("-rf", path);
         ShellJS.mkdir(path);
@@ -288,6 +412,10 @@ function(packageId, args, callback) {
 
     var output = this.application.output;
 
+    if (args.shared) {
+        this._shared = true;
+    }
+
     var minApiLevel = 21;
     this._sdk.queryTarget(minApiLevel,
                           function(apiTarget, errormsg) {
@@ -308,6 +436,11 @@ function(packageId, args, callback) {
                 callback(errormsg);
                 return;
             }
+
+            // Remove _* from the default set of assets that are ignored
+            // see sdk/tools/ant/build.xml for more info
+            // the following is the default, without '_*'
+            'aapt.ignore.assets = "!.svn:!.git:.*:!CVS:!thumbs.db:!picasa.ini:!*.scc:*~"\n'.toEnd(path + Path.sep + 'ant.properties');
 
             var versionSpec = null;
             if (args.crosswalk) {
@@ -449,12 +582,19 @@ function(abi) {
 
     var output = this.application.output;
 
-    if (!ShellJS.test("-d", "xwalk_core_library/libs")) {
+    // There is no need to enable/disable various ABIs when building shared.
+    // Only one APK is being built.
+    if (this._shared) {
+        return true;
+    }
+
+    var libsDir = "xwalk_core_library/libs";
+    if (!ShellJS.test("-d", libsDir)) {
         output.error("This does not appear to be the root of a Crosswalk project.");
         return false;
     }
 
-    ShellJS.pushd("xwalk_core_library/libs");
+    ShellJS.pushd(libsDir);
 
     var abiMatched = false;
     var list = ShellJS.ls(".");
@@ -499,13 +639,13 @@ function(abi, release) {
 
     var apkInPattern;
     if (release) {
-        apkInPattern = "*-release-unsigned.apk";
+        apkInPattern = "-release-unsigned.apk";
     } else {
-        apkInPattern = "*-debug.apk";
+        apkInPattern = "-debug.apk";
     }
 
     ShellJS.pushd("bin");
-    var apkInName = ShellJS.ls(apkInPattern)[0];
+    var apkInName = ShellJS.ls("*" + apkInPattern)[0];
     ShellJS.popd();
 
     if (!ShellJS.test("-f", "bin" + Path.sep + apkInName)) {
@@ -513,8 +653,11 @@ function(abi, release) {
         return null;
     }
 
-    var base = apkInName.substring(0, apkInName.length - ".apk".length);
-    var apkOutName = base + "." + abi + ".apk";
+    var base = apkInName.substring(0, apkInName.length - apkInPattern.length);
+    var apkOutName = base + "-" +
+                     this.application.manifest.appVersion + "-" +
+                     (release ? "release-unsigned" : "debug") + "." +
+                     abi + ".apk";
     ShellJS.mv("bin" + Path.sep + apkInName,
                "bin" + Path.sep + apkOutName);
 
@@ -545,6 +688,7 @@ function(output, appVersion, abi) {
     }
 
     var abiCodes = {
+        "shared": 2, // use same as ARM, TODO check if correct.
         "armeabi-v7a": 2,
 //        "arm64": 3, TODO check name
         "x86": 6
@@ -601,10 +745,6 @@ function(abi) {
 
     output.info("Using android:versionCode '" + versionCode + "'");
     manifest.versionCode = versionCode;
-
-    // TODO HACK this should be done only once per build
-    manifest.versionName = this.application.manifest.appVersion;
-    manifest.applicationLabel = this.application.manifest.name;
 
     return true;
 };
@@ -702,6 +842,197 @@ function(closure) {
 };
 
 /**
+ * Apply icon if none yet, or source has higher quality
+ * @param {String} srcPath Icon to apply
+ * @param {String} dstDir Path to destination directory
+ * @param {String} iconFilename Destination icon filename without extension
+ * @param {Function} callback Error callback
+ * @returns {Boolean} True if applied, otherwise false.
+ */
+AndroidPlatform.prototype.applyIcon =
+function(srcPath, dstDir, iconFilename, callback) {
+
+    var output = this.application.output;
+
+    // Different image types get different priorities.
+    var score = {
+        "png": 3,
+        "jpeg": 2,
+        "jpg": 2,
+        "gif": 1
+    };
+
+    // extname() includes the ".", so strip it
+    var srcExt = Path.extname(srcPath);
+    if (srcExt && srcExt[0] === ".")
+        srcExt = srcExt.substring(1);
+
+    var srcScore = score[srcExt.toLowerCase()];
+    if (!srcScore) {
+        output.warning("Image type not supported: " + srcPath);
+        return false;
+    }
+
+    // Replace existing icon if we have a better one.
+    var curPath = null;
+    var curScore = -1;
+    var ls = ShellJS.ls(Path.join(dstDir, iconFilename + "*"));
+    if (ls.length > 1) {
+        output.warning("Unexpected extra files in " + dstDir);
+    }
+    if (ls.length > 0) {
+
+        // extname() includes the ".", so strip it
+        curPath = ls[0];
+        var curExt = Path.extname(curPath);
+        if (curExt && curExt[0] === ".")
+            curExt = curExt.substring(1);
+
+        curScore = +score[curExt.toLowerCase()];
+    }
+
+    if (srcScore >= curScore) {
+        if (curPath) {
+            // We have found a better quality icon
+            ShellJS.rm(curPath);
+        }
+        var dstPath = Path.join(dstDir, iconFilename + Path.extname(srcPath));
+        ShellJS.cp(srcPath, dstPath);
+    }
+
+    return true;
+};
+
+/**
+ * Update launcher icons.
+ * @param {AndroidManifest} androidManifest
+ * @param {Function} callback Error callback
+ */
+AndroidPlatform.prototype.updateIcons =
+function(androidManifest, callback) {
+
+    var output = this.application.output;
+
+    // See http://iconhandbook.co.uk/reference/chart/android/
+    var sizes = {
+        "ldpi": 36,
+        "mdpi": 48,
+        "hdpi": 72,
+        "xhdpi": 96,
+        "xxhdpi": 144,
+        "xxxhdpi": 192,
+        match: function(size) {
+
+            // Default to "hdpi", android will scale.
+            if (size === "any")
+                return "hdpi";
+
+            // Match size as per categories above.
+            // Start from the biggest size, and pick the first
+            // one where the icon is bigger or same.
+            var keys = Object.keys(this);
+            for (var k = keys.length - 1; k >= 0; k--) {
+                var prop = keys[k];
+                if (size >= this[prop]) {
+                    return prop;
+                }
+            }
+            // Default to smallest size when below 36.
+            return "ldpi";
+        }
+    };
+
+    var nUpdated = 0;
+    var iconFilename = "crosswalk_icon";
+
+    // Add icons from manifest
+    var icons = this.application.manifest.icons;
+    if (icons && icons.length > 0) {
+
+        // Remove existing icons, so we don't have stale ones around
+        // FIXME check that no icon was added manually.
+        ShellJS.rm("-rf", Path.join(this.platformPath, "res", "mipmap-*"));
+
+        for (var i = 0; i < icons.length; i++) {
+
+            var icon = icons[i];
+            var size = icon.sizes ? +icon.sizes.split("x")[0] : "any";
+            var density = sizes.match(size);
+
+            // Copy icon into place
+            // Icon will always be named crosswalk-icon.<ext>
+            // Because android:icon has no way to refer to different sizes.
+            var src = Path.join(this.appPath, icon.src);
+            var dstPath = Path.join(this.platformPath, "res", "mipmap-" + density);
+            ShellJS.mkdir(dstPath);
+
+            var ret = this.applyIcon(src, dstPath, iconFilename, callback);
+            if (ret)
+                nUpdated++;
+        }
+    }
+
+    if (nUpdated > 0) {
+        androidManifest.applicationIcon = "@mipmap/" + iconFilename;
+    } else {
+        output.warning("No usable icons found in manifest.json");
+        output.warning("Using builtin default icon");
+        // Fall back to the default icon
+        androidManifest.applicationIcon = "@drawable/crosswalk";
+    }
+
+    return nUpdated;
+};
+
+/**
+ * Configure crosswalk runtime.
+ */
+AndroidPlatform.prototype.updateEngine =
+function() {
+
+    var output = this.application.output;
+
+    // Write command-line params file.
+    var path = Path.join(this.platformPath, "assets", "xwalk-command-line");
+
+    if (this.application.manifest.commandLine) {
+        // Write file.
+        output.info("Writing command-line parameters file");
+        var commandLine = "xwalk " + this.application.manifest.commandLine;
+        FS.writeFileSync(path, commandLine);
+    } else {
+        // Delete file to make sure there's not a stale one
+        ShellJS.rm(path);
+    }
+};
+
+/**
+ * Update android manifest.
+ * @param {Function} callback Error callback
+ */
+AndroidPlatform.prototype.updateManifest =
+function(callback) {
+
+    var output = this.application.output;
+
+    var manifest = new AndroidManifest(output,
+                                       Path.join(this.platformPath, "AndroidManifest.xml"));
+
+    // Renaming package is not supported.
+    if (manifest.package !== this.application.manifest.packageId) {
+        callback("Renaming of package not supported (" +
+                 manifest.package + "/" + this.application.manifest.packageId + ")");
+        return;
+    }
+
+    manifest.versionName = this.application.manifest.appVersion;
+    manifest.applicationLabel = this.application.manifest.name;
+
+    // Update icons
+    this.updateIcons(manifest, callback);
+};
+
+/**
  * Update java activity file for build config.
  * @param {Boolean} release True if release build, false if debug
  * @returns {Boolean} True if successful, otherwise false.
@@ -712,6 +1043,7 @@ function(release) {
     var output = this.application.output;
     var ret = true;
 
+    // Update java
     var config = release ? "release" : "debug";
     output.info("Updating java activity for '" + config + "' configuration");
 
@@ -721,8 +1053,117 @@ function(release) {
 
     // Enable remote debugging for debug builds.
     ret = activity.enableRemoteDebugging(!release);
+    if (!ret)
+        return false;
+
+    // Animatable view
+    ret = activity.enableAnimatableView(this.application.manifest.androidAnimatableView);
+    if (!ret)
+        return false;
+
+    // Fullscreen
+    var fullscreen = this.application.manifest.display === "fullscreen";
+    ret = activity.enableFullscreen(fullscreen);
+    if (!ret)
+        return false;
+    output.info("Updating theme.xml for display mode (fullscreen: " + (fullscreen ? "yes" : "no") + ")");
+    var theme = new XmlTheme(output,
+                             Path.join(this.platformPath, "res", "values-v14", "theme.xml"));
+    theme.fullscreen = fullscreen;
+
+    // "Keep screen on"
+    ret = activity.enableKeepScreenOn(this.application.manifest.androidKeepScreenOn);
+    if (!ret)
+        return false;
 
     return ret;
+};
+
+/**
+ * Convert assets to webp format
+ */
+AndroidPlatform.prototype.updateWebApp =
+function() {
+
+    var output = this.application.output;
+
+    // Always copy over the app tree to the android project
+    var wwwPath = Path.join(this.platformPath, "assets", "www");
+    ShellJS.rm("-rf", wwwPath + Path.sep + "*");
+    output.info("Copying app to " + wwwPath);
+    ShellJS.cp("-r", this.appPath + Path.sep + "*", wwwPath);
+
+    var params = this.application.manifest.androidWebp;
+    if (!params) {
+        // No webp conversion needed.
+        return;
+    }
+
+    output.info("Converting image assets to webp format (" + params + ")");
+
+    // Check for conversion tool
+    var cwebp = ShellJS.which("cwebp");
+    output.info("Checking for cwebp ... " + cwebp);
+    if (!cwebp) {
+        output.warning("Webp conversion tool not found, install from http://downloads.webmproject.org/releases/webp");
+        output.warning("Webp conversion failed, packaging unconverted assets");
+        return;
+    }
+
+    // Quality parameters
+    var jpegQuality = 80;
+    var pngQuality = 80;
+    var pngAlphaQuality = 80;
+    var argsList = [];
+    if (typeof params === "string")
+        argsList = params.split(/[ ,]+/);
+    if (argsList && argsList.length > 0)
+        jpegQuality = argsList[0];
+    if (argsList && argsList.length > 1)
+        pngQuality = argsList[1];
+    if (argsList && argsList.length > 2)
+        pngAlphaQuality = argsList[2];
+
+    // Directory traversal function
+    function walk(dir) {
+        var results = [];
+        var list = FS.readdirSync(dir);
+        list.forEach(function(file) {
+            file = dir + "/" + file;
+            var stat = FS.statSync(file);
+            if (stat && stat.isDirectory())
+                results = results.concat(walk(file));
+            else
+                results.push(file);
+        });
+        return results;
+    }
+
+    // Do conversion
+    var fileList = walk(wwwPath);
+    for (var i in fileList) {
+        if (FS.lstatSync(fileList[i]).isFile()) {
+            var filePath = fileList[i];
+            var tmpFilePath = filePath + ".webp";
+            var ext = Path.extname(filePath);
+            if (".jpeg" == ext || ".jpg" == ext) {
+                ChildProcess.execSync(cwebp +
+                                      " " + filePath +
+                                      " -q " + jpegQuality +
+                                      " -o " + tmpFilePath,
+                                      {stdio:[]});
+                ShellJS.mv("-f", tmpFilePath, filePath);
+            } else if (".png" == ext) {
+                ChildProcess.execSync(cwebp +
+                                      " " + filePath +
+                                      " -q " + pngQuality +
+                                      " -alpha_q " + pngAlphaQuality +
+                                      " -o " + tmpFilePath,
+                                      {stdio:[]});
+                ShellJS.mv("-f", tmpFilePath, filePath);
+            }
+        }
+    }
 };
 
 /**
@@ -736,16 +1177,27 @@ function(configId, args, callback) {
     // TODO should we cd back afterwards?
     process.chdir(this.platformPath);
 
+    // Embedded or shared build?
+    if (ShellJS.test("-d", Path.join(this.platformPath, "xwalk_shared_library"))) {
+        this._shared = true;
+    }
+
+    this.updateEngine();
+    this.updateManifest(callback);
     this.updateJavaActivity(configId === "release");
+    this.updateWebApp(this.application.manifest.androidWebp);
 
     var closure = {
-        abis: ["armeabi-v7a", "x86"], // TODO export option
+        abis: this._shared ? ["shared"] : ["armeabi-v7a", "x86"], // TODO export option
         abiIndex : 0,
         release: configId == "release", // TODO verify above
         apks: [],
         callback: function(errormsg) {
 
-            if (!errormsg) {
+            if (!errormsg &&
+                closure.apks.length > 0) {
+
+                output.highlight("  * Built package(s):");
 
                 for (var i = 0; i < closure.apks.length; i++) {
 
@@ -753,7 +1205,7 @@ function(configId, args, callback) {
                     var packagePath = Path.join(this.platformPath, "bin", closure.apks[i]);
                     this.exportPackage(packagePath);
 
-                    output.highlight("  pkg/" + closure.apks[i]);
+                    output.highlight("    + " + closure.apks[i]);
                 }
             }
             callback(errormsg);

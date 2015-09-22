@@ -12,6 +12,7 @@ var CommandParser = require("./CommandParser");
 var PlatformBase = require("./PlatformBase");
 var PlatformsManager = require("./PlatformsManager");
 var TerminalOutput = require("./TerminalOutput");
+var util = require("./util/index.js");
 
 var MAIN_EXIT_CODE_OK = 0;
 var MAIN_EXIT_CODE_ERROR = 127;
@@ -82,6 +83,69 @@ function() {
     var platform = platformInfo.create(this);
 
     return platform;
+};
+
+/**
+ * Have platform implementations check the host setup.
+ * @param {String[]} platformIds Platforms to check, null or empty array checks all.
+ * @param {OutputIface} output Output to write to
+ * @param {Main~mainOperationCb} callback Callback function
+ * @static
+ */
+Main.prototype.check =
+function(platformIds, output, callback) {
+
+    var mgr = new PlatformsManager(output);
+
+    var platforms = [];
+    if (platformIds && platformIds.length > 0) {
+
+        platformIds.forEach(function (platformId) {
+            var errormsg = null;
+            var platformInfo = mgr.load(platformId,
+                                        function (errormsg_) {
+                errormsg = errormsg_;
+            });
+            if (platformInfo) {
+                platforms.push(platformInfo);
+            } else {
+                output.error(errormsg);
+                output.error("Failed to load platform '" + platformId + "'");
+                callback(MAIN_EXIT_CODE_ERROR);
+                return;
+            }
+        });
+
+    } else {
+        platforms = mgr.loadAll();
+    }
+
+    if (!platforms || platforms.length === 0) {
+        output.error("Failed to load platform modules");
+        callback(MAIN_EXIT_CODE_ERROR);
+        return;
+    }
+
+    function checkPlatform(platformInfo, next) {
+
+        if (platformInfo.Ctor.check) {
+            output.info("Checking host setup for target " + platformInfo.platformId);
+            platformInfo.Ctor.check(output,
+                                    function(success) {
+                next();
+            });
+
+        } else {
+            output.warning("Skipping '" + platformInfo.platformId + "': 'check' not implemented");
+            next();
+        }
+    }
+
+    util.iterate(platforms, checkPlatform,
+                 function () {
+
+        callback(MAIN_EXIT_CODE_OK);
+    });
 };
 
 /**
@@ -158,13 +222,14 @@ function(packageId, extraArgs, callback) {
 
         if (errormsg) {
             output.error(errormsg);
+            output.info("Logfiles at " + this.logPath);
             callback(MAIN_EXIT_CODE_ERROR);
             return;
         } else {
             callback(MAIN_EXIT_CODE_OK);
             return;
         }
-    });
+    }.bind(this));
 };
 
 /**
@@ -196,13 +261,14 @@ function(version, extraArgs, callback) {
 
         if (errormsg) {
             output.error(errormsg);
+            output.info("Logfiles at " + this.logPath);
             callback(MAIN_EXIT_CODE_ERROR);
             return;
         } else {
             callback(MAIN_EXIT_CODE_OK);
             return;
         }
-    });
+    }.bind(this));
 };
 
 /**
@@ -239,24 +305,19 @@ function(configId, extraArgs, callback) {
         buildArgs = this.collectArgs(project.platformId, extraArgs, argSpec.build);
     }
 
-    // Copy manifest.json from root to app so the latest is shipped with the app
-    // FIXME check there are no manual changes.
-    output.info("Sync'ing manifest.json to app dir");
-    ShellJS.cp(Path.join(this.rootPath, "manifest.json"),
-               this.appPath);
-
     // Build
     project.build(configId, buildArgs, function(errormsg) {
 
         if (errormsg) {
             output.error(errormsg);
+            output.info("Logfiles at " + this.logPath);
             callback(MAIN_EXIT_CODE_ERROR);
             return;
         } else {
             callback(MAIN_EXIT_CODE_OK);
             return;
         }
-    });
+    }.bind(this));
 };
 
 /**
@@ -309,7 +370,7 @@ function(parser, output) {
 
         // Print environment variables
         if (Object.keys(platformInfo.envSpec).length > 0) {
-            output.write("Environment variables for platform '" + platformInfo.platformId + "'\n\n");
+            output.write("\nEnvironment variables for platform '" + platformInfo.platformId + "'\n\n");
             for (var env in platformInfo.envSpec) {
                 output.write("    " + env + "               " + platformInfo.envSpec[env] + "\n");
             }
@@ -343,10 +404,12 @@ function(callback) {
     // Temporary output object because of static method here
     var output = TerminalOutput.getInstance();
     var parser = new CommandParser(output, process.argv);
+    var app = new Main();
+    var rootDir = null;
 
     if (process.argv.length < 3) {
         // No command given, print help and exit without error code.
-        this.printHelp(parser, output);
+        app.printHelp(parser, output);
         callback(MAIN_EXIT_CODE_OK);
         return;
     }
@@ -361,58 +424,47 @@ function(callback) {
 
     var extraArgs = Minimist(process.argv.slice(2));
     switch (cmd) {
+    case "check":
+        var platforms = parser.checkGetPlatforms();
+        app.check(platforms, output, callback);
+        break;
+
     case "create":
         var packageId = parser.createGetPackageId();
 
-        try {
-            // Chain up the constructor.
-            Application.call(this, process.cwd(), packageId);
-            this.create(packageId, extraArgs, callback);
-        } catch (e) {
-            output.error("Failed to initialize");
-            output.error("Ensure directory '" + packageId + "' does not already exist");
-            callback(MAIN_EXIT_CODE_ERROR);
-        }
+        // Chain up the constructor.
+        Application.call(app, process.cwd(), packageId);
+        app.create(packageId, extraArgs, callback);
         break;
 
     case "update":
         var version = parser.updateGetVersion();
+        rootDir = parser.updateGetDir();
 
-        try {
-            // Chain up the constructor.
-            Application.call(this, process.cwd(), null);
-            this.update(version, extraArgs, callback);
-        } catch (e) {
-            output.error("Failed to initialize");
-            output.error("Ensure to invoke 'crosswalk-app-tools' from a toplevel project directory");
-            callback(MAIN_EXIT_CODE_ERROR);
-        }
+        // Chain up the constructor.
+        Application.call(app, rootDir, null);
+        app.update(version, extraArgs, callback);
         break;
 
     case "build":
         var type = parser.buildGetType();
+        rootDir = parser.buildGetDir();
 
-        try {
-            // Chain up the constructor.
-            Application.call(this, process.cwd(), null);
-            this.build(type, extraArgs, callback);
-        } catch (e) {
-            output.error("Failed to initialize");
-            output.error("Ensure to invoke 'crosswalk-app-tools' from a toplevel project directory");
-            callback(MAIN_EXIT_CODE_ERROR);
-        }
+        // Chain up the constructor.
+        Application.call(app, rootDir, null);
+        app.build(type, extraArgs, callback);
         break;
 
     case "platforms":
-        this.listPlatforms(output);
+        app.listPlatforms(output);
         break;
 
     case "help":
-        this.printHelp(parser, output);
+        app.printHelp(parser, output);
         break;
 
     case "version":
-        this.printVersion(output);
+        app.printVersion(output);
         break;
 
     default:

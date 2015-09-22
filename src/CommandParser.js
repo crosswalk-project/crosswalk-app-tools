@@ -2,7 +2,10 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var Path = require("path");
+
 var Minimist = require("minimist");
+var ShellJS = require("shelljs");
 
 /**
  * Parsing and validation of command-line arguments.
@@ -20,7 +23,6 @@ function CommandParser(output, argv) {
     }
 
     this._argv = argv;
-    this._createOptions = null;
 }
 
 /**
@@ -30,23 +32,28 @@ function CommandParser(output, argv) {
 CommandParser.prototype.help =
 function() {
     return "" +
-        "\n" +
-        "Crosswalk Application Project and Packaging Tool\n" +
-        "\n" +
-        "    crosswalk-app create <package-id>\t\tCreate project <package-id>\n" +
-        "                  --platforms=<targetPlatform>\tOptional, e.g. \"windows\"\n" +
-        "\n" +
-        "    crosswalk-app build [release|debug]\t\tBuild project to create packages\n" +
-        "                                       \t\tDefaults to debug when not given\n" +
-        "\n" +
-        "    crosswalk-app update <channel>|<version>    Update Crosswalk to latest in named\n" +
-        "                                                channel, or specific version\n" +
-        "\n" +
-        "    crosswalk-app platforms\t\t\tList available target platforms\n" +
-        "\n" +
-        "    crosswalk-app help\t\t\t\tDisplay usage information\n" +
-        "\n" +
-        "    crosswalk-app version\t\t\tDisplay version information\n";
+"\n" +
+"Crosswalk Project Application Packaging Tool\n" +
+"\n" +
+"    crosswalk-app check [<platforms>]           Check host setup\n" +
+"                                                Check all platforms if none given\n" +
+"\n" +
+"    crosswalk-app create <package-id>           Create project <package-id>\n" +
+"                  --platforms=<target>          Optional, e.g. \"windows\"\n" +
+"\n" +
+"    crosswalk-app build [release|debug] [<dir>] Build project to create packages\n" +
+"                                                Defaults to \"debug\" when not given\n" +
+"                                                Tries to build in current dir by default\n" +
+"\n" +
+"    crosswalk-app update [<version>] [<dir>]    Update Crosswalk to latest in named\n" +
+"                                                channel, or specific version\n" +
+"                                                Version is \"stable\" when not given" +
+"\n" +
+"    crosswalk-app platforms                     List available target platforms\n" +
+"\n" +
+"    crosswalk-app help                          Display usage information\n" +
+"\n" +
+"    crosswalk-app version                       Display version information\n";
 };
 
 /**
@@ -59,12 +66,14 @@ function() {
 
     var cmd = this.peekCommand();
     switch (cmd) {
+    case "check":
+        return cmd;
     case "create":
         var packageId = this.createGetPackageId();
         return packageId !== null ? cmd : null;
     case "update":
         var version = this.updateGetVersion();
-        if (version === false) {
+        if (!version) {
             // Error: version could not be parsed.
             return null;
         }
@@ -104,11 +113,25 @@ function() {
         return "help";
     }
 
-    if (["create", "update", "refresh", "build", "platforms"].indexOf(command) > -1) {
+    if (["check", "create", "update", "refresh", "build", "platforms"].indexOf(command) > -1) {
         return command;
     }
 
     return null;
+};
+
+/**
+ * Get platforms to check the host configuration for.
+ * @returns {String[]} Array of platform IDs or empty array to check all available platforms.
+ */
+CommandParser.prototype.checkGetPlatforms =
+function() {
+
+    // Command goes like this
+    // node crosswalk-app create platforms*
+    // So we take everything from the third index
+    var platforms = this._argv.slice(3);
+    return platforms;
 };
 
 /**
@@ -125,11 +148,6 @@ function() {
 
     var packageId = CommandParser.validatePackageId(this._argv[3], this._output);
 
-    if (this._argv.length > 4) {
-        var options = this._argv.slice(4);
-        this._createOptions = Minimist(options);
-    }
-
     return packageId;
 };
 
@@ -141,32 +159,57 @@ function() {
 CommandParser.prototype.updateGetVersion =
 function() {
 
-    var errormsg = "Version must be channel 'stable', 'beta', 'canary', or format ab.cd.ef.gh";
+    // argv is filled like this:
+    // node crosswalk-app update [version] [dir]
+    // So argv[3] is either version or dir.
 
     if (this._argv.length < 4) {
-        return null;
+        return "stable";
     }
 
     var version = this._argv[3];
-
-    // Recognise channel name for version
-    if (["beta", "canary", "stable"].indexOf(version) > -1) {
+    if (CommandParser.validateVersion(version, null)) {
         return version;
     }
 
-    var match = version.match("[0-9\\.]*");
-    if (match[0] != version) {
-        this._output.error(errormsg);
-        return false;
+    return null;
+};
+
+// FIXME require node 0.12 and use Path.isAbsolute
+CommandParser.prototype.isAbsolute =
+function(path) {
+
+    if (Path.sep === "/" &&
+        path[0] === Path.sep) {
+        return true;
     }
 
-    var parts = version.split('.');
-    if (parts.length != 4) {
-        this._output.error(errormsg);
-        return false;
+    // Windows
+    return path.match(/^[a-zA-z]:/) !== null;
+};
+
+/**
+ * Get dir when command is "update". Defaults to current dir.
+ */
+CommandParser.prototype.updateGetDir =
+function() {
+
+    // argv is filled like this:
+    // node crosswalk-app update [version] [dir]
+    // Dir can only be specified if version is given, though,
+    // no guessing around here.
+
+    if (this._argv.length < 5) {
+        // Dir not given.
+        return process.cwd();
     }
 
-    return version;
+    var path = this._argv[4];
+    if (this.isAbsolute(path)) {
+        return Path.resolve(Path.normalize(path));
+    }
+
+    return Path.resolve(Path.normalize(Path.join(process.cwd(), path)));
 };
 
 /**
@@ -189,6 +232,35 @@ function() {
     var type = this._argv[3];
     if (["debug", "release"].indexOf(type) > -1) {
         return type;
+    } else {
+        return "debug";
+    }
+
+    return null;
+};
+
+/**
+ * Get project directory to build
+ * @returns {String} Absolute path to project directory
+ */
+CommandParser.prototype.buildGetDir =
+function() {
+
+    // Default to current dir when no type given.
+    if (this._argv.length < 4) {
+        return Path.resolve(".");
+    }
+
+    if (this._argv.length === 4) {
+        if (["debug", "release"].indexOf(this._argv[3]) > -1) {
+            return Path.resolve(".");
+        } else {
+            return Path.resolve(this._argv[3]);
+        }
+    }
+
+    if (this._argv.length > 4) {
+        return Path.resolve(this._argv[4]);
     }
 
     return null;
@@ -238,6 +310,39 @@ function(packageId, output) {
     }
 
     return packageId;
+};
+
+/**
+ * Validate crosswalk version.
+ * @param {String} version Version string
+ * @param {OutputIface} [output]
+ * @returns {Boolean} true if valid, otherwise false.
+ */
+CommandParser.validateVersion =
+function(version, output) {
+
+    var errormsg = "Version must be channel 'stable', 'beta', 'canary', or format ab.cd.ef.gh";
+
+    // Recognise channel name for version
+    if (["beta", "canary", "stable"].indexOf(version) > -1) {
+        return true;
+    }
+
+    var match = version.match("[0-9\\.]*");
+    if (match[0] != version) {
+        if (output)
+            output.error(errormsg);
+        return false;
+    }
+
+    var parts = version.split('.');
+    if (parts.length != 4) {
+        if (output)
+            output.error(errormsg);
+        return false;
+    }
+
+    return true;
 };
 
 module.exports = CommandParser;

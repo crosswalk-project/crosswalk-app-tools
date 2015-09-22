@@ -2,6 +2,7 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var OS = require("os");
 var Path = require('path');
 
 var ShellJS = require("shelljs");
@@ -32,58 +33,52 @@ function Application(cwd, packageId) {
         throw new InvalidPathException("Path not absolute: " + cwd);
     }
     if (!ShellJS.test("-d", cwd)) {
-        throw new InvalidPathException("Path does not exist: " + cwd);        
+        throw new InvalidPathException("Path does not exist: " + cwd);
     }
-    
+
     // PackageId is only passed when a new project is created.
     if (packageId) {
 
         this._packageId = CommandParser.validatePackageId(packageId, this.output);
 
-        initMembers.call(this, cwd);
-
-        // Check that dir not already exists
-        if (ShellJS.test("-d", this._rootPath)) {
-            throw new InvalidPathException("Failed to create project, path already exists: " + this._rootPath);        
+        // Check that project dir not already exists
+        var rootPath = Path.join(cwd, this._packageId);
+        if (ShellJS.test("-d", rootPath)) {
+            throw new InvalidPathException("Failed to create project, path already exists: " + rootPath);
         }
 
-        // Initialise project skeleton
-        ShellJS.mkdir(this._rootPath);
-        ShellJS.mkdir(this._appPath);
-        ShellJS.mkdir(this._logPath);
-        ShellJS.mkdir(this._pkgPath);
-        ShellJS.mkdir(this._prjPath);
+        initMembers.call(this, rootPath);
 
         // Create Manifest
-        Manifest.create(Path.join(this._rootPath, "manifest.json"), packageId);
+        Manifest.create(Path.join(this._appPath, "manifest.json"), packageId);
 
     } else {
-        
-        // Get packageId from current directory
-        var basename = Path.basename(cwd);
-        this._packageId = CommandParser.validatePackageId(basename, this.output);
+
+        // Get packageId from manifest
+        var manifest = new Manifest(this._output, Path.join(cwd, "app", "manifest.json"));
+        this._packageId = manifest.packageId;
         if (!this._packageId) {
-            throw new InvalidPathException("Path does not seem to be a project toplevel: " + cwd);                    
+            throw new InvalidPathException("Path does not seem to be a project toplevel: " + cwd);
         }
 
-        initMembers.call(this, Path.dirname(cwd));
+        initMembers.call(this, cwd);
     }
 
     // Check all paths exist.
     if (!ShellJS.test("-d", this._rootPath)) {
-        throw new InvalidPathException("Failed to load, invalid path: " + this._rootPath);        
+        throw new InvalidPathException("Failed to load, invalid path: " + this._rootPath);
     }
     if (!ShellJS.test("-d", this._appPath)) {
-        throw new InvalidPathException("Failed to load, invalid path: " + this._appPath);        
+        throw new InvalidPathException("Failed to load, invalid path: " + this._appPath);
     }
     if (!ShellJS.test("-d", this._logPath)) {
-        throw new InvalidPathException("Failed to load, invalid path: " + this._logPath);        
+        throw new InvalidPathException("Failed to load, invalid path: " + this._logPath);
     }
     if (!ShellJS.test("-d", this._pkgPath)) {
-        throw new InvalidPathException("Failed to load, invalid path: " + this._pkgPath);        
+        throw new InvalidPathException("Failed to load, invalid path: " + this._pkgPath);
     }
     if (!ShellJS.test("-d", this._prjPath)) {
-        throw new InvalidPathException("Failed to load, invalid path: " + this._prjPath);        
+        throw new InvalidPathException("Failed to load, invalid path: " + this._prjPath);
     }
 
     // Set up logging, always start a new file for each time the app is run.
@@ -95,20 +90,25 @@ function Application(cwd, packageId) {
 
     this._output = new OutputTee(this._logfileOutput, TerminalOutput.getInstance());
 
-    this._manifest = new Manifest(this._output, Path.join(this._rootPath, "manifest.json"));
+    this._manifest = new Manifest(this._output, Path.join(this._appPath, "manifest.json"));
 }
 
-function initMembers(basePath) {
+function initMembers(rootPath) {
 
-    this._rootPath = basePath + Path.sep + this._packageId;        
+    this._rootPath = rootPath;
+    ShellJS.mkdir(this._rootPath);
 
     this._appPath = this._rootPath + Path.sep + "app";
+    ShellJS.mkdir(this._appPath);
 
-    this._logPath = this._rootPath + Path.sep + "log";
+    this._logPath = Path.join(OS.tmpdir(), "crosswalk-app-tools-" + this._packageId);
+    ShellJS.mkdir(this._logPath);
 
-    this._pkgPath = this._rootPath + Path.sep + "pkg";
+    // Packages end up in working dir
+    this._pkgPath = process.cwd();
 
     this._prjPath = this._rootPath + Path.sep + "prj";
+    ShellJS.mkdir(this._prjPath);
 }
 
 /**
@@ -229,21 +229,21 @@ Object.defineProperty(Application.prototype, "platformLogfileOutput", {
                                 return this._platformLogfileOutput;
                            },
                       set: function(platformLogfileOutput) {
-                        
+
                                 if (platformLogfileOutput instanceof LogfileOutput) {
 
                                     // Route output to platform logfile.
                                     this._platformLogfileOutput = platformLogfileOutput;
                                     this.output.logfileOutput = platformLogfileOutput;
-                                
+
                                 } else if (platformLogfileOutput === null) {
-                                
+
                                     // Reset output to common logfile.
                                     this._platformLogfileOutput = null;
                                     this.output.logfileOutput = this._logfileOutput;
-                                
+
                                 } else {
-                                    
+
                                     throw new IllegalAccessException("Attempting invalid write to property Application.platformLogfileOutput");
                                 }
                            }

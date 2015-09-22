@@ -10,6 +10,7 @@ var xmldom = require("xmldom");
  * AndroidManifest wrapper.
  * @param {OutputIface} output Output implementation
  * @param {String} path Path to manifest.json
+ * @constructor
  */
 function AndroidManifest(output, path) {
 
@@ -17,15 +18,34 @@ function AndroidManifest(output, path) {
     this._path = path;
 
     var doc = this.read();
+    this._package = doc.documentElement.getAttribute("package");
     this._versionCode = doc.documentElement.getAttribute("android:versionCode");
     this._versionName = doc.documentElement.getAttribute("android:versionName");
 
-    this._applicationLabel = null;
+    this._applicationIcon = null;
     var node = this.findApplicationNode(doc);
+    if (node) {
+        this._applicationIcon = node.getAttribute("android:icon");
+    }
+
+    this._applicationLabel = null;
+    node = this.findApplicationNode(doc);
     if (node) {
         this._applicationLabel = node.getAttribute("android:label");
     }
 }
+
+/**
+ * Android package name
+ * @member {String} package
+ * @instance
+ * @memberOf AndroidManifest
+ */
+Object.defineProperty(AndroidManifest.prototype, "package", {
+                      get: function() {
+                                return this._package;
+                           },
+                      });
 
 /**
  * Application version a.b.c where a,b < 100, c < 1000
@@ -66,6 +86,31 @@ Object.defineProperty(AndroidManifest.prototype, "versionName", {
                       });
 
 /**
+ * Application icon
+ * @member {String} applicationIcon Value for <application android:icon= in the android manifest
+ * @instance
+ * @memberOf AndroidManifest
+ */
+Object.defineProperty(AndroidManifest.prototype, "applicationIcon", {
+                      get: function() {
+                                return this._applicationIcon;
+                           },
+                      set: function(applicationIcon) {
+                                // Look up <application> node
+                                var doc = this.read();
+                                var node = this.findApplicationNode(doc);
+                                // Test and set
+                                if (node) {
+                                    this._applicationIcon = applicationIcon;
+                                    node.setAttribute("android:icon", applicationIcon);
+                                    this.write(doc);
+                                } else {
+                                    this._output.warning("Did not find <application> element in AndroidManifest.xml");
+                                }
+                           }
+                      });
+
+/**
  * Application label
  * @member {String} applicationLabel Value for <application android:label= in the android manifest
  * @instance
@@ -86,6 +131,11 @@ Object.defineProperty(AndroidManifest.prototype, "applicationLabel", {
                                     } else {
                                         this._applicationLabel = applicationLabel;
                                         node.setAttribute("android:label", applicationLabel);
+                                        // Also set name on the activity
+                                        var activityNode = this.findChildNode(node, "activity");
+                                        if (activityNode)
+                                            activityNode.setAttribute("android:label", applicationLabel);
+                                        // Save
                                         this.write(doc);
                                     }
                                 } else {
@@ -142,6 +192,28 @@ function(document) {
     }
 
     return node;
+};
+
+/**
+ * Find named child node
+ * @param {xmldom.Node} node
+ * @param {String} name Child name
+ * @returns {xmldom.Node} Node if found or null
+ * @private
+ */
+AndroidManifest.prototype.findChildNode =
+function(node, name) {
+
+    var child = null;
+
+    for (var idx in node.childNodes) {
+        child = node.childNodes[idx];
+        if (child.nodeName === name) {
+            return child;
+        }
+    }
+
+    return null;
 };
 
 module.exports = AndroidManifest;

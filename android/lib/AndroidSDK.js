@@ -7,6 +7,7 @@ var Path = require("path");
 var ShellJS = require("shelljs");
 
 var AndroidTargets = require("./AndroidTargets");
+var JavaActivity = require("./JavaActivity");
 
 
 
@@ -163,15 +164,25 @@ function(path, packageId, apiTarget, callback) {
 
     indicator.update("...");
     var child = ChildProcess.execFile(this._scriptPath, args, {},
-                                      function(errmsg, stdlog, errlog) {
+                                      function(error, stdlog, errlog) {
 
-        errlog = this.filterErrorLog(errlog);
-        if (errlog && !errmsg) {
-            // Pass back errlog output as error message.
-            errmsg = errlog;
+        errmsg = this.filterErrorLog(errlog);
+        if (error && error.message) {
+            errmsg += error.message;
+            indicator.done("error");
+        } else {
+            indicator.done();
         }
 
-        indicator.done();
+        // Delete stub activity, we extract the crosswalk one later on.
+        var javaActivityPath = Path.join(JavaActivity.pathForPackage(path, packageId),
+                                        "MainActivity.java");
+        if (ShellJS.test("-f", javaActivityPath)) {
+            ShellJS.rm("-f", javaActivityPath);
+        } else {
+            output.warning("File not found: " + javaActivityPath);
+        }
+
         callback(path, stdlog, errmsg);
         return;
     }.bind(this));

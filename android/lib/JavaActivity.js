@@ -11,6 +11,7 @@ var ShellJS = require("shelljs");
  * JavaActivity wrapper.
  * @param {OutputIface} output Output implementation
  * @param {String} path Path to android app's main java activity file
+ * @constructor
  */
 function JavaActivity(output, path) {
 
@@ -73,6 +74,10 @@ function(zipEntry, packageId) {
     }
     templateData = templateData.replace(templateClass, "MainActivity");
 
+    // Always load app from manifest instead of index.html
+    templateData = templateData.replace('loadAppFromUrl("file:///android_asset/www/index.html")',
+                                        'loadAppFromManifest("file:///android_asset/www/manifest.json")');
+
     // Do not overwrite activity file because it may contain app-specific code
     // FIXME we should be smarter about this:
     // 1 - check if file is different from new content
@@ -109,12 +114,57 @@ function(zipEntry, packageId) {
 };
 
 /**
- * Enable remote debugging.
+ * Enable or disable animatable view.
+ * @param {Boolean} enable True if to be enabled, false to disable feature
+ * @returns {Boolean} True on success, otherwise false.
+ */
+JavaActivity.prototype.enableAnimatableView =
+function(enable) {
+
+    return this.editOnCreate(enable, "        setUseAnimatableView(true);");
+};
+
+/**
+ * Enable or disable remote debugging.
  * @param {Boolean} enable True if to be enabled, false to disable feature
  * @returns {Boolean} True on success, otherwise false.
  */
 JavaActivity.prototype.enableRemoteDebugging =
 function(enable) {
+
+    return this.editOnCreate(enable, "        setRemoteDebugging(true);");
+};
+
+/**
+ * Enable or disable fullscreen.
+ * @param {Boolean} enable True if to be enabled, false to disable feature
+ * @returns {Boolean} True on success, otherwise false.
+ */
+JavaActivity.prototype.enableFullscreen =
+function(enable) {
+
+    return this.editOnCreate(enable, "        setIsFullscreen(true);");
+};
+
+/**
+ * Enable or disable "keep screen on".
+ * @param {Boolean} enable True if to be enabled, false to disable feature
+ * @returns {Boolean} True on success, otherwise false.
+ */
+JavaActivity.prototype.enableKeepScreenOn =
+function(enable) {
+
+    return this.editOnCreate(enable, "        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);");
+};
+
+/**
+ * Edit the onCreate() method inserting or removing config statements.
+ * @param {Boolean} insert If true, insert statement if missing, otherwise remove it
+ * @param {String} stmt Statement to edit
+ * @returns {Boolean} True on success, otherwise false.
+ */
+JavaActivity.prototype.editOnCreate =
+function(insert, stmt) {
 
     // FIXME better error handling
 
@@ -127,10 +177,10 @@ function(enable) {
         var line = lines[i];
         if (line === "    public void onCreate(Bundle savedInstanceState) {") {
 
-            if (enable) {
-                i = this.insertIfMissing(lines, i, "        setRemoteDebugging(true);", outBuf);
+            if (insert) {
+                i = this.insertIfMissing(lines, i, stmt, outBuf);
             } else {
-                i = this.skipIfPresent(lines, i, "        setRemoteDebugging(true);", outBuf);
+                i = this.skipIfPresent(lines, i, stmt, outBuf);
             }
         }
         outBuf.push(lines[i]);
@@ -140,6 +190,7 @@ function(enable) {
 
     return true;
 };
+
 
 /**
  * Insert configuration statement if not already present.

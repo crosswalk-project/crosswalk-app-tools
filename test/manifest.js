@@ -51,39 +51,39 @@ exports.tests = {
         test.expect(9);
 
         version = "2";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(version, consumeManifest(path).appVersion);
 
         version = "2.2";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(version, consumeManifest(path).appVersion);
 
         version = "2.2.2";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(version, consumeManifest(path).appVersion);
 
         version = "2.";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(false, version == consumeManifest(path).appVersion);
 
         version = "2.2.";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(false, version == consumeManifest(path).appVersion);
 
         version = "2.2.2.";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(false, version == consumeManifest(path).appVersion);
 
         version = "3333";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(false, version == consumeManifest(path).appVersion);
 
         version = "333.333";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(false, version == consumeManifest(path).appVersion);
 
         version = "33.333.333";
-        path = produceManifest({"crosswalk_app_version": version});
+        path = produceManifest({"xwalk_app_version": version});
         test.equal(false, version == consumeManifest(path).appVersion);
 
         test.done();
@@ -129,11 +129,114 @@ exports.tests = {
         test.done();
     },
 
+    display: function(test) {
+
+        test.expect(3);
+
+        // Default to "false"
+        var path = produceManifest();
+        var manifest = consumeManifest(path);
+        test.equal(manifest.display, "standalone");
+
+        // Test reading "fullscreen"
+        path = produceManifest({"display": "fullscreen"});
+        manifest = consumeManifest(path);
+        test.equal(manifest.display, "fullscreen");
+
+        // Test reading bogus value "foo", default to "standalone"
+        path = produceManifest({"display": "foo"});
+        manifest = consumeManifest(path);
+        test.equal(manifest.display, "standalone");
+
+        test.done();
+    },
+
+    icons: function(test) {
+
+        test.expect(3);
+
+        // Default to empty
+        var path = produceManifest();
+        var manifest = consumeManifest(path);
+        // Default icon, so length 1
+        test.equal(manifest.icons.length, 1);
+
+        // Test reading "fullscreen"
+        var icon = {
+            src: "icon.png",
+            sizes: "32x32"
+        };
+        path = produceManifest({"icons": [ icon ]});
+        manifest = consumeManifest(path);
+        test.equal(manifest.icons[0].src, "icon.png");
+        test.equal(manifest.icons[0].sizes, "32x32");
+
+        test.done();
+    },
+
+    startUrl: function(test) {
+
+        test.expect(2);
+
+        var path = produceManifest();
+
+        // read default
+        var manifest = consumeManifest(path);
+        test.equal(manifest.startUrl, "index.html");
+
+        // Test reading "start.html"
+        path = produceManifest({"start_url": "start.html"});
+        manifest = consumeManifest(path);
+        test.equal(manifest.startUrl, "start.html");
+
+        test.done();
+    },
+
+    commandLine: function(test) {
+
+        test.expect(2);
+
+        // default
+        var path = produceManifest();
+        var manifest = consumeManifest(path);
+        test.equal(manifest.commandLine, null);
+
+        // custom value
+        path = produceManifest({"xwalk_command_line": "foo"});
+        manifest = consumeManifest(path);
+        test.equal(manifest.commandLine, "foo");
+
+        test.done();
+    },
+
+    packageId: function(test) {
+
+        test.expect(2);
+
+        var path = produceManifest({"xwalk_package_id": "com.example.foo"});
+
+        // read
+        var manifest = consumeManifest(path);
+        test.equal(manifest.packageId, "com.example.foo");
+
+        // bad case
+        path = produceManifest({"xwalk_package_id": "foo"});
+        try {
+            manifest = new Manifest(_output, path);
+        } catch (error) {
+            ShellJS.rm("-rf", path);
+            // Just make sure we pass by here.
+            test.equal(true, true);
+        }
+
+        test.done();
+    },
+
     targetPlatforms: function(test) {
 
         test.expect(2);
 
-        var path = produceManifest({"crosswalk_target_platforms": "android"});
+        var path = produceManifest({"xwalk_target_platforms": "android"});
 
         // read
         var manifest = new Manifest(_output, path);
@@ -145,6 +248,57 @@ exports.tests = {
         // read back
         manifest = consumeManifest(path);
         test.equal(manifest.targetPlatforms, "windows");
+
+        test.done();
+    },
+
+    androidAnimatableView: function(test) {
+
+        test.expect(2);
+
+        // Default to "false"
+        var path = produceManifest();
+        var manifest = consumeManifest(path);
+        test.equal(manifest.androidAnimatableView, false);
+
+        // Test reading "true"
+        path = produceManifest({"xwalk_android_animatable_view": true});
+        manifest = consumeManifest(path);
+        test.equal(manifest.androidAnimatableView, true);
+
+        test.done();
+    },
+
+    androidKeepScreenOn: function(test) {
+
+        test.expect(2);
+
+        // Default to "false"
+        var path = produceManifest();
+        var manifest = consumeManifest(path);
+        test.equal(manifest.androidKeepScreenOn, false);
+
+        // Test reading "true"
+        path = produceManifest({"xwalk_android_keep_screen_on": true});
+        manifest = consumeManifest(path);
+        test.equal(manifest.androidKeepScreenOn, true);
+
+        test.done();
+    },
+
+    androidWebp: function(test) {
+
+        test.expect(2);
+
+        // Default to "false"
+        var path = produceManifest();
+        var manifest = consumeManifest(path);
+        test.equal(!manifest.androidWebp, true);
+
+        // Test reading "true"
+        path = produceManifest({"xwalk_android_webp": "80 80 100"});
+        manifest = consumeManifest(path);
+        test.equal(manifest.androidWebp, "80 80 100");
 
         test.done();
     },
@@ -165,12 +319,16 @@ exports.tests = {
 
     windowsVendor: function(test) {
 
-        test.expect(1);
+        test.expect(2);
 
-        var path3 = produceManifest();
-        var m3 = consumeManifest(path3);
+        var path1 = produceManifest();
+        var m1 = consumeManifest(path1);
+        test.equal(m1.windowsVendor, null);
 
-        test.equal(typeof m3.windowsVendor === "string", true);
+        var path2 = produceManifest({"xwalk_windows_vendor": "foo"});
+        var m2 = consumeManifest(path2);
+        test.equal(m2.windowsVendor, "foo");
+
         test.done();
     }
 };

@@ -58,13 +58,36 @@ exports.tests = {
         test.done();
     },
 
+    renameDir: function(test) {
+
+        test.expect(1);
+
+        var application = Util.createTmpApplication("com.example.foo");
+        var path = application.rootPath;
+        var path2 = Path.join(Path.dirname(path), "foo");
+        ShellJS.mv(path, path2);
+        try {
+            application = new Application(path2, null);
+            test.equal(application.packageId, "com.example.foo");
+        } catch (error) {
+            // Just catch error, missing test assertion makes test case fail.
+        }
+
+        // Clean up manually, so it also works in case of error.
+        // Util.createTmpApplication() always works inside a random named dir
+        // so go one level up and remove.
+        ShellJS.rm("-rf", Path.dirname(path2));
+
+        test.done();
+    },
+
     getManifest: function(test) {
 
         test.expect(2);
         var application = Util.createTmpApplication("com.example.foo");
         var manifest = application.manifest;
         test.equal(manifest instanceof Manifest, true);
-        test.equal(manifest.appVersion, "1");
+        test.equal(manifest.appVersion, "0.1");
         Util.deleteTmpApplication(application);
         test.done();
     },

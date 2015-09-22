@@ -4,11 +4,12 @@ Crosswalk-app-tools
 Command line tools to create and package Crosswalk applications. The license for this project is Apache License
 Version 2.0, please refer to the LICENSE-APACHE-V2 included with the package.
 
-Crosswalk-app-tools is in early stages of development, and not suitable for use in a production environment. Preliminary releases and announcements are made available as a technology preview only. No packages are being published at this time, but git tags serve as reference points for release milestones.
+Crosswalk-app-tools is our forthcoming packaging tool for creating Crosswalk applications. We are inviting early adopters to build their web applications using crosswalk-app-tools, and provide feedback for future improvements.
+
 
 ### Installation
 
-Crosswalk-app-tools is cross-platform by virtue of being based on Node.js. However at this point most testing is done on Linux, so we expect the least number of hickups there. In any case we have seen reports of successful runs on Apple OS X, and are looking forward to hearing about adventurous individuals giving it a spin on Microsoft Windows as well. (But be warned that there are known problems with proxy support on Windows, for starters)
+Crosswalk-app-tools is cross-platform by virtue of being based on Node.js. We are supporting Microsoft Windows, Apple OS X and Linux (testing is mostly done on Fedora and Ubuntu distributions).
 
 The following components are required
   1. Android SDK with 5.0 (target-21) installed
@@ -24,48 +25,57 @@ cd com.example.foo
 ant debug
 ```
 
-In order to get the `crosswalk-app` script available everywhere, global npm installation is required. On most Linux distributions this can be achieved by using `sudo`.
+In order to get the `crosswalk-app` script available everywhere, global npm installation is required.
 ```
-sudo npm install -g crosswalk-app-tools
+Microsoft Windows: npm install -g crosswalk-app-tools
+Apple OS X and Linux: sudo npm install -g crosswalk-app-tools
 ```
+
 
 ### Usage
 
 ```
-Crosswalk Application Project and Packaging Tool
+Crosswalk Project Application Packaging Tool
 
-    crosswalk-app create <package-id>		    Create project <package-id>
+    crosswalk-app create <package-id>           Create project <package-id>
+                  --platforms=<target>          Optional, e.g. "windows"
 
-    crosswalk-app build [release|debug]		    Build project to create packages
-                                       		    Defaults to debug when not given
+    crosswalk-app build [release|debug] [<dir>] Build project to create packages
+                                                Defaults to "debug" when not given
+                                                Tries to build in current dir by default
 
     crosswalk-app update <channel>|<version>    Update Crosswalk to latest in named
                                                 channel, or specific version
 
-    crosswalk-app help				            Display usage information
+    crosswalk-app platforms                     List available target platforms
 
-    crosswalk-app version			            Display version information
+    crosswalk-app help                          Display usage information
+
+    crosswalk-app version                       Display version information
 
 Options for platform 'android'
 
     For command 'create'
-        --android-crosswalk    			        Channel name (stable/beta/canary)
-						                        or version number (w.x.y.z)
-Environment Variables
+        --android-crosswalk    	                Channel name (stable/beta/canary)
+                                                or version number (w.x.y.z)
+Environment variables for platform 'android'
 
-    CROSSWALK_APP_TOOLS_CACHE_DIR		        Keep downloaded files in this dir
+    CROSSWALK_APP_TOOLS_CACHE_DIR               Keep downloaded files in this dir
 ```
 #### Example: Create App
 `crosswalk-app create com.example.foo`: This sets up a skeleton project in directory com.example.foo/, downloads and imports Crosswalk, and puts a sample "hello world" web app under com.example.foo/app/.
 
 #### Example: Build App
-`cd com.example.foo` and then `crosswalk-app build` builds packages. The APKs can be found under pkg/ when done.
+`cd com.example.foo` and then `crosswalk-app build` builds packages. The APKs can be found in the current directory when done.
 
 #### Example: Update Crosswalk
 `crosswalk-app update stable` updates Crosswalk to the latest version available in the stable channel.
 
+
 ### Limitations
+* Android release packages will have to be signed manually before they are published on Google's Play Store, as that functionality is not yet integrated.
 * This is alpha stage software and under continuous development. We encourage trying it and appreciate feedback, but use in a production environment is not supported at this point in time.
+
 
 ### Run development versions from git
 

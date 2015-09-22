@@ -4,8 +4,8 @@
 
 var ShellJS = require("shelljs");
 
-var Application = require("../src/Application");
-var Util = require("../test-util/Util.js");
+var Application = require("../../src/Application");
+var Util = require("../../test-util/Util.js");
 
 var _packageId = "com.example.foo";
 
@@ -21,7 +21,7 @@ exports.tests = {
         process.argv = process.argv.slice(0, 2);
 
         // As long as no exception hits us we're good.
-        var app = require("../src/Main");
+        var app = require("../../src/Main");
         app.run(function (errno) {
             test.equal(errno, 0);
             test.done();
@@ -36,7 +36,7 @@ exports.tests = {
         var tmpdir = Util.createTmpDir();
         ShellJS.pushd(tmpdir);
 
-        var app = require("../src/Main");
+        var app = require("../../src/Main");
         Application.call(app, tmpdir, _packageId);
         app.create(_packageId, {platforms: "windows"}, function(errno) {
 

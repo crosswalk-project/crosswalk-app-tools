@@ -1,6 +1,6 @@
 {
   "name": "crosswalk-app-tools",
-  "version": "0.5.1",
+  "version": "0.7.0",
   "description": "An APK packager for the Crosswalk Project -- http://crosswalk-project.org",
   "author": "Robert Staudinger <robert.staudinger@intel.com>",
   "license": "Apache V2",
@@ -16,21 +16,25 @@
   },
   "dependencies": {
     "adm-zip": "~0.4.4",
+    "format-json": "~1.0.3",
     "https-proxy-agent": "~0.3.5",
     "memorystream": "~0.3.0",
     "minimist": "~1.1.0",
     "mktemp": "~0.3.5",
     "mustache": "~0.8.2",
+    "node-uuid": "~1.4.3",
+    "readdir": "~0.0.13",
     "shelljs": "~0.3.0",
+    "xmlbuilder": "~2.6.4",
     "xmldom": "~0.1.19"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-contrib-nodeunit": "~0.4.1",
-    "grunt-jsdoc": "~0.4.2",
+    "grunt-jsdoc": "~0.6.7",
     "grunt-release": "~0.9.0",
-    "jsdoc": "https://github.com/jsdoc3/jsdoc/archive/v3.2.2.tar.gz",
+    "jsdoc": "~3.3.2",
     "nodeunit": "~0.9.0"
   },
   "keywords": [
@@ -49,6 +53,7 @@
     "Gruntfile.js",
     "LICENSE-APACHE-V2",
     "package.json",
+    "manifest.md",
     "README.md",
     "src",
     "test",

@@ -31,5 +31,45 @@ exports.tests = {
                 return;
             }
         }
+    },
+
+    interruptedProgress: function(test) {
+
+        test.expect(5);
+
+        var tags = ["foo", "bar", "baz", "maman", "quux"];
+        var index = 0;
+        var indicator = _output.createInfiniteProgress("foo");
+        var interval = setInterval(callback, 300);
+
+        function callback() {
+
+            indicator.update(tags[index]);
+
+            switch (index) {
+            case 0:
+            _output.info("info " + index);
+                break;
+            case 1:
+                _output.warning("warning " + index);
+                break;
+            case 2:
+                _output.error("error " + index);
+                break;
+            case 3:
+                _output.highlight("highlight " + index);
+                break;
+            }
+
+            index++;
+            test.equal(true, true);
+
+            if (index >= tags.length) {
+                indicator.done("done");
+                clearInterval(interval);
+                test.done();
+                return;
+            }
+        }
     }
 };

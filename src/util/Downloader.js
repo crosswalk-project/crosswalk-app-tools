@@ -159,10 +159,14 @@ function(urlInfo, callback) {
                 this.progress(1.0);
             }
 
+            this._stream.on("finish", function() {
+                // All data flushed.
+                callback(null);
+            });
+
             this._stream.end();
             this._stream = null;
             this._url = null;
-            callback(null);
 
         }.bind(this));
 
