@@ -12,6 +12,7 @@ var IllegalAccessException = require("./util/exceptions").IllegalAccessException
 var InvalidPathException = require("./util/exceptions").InvalidPathException;
 var LogfileOutput = require("./LogfileOutput");
 var Manifest = require("./Manifest");
+var OutputIface = require("./OutputIface");
 var OutputTee = require("./OutputTee");
 var TerminalOutput = require("./TerminalOutput");
 
@@ -261,7 +262,11 @@ Object.defineProperty(Application.prototype, "output", {
                                 return this._output;
                            },
                       set: function(output) {
-                                throw new IllegalAccessException("Attempting to write read-only property Application.output");
+                                if (output instanceof OutputIface) {
+                                    this._output = output;
+                                } else {
+                                    throw new IllegalAccessException("Application.output must implement OutputIface");
+                                }
                            }
                       });
 

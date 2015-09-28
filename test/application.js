@@ -13,6 +13,7 @@ var IllegalAccessException = require("../src/util/exceptions").IllegalAccessExce
 var LogfileOutput = require("../src/LogfileOutput");
 var Manifest = require("../src/Manifest");
 var OutputTee = require("../src/OutputTee");
+var TerminalOutput = require("../src/TerminalOutput");
 var Util = require("../test-util/Util.js");
 
 
@@ -147,6 +148,19 @@ exports.tests = {
         } catch (e) {
             test.equal(e instanceof IllegalAccessException, true);
         }
+        Util.deleteTmpApplication(application);
+        test.done();
+    },
+
+    setOutput2: function(test) {
+
+        test.expect(1);
+        var application = Util.createTmpApplication("com.example.foo");
+        application.output = TerminalOutput.getInstance();
+
+        // If we get here without exception, all is good.
+        test.equal(true, true);
+
         Util.deleteTmpApplication(application);
         test.done();
     },
