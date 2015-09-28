@@ -89,9 +89,11 @@ function(output, callback) {
     ];
 
     var found = true;
+    var msg;
+
     deps.forEach(function (dep) {
         var path = ShellJS.which(dep);
-        var msg = "Checking for " + dep + "... " + path;
+        msg = "Checking for " + dep + "... " + path;
         if (path) {
             output.info(msg);
         } else {
@@ -99,6 +101,17 @@ function(output, callback) {
             output.error(msg);
         }
     });
+
+    // Checking env
+    var androidHome = "ANDROID_HOME";
+    msg = "Checking for " + androidHome + "... ";
+    if (process.env[androidHome]) {
+        output.info(msg + process.env[androidHome]);
+    } else {
+        found = false;
+        output.info(msg + "empty");
+        output.error(androidHome + " needs to be set for builds to work");
+    }
 
     if (!found) {
         callback(false);
