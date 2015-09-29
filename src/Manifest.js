@@ -76,7 +76,9 @@ function Manifest(output, path) {
     this._display = "standalone";
     if (json.display) {
 
-        if (["fullscreen", "standalone"].indexOf(json.display) > -1) {
+        var values = ["fullscreen", "standalone", "minimal-ui", "browser"];
+
+        if (values.indexOf(json.display) > -1) {
             // supported mode
             this._display = json.display;
         } else {

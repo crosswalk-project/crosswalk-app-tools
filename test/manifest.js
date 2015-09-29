@@ -131,17 +131,20 @@ exports.tests = {
 
     display: function(test) {
 
-        test.expect(3);
+        test.expect(6);
 
-        // Default to "false"
+        // Default to "standalone"
         var path = produceManifest();
         var manifest = consumeManifest(path);
         test.equal(manifest.display, "standalone");
 
-        // Test reading "fullscreen"
-        path = produceManifest({"display": "fullscreen"});
-        manifest = consumeManifest(path);
-        test.equal(manifest.display, "fullscreen");
+        // Test reading various values
+        var values =  ["fullscreen", "standalone", "minimal-ui", "browser"];
+        values.forEach(function (value) {
+            path = produceManifest({"display": value});
+            manifest = consumeManifest(path);
+            test.equal(manifest.display, value);
+        });
 
         // Test reading bogus value "foo", default to "standalone"
         path = produceManifest({"display": "foo"});
