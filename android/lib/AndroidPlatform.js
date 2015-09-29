@@ -1147,26 +1147,57 @@ function() {
 
     // Do conversion
     var fileList = walk(wwwPath);
+    var progress = output.createInfiniteProgress("Converting images to webp");
     for (var i in fileList) {
         if (FS.lstatSync(fileList[i]).isFile()) {
             var filePath = fileList[i];
             var tmpFilePath = filePath + ".webp";
             var ext = Path.extname(filePath);
+            progress.update(filePath);
             if (".jpeg" == ext || ".jpg" == ext) {
-                ChildProcess.execSync(cwebp +
-                                      " " + filePath +
-                                      " -q " + jpegQuality +
-                                      " -o " + tmpFilePath,
-                                      {stdio:[]});
+                execSync(cwebp +
+                         " " + filePath +
+                         " -q " + jpegQuality +
+                         " -o " + tmpFilePath);
                 ShellJS.mv("-f", tmpFilePath, filePath);
             } else if (".png" == ext) {
-                ChildProcess.execSync(cwebp +
-                                      " " + filePath +
-                                      " -q " + pngQuality +
-                                      " -alpha_q " + pngAlphaQuality +
-                                      " -o " + tmpFilePath,
-                                      {stdio:[]});
+                execSync(cwebp +
+                         " " + filePath +
+                         " -q " + pngQuality +
+                         " -alpha_q " + pngAlphaQuality +
+                         " -o " + tmpFilePath);
                 ShellJS.mv("-f", tmpFilePath, filePath);
+            }
+        }
+    }
+    progress.done();
+
+    var logOutput = this.logOutput;
+    var execSyncImpl;
+    function execSync(cmd) {
+
+        // On first run, work out which implementation to use.
+        if (typeof execSyncImpl === "undefined") {
+            if (ChildProcess.execSync) {
+                // Nodejs >= 0.12
+                execSyncImpl = ChildProcess.execSync;
+            } else {
+                // Try to use npm module.
+                try {
+                    // Exec-sync does throw even though it works, so let's use this hack,
+                    // it's just for nodejs 0.10 compat anyway.
+                    execSyncImpl = function(cmd) { try { return require("exec-sync")(cmd); } catch (e) {} return null; };
+                } catch (e) {
+                    output.error("NPM module 'exec-sync' not found");
+                    execSyncImpl = null;
+                }
+            }
+        }
+
+        if (execSyncImpl !== null) {
+            var ret = execSyncImpl(cmd);
+            if (ret) {
+                logOutput.write(cmd + "\n" + ret + "\n");
             }
         }
     }
