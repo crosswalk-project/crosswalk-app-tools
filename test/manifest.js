@@ -154,6 +154,39 @@ exports.tests = {
         test.done();
     },
 
+    orientation: function(test) {
+
+        test.expect(10);
+
+        // Default to "any"
+        var path = produceManifest();
+        var manifest = consumeManifest(path);
+        test.equal(manifest.orientation, "any");
+
+        // Test reading various values
+        var values = [ "any",
+                       "natural",
+                       "landscape",
+                       "portrait",
+                       "portrait-primary",
+                       "portrait-secondary",
+                       "landscape-primary",
+                       "landscape-secondary"
+                     ];
+        values.forEach(function (value) {
+            path = produceManifest({"orientation": value});
+            manifest = consumeManifest(path);
+            test.equal(manifest.orientation, value);
+        });
+
+        // Test reading bogus value "foo", default to "any"
+        path = produceManifest({"orientation": "foo"});
+        manifest = consumeManifest(path);
+        test.equal(manifest.orientation, "any");
+
+        test.done();
+    },
+
     icons: function(test) {
 
         test.expect(3);

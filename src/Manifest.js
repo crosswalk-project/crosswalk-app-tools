@@ -72,17 +72,40 @@ function Manifest(output, path) {
         this._shortName= json.short_name;
     }
 
+    var values;
+
     // Display
     this._display = "standalone";
     if (json.display) {
 
-        var values = ["fullscreen", "standalone", "minimal-ui", "browser"];
+        values = ["fullscreen", "standalone", "minimal-ui", "browser"];
 
         if (values.indexOf(json.display) > -1) {
             // supported mode
             this._display = json.display;
         } else {
             output.warning("Unsupported value '" + json.display + "' in manifest.json");
+        }
+    }
+
+    // Orientation
+    this._orientation = "any";
+    if (json.orientation) {
+
+        values = [ "any",
+                   "natural",
+                   "landscape",
+                   "portrait",
+                   "portrait-primary",
+                   "portrait-secondary",
+                   "landscape-primary",
+                   "landscape-secondary" ];
+
+        if (values.indexOf(json.orientation) > -1) {
+            // supported mode
+            this._orientation = json.orientation;
+        } else {
+            output.warning("Unsupported value '" + json.orientation + "' in manifest.json");
         }
     }
 
@@ -242,6 +265,7 @@ function(path, packageId) {
         "name": packageId,
         "short_name": packageId.split(".").pop(),
         "display": "standalone",
+        "orientation": "any",
         "icons": [ icon ],
         "start_url": "index.html",
         // Crosswalk fields
@@ -359,6 +383,19 @@ Object.defineProperty(Manifest.prototype, "shortName", {
 Object.defineProperty(Manifest.prototype, "display", {
                       get: function() {
                                 return this._display;
+                           }
+                      });
+
+/**
+ * Orientation
+ * @member {String} orientation
+ * @instance
+ * @memberOf Manifest
+ * @see https://w3c.github.io/manifest/#orientation-member
+ */
+Object.defineProperty(Manifest.prototype, "orientation", {
+                      get: function() {
+                                return this._orientation;
                            }
                       });
 

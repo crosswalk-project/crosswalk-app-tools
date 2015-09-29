@@ -23,16 +23,23 @@ function AndroidManifest(output, path) {
     this._versionName = doc.documentElement.getAttribute("android:versionName");
 
     this._applicationIcon = null;
-    var node = this.findApplicationNode(doc);
-    if (node) {
-        this._applicationIcon = node.getAttribute("android:icon");
+    var appNode = this.findApplicationNode(doc);
+    if (appNode) {
+        this._applicationIcon = appNode.getAttribute("android:icon");
     }
 
     this._applicationLabel = null;
-    node = this.findApplicationNode(doc);
-    if (node) {
-        this._applicationLabel = node.getAttribute("android:label");
+    appNode = this.findApplicationNode(doc);
+    if (appNode) {
+        this._applicationLabel = appNode.getAttribute("android:label");
     }
+
+    var activityNode = this.findChildNode(appNode, "activity");
+    if (activityNode) {
+        this._screenOrientation = activityNode.getAttribute("android:screenOrientation");
+    }
+
+    // TODO read other values from manifest and initialize members
 }
 
 /**
@@ -138,6 +145,50 @@ Object.defineProperty(AndroidManifest.prototype, "applicationLabel", {
                                         // Save
                                         this.write(doc);
                                     }
+                                } else {
+                                    this._output.warning("Did not find <application> element in AndroidManifest.xml");
+                                }
+                           }
+                      });
+
+/**
+ * Orientation
+ * @member {String} screenOrientation Value for <activity android:screenOrientation= in the android manifest
+ * @instance
+ * @memberOf AndroidManifest
+ */
+Object.defineProperty(AndroidManifest.prototype, "screenOrientation", {
+                      get: function() {
+                                return this._screenOrientation;
+                           },
+                      set: function(orientation) {
+
+                                // Check
+                                var values = ["unspecified", "behind",
+                                              "landscape", "portrait",
+                                              "reverseLandscape", "reversePortrait",
+                                              "sensorLandscape", "sensorPortrait",
+                                              "userLandscape", "userPortrait",
+                                              "sensor", "fullSensor", "nosensor",
+                                              "user", "fullUser", "locked"];
+                                if (values.indexOf(orientation) < 0) {
+                                    this._output.warning("Invalid screenOrientation: " + orientation);
+                                    return;
+                                }
+
+                                // Look up <application> node
+                                var doc = this.read();
+                                var node = this.findApplicationNode(doc);
+                                if (node) {
+                                    var activityNode = this.findChildNode(node, "activity");
+                                    if (activityNode) {
+                                        activityNode.setAttribute("android:screenOrientation", orientation);
+                                        this._screenOrientation = orientation;
+                                    } else {
+                                        this._output.warning("Did not find <activity> element in AndroidManifest.xml");
+                                    }
+                                    // Save
+                                    this.write(doc);
                                 } else {
                                     this._output.warning("Did not find <application> element in AndroidManifest.xml");
                                 }

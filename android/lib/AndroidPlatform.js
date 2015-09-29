@@ -1036,6 +1036,36 @@ function(callback) {
 
     // Update icons
     this.updateIcons(manifest, callback);
+
+    // Update orientation
+    switch (this.application.manifest.orientation) {
+    case "any":
+        manifest.screenOrientation = "unspecified";
+        break;
+    case "natural":
+        manifest.screenOrientation = "sensor";
+        break;
+    case "landscape":
+        manifest.screenOrientation = "userLandscape";
+        break;
+    case "portrait":
+        manifest.screenOrientation = "userPortrait";
+        break;
+    case "portrait-primary":
+        manifest.screenOrientation = "portrait";
+        break;
+    case "portrait-secondary":
+        manifest.screenOrientation = "reversePortrait";
+        break;
+    case "landscape-primary":
+        manifest.screenOrientation = "landscape";
+        break;
+    case "landscape-secondary":
+        manifest.screenOrientation = "reverseLandscape";
+        break;
+    default:
+        output.warning("Unsupported orientation value in web manifest: " + this.application.manifest.orientation);
+    }
 };
 
 /**

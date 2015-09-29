@@ -131,5 +131,38 @@ exports.tests = {
         ShellJS.rm("-f", path);
 
         test.done();
+    },
+
+    screenOrientation: function(test) {
+
+        test.expect(18);
+
+        var manifest;
+        var path = createManifest();
+        manifest = new AndroidManifest(_output, path);
+        // Default
+        test.equal(manifest.screenOrientation, "unspecified");
+
+        var values = ["unspecified", "behind",
+              "landscape", "portrait",
+              "reverseLandscape", "reversePortrait",
+              "sensorLandscape", "sensorPortrait",
+              "userLandscape", "userPortrait",
+              "sensor", "fullSensor", "nosensor",
+              "user", "fullUser", "locked"];
+        values.forEach(function (value) {
+            // Test write, then read and compare.
+            manifest.screenOrientation = value;
+            test.equal(manifest.screenOrientation, value);
+        });
+
+        manifest.screenOrientation = "unspecified";
+        // Test bogus value
+        manifest.screenOrientation = "foo";
+        test.equal(manifest.screenOrientation, "unspecified");
+
+        ShellJS.rm("-f", path);
+
+        test.done();
     }
 };
