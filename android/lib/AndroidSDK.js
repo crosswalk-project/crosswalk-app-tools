@@ -262,7 +262,8 @@ function() {
 function SDKNotFoundError(message) {
     Error.call(this, message);
 }
-SDKNotFoundError.prototype = Error.prototype;
+SDKNotFoundError.prototype = Object.create(Error.prototype);
+SDKNotFoundError.prototype.constructor = SDKNotFoundError;
 
 AndroidSDK.prototype.SDKNotFoundError = SDKNotFoundError;
 

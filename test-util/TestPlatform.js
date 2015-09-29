@@ -8,7 +8,8 @@ function TestPlatformScope(PlatformBase, baseData) {
         // Chain up constructor.
         PlatformBase.call(this, baseData);
     }
-    TestPlatform.prototype = PlatformBase.prototype;
+    TestPlatform.prototype = Object.create(PlatformBase.prototype);
+    TestPlatform.prototype.constructor = TestPlatform;
 
     TestPlatform.prototype.create =
     function(packageId, args, callback) {

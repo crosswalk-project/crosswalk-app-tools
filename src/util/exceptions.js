@@ -16,7 +16,8 @@
 function FileCreationFailed(message) {
     Error.call(this, message);
 }
-FileCreationFailed.prototype = Error.prototype;
+FileCreationFailed.prototype = Object.create(Error.prototype);
+FileCreationFailed.prototype.constructor = FileCreationFailed;
 
 /**
  * Creates a new IllegalAccessException.
@@ -28,7 +29,8 @@ FileCreationFailed.prototype = Error.prototype;
 function IllegalAccessException(message) {
     Error.call(this, message);
 }
-IllegalAccessException.prototype = Error.prototype;
+IllegalAccessException.prototype = Object.create(Error.prototype);
+IllegalAccessException.prototype.constructor = IllegalAccessException;
 
 /**
  * Creates a new InvalidPathException.
@@ -40,7 +42,8 @@ IllegalAccessException.prototype = Error.prototype;
 function InvalidPathException(message) {
     Error.call(this, message);
 }
-InvalidPathException.prototype = Error.prototype;
+InvalidPathException.prototype = Object.create(Error.prototype);
+InvalidPathException.prototype.constructor = InvalidPathException;
 
 
 

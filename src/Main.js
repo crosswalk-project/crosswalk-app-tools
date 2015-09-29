@@ -39,7 +39,8 @@ function mainOperationCb(errno) {}
 function Main() {
 
 }
-Main.prototype = Application.prototype;
+Main.prototype = Object.create(Application.prototype);
+Main.prototype.constructor = Main;
 
 /* TODO move to android project
 function workingDirectoryIsProject() {

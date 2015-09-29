@@ -19,7 +19,8 @@ function OutputTee(logfileOutput, terminalOutput) {
     this._outputs[_OUTPUT_TEE_LOGFILE] = logfileOutput;
     this._outputs[_OUTPUT_TEE_TERMINAL] = terminalOutput;
 }
-// OutputTee.prototype = OutputIface.prototype;
+OutputTee.prototype = Object.create(OutputIface.prototype);
+OutputTee.prototype.constructor = OutputTee;
 
 /**
  * Logfile output.

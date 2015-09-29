@@ -205,7 +205,8 @@ function(version, defaultPath, callback) {
 function InvalidChannelError(message) {
     Error.call(this, message);
 }
-InvalidChannelError.prototype = Error.prototype;
+InvalidChannelError.prototype = Object.create(Error.prototype);
+InvalidChannelError.prototype.constructor = InvalidChannelError;
 
 AndroidDependencies.prototype.InvalidChannelError = InvalidChannelError;
 

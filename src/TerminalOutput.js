@@ -26,8 +26,8 @@ function TerminalOutput() {
 
     return TerminalOutput._instance;
 }
-
-TerminalOutput.prototype = OutputIface.prototype;
+TerminalOutput.prototype = Object.create(OutputIface.prototype);
+TerminalOutput.prototype.constructor = TerminalOutput;
 
 TerminalOutput.prototype.error =
 function(message) {

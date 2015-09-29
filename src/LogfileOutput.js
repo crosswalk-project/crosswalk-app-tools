@@ -33,9 +33,8 @@ function LogfileOutput(path) {
     }
 */
 }
-
-// FIXME I have no idea why this breaks, something about the singleton maybe?
-// LogfileOutput.prototype = OutputIface.prototype;
+LogfileOutput.prototype = Object.create(OutputIface.prototype);
+LogfileOutput.prototype.constructor = LogfileOutput;
 
 LogfileOutput.prototype.error =
 function(message) {
