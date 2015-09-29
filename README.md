@@ -12,9 +12,9 @@ Crosswalk-app-tools is our forthcoming packaging tool for creating Crosswalk app
 Crosswalk-app-tools is cross-platform by virtue of being based on Node.js. We are supporting Microsoft Windows, Apple OS X and Linux (testing is mostly done on Fedora and Ubuntu distributions).
 
 The following components are required
-  1. Android SDK with 5.0 (target-21) installed
-  2. Java JDK and Apache Ant
-  3. Node.js and NPM
+  1. Node.js and NPM
+  2. WiX Toolset (http://wixtoolset.org) for creating Windows MSI installers
+  3. Android SDK with 5.0 (target-21) installed, plus Java JDK and Apache Ant for creating Android APK packages
 
 The best way to check if a machine has all the required dependencies is to create and build a plain empty Android app 
 on the system. If this does not work, then building Crosswalk apps will not succeed either.
