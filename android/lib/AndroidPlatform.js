@@ -1222,6 +1222,7 @@ function() {
                     execSyncImpl = function(cmd) { try { return require("exec-sync")(cmd); } catch (e) {} return null; };
                 } catch (e) {
                     output.error("NPM module 'exec-sync' not found");
+                    output.error("Please install this package manually when on nodejs < 0.12");
                     execSyncImpl = null;
                 }
             }

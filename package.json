@@ -4,6 +4,9 @@
   "description": "An APK packager for the Crosswalk Project -- http://crosswalk-project.org",
   "author": "Robert Staudinger <robert.staudinger@intel.com>",
   "license": "Apache V2",
+  "engines" : {
+    "node" : ">=0.12"
+  },
   "bin": {
     "crosswalk-app": "./src/crosswalk-app"
   },
@@ -27,9 +30,6 @@
     "shelljs": "~0.3.0",
     "xmlbuilder": "~2.6.4",
     "xmldom": "~0.1.19"
-  },
-  "optionalDependencies": {
-    "exec-sync": "~0.1.6"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
