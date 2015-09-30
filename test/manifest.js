@@ -322,6 +322,23 @@ exports.tests = {
         test.done();
     },
 
+    androidPermissions: function(test) {
+
+        test.expect(2);
+
+        // Default, check INTERNET is set (also needs networks etc)
+        var path = produceManifest();
+        var manifest = consumeManifest(path);
+        test.equal(manifest.androidPermissions.indexOf("INTERNET") >= 0, true);
+
+        // Test adding CAMERA
+        path = produceManifest({"xwalk_android_permissions": [ "CAMERA" ]});
+        manifest = consumeManifest(path);
+        test.equal(manifest.androidPermissions.indexOf("CAMERA") >= 0, true);
+
+        test.done();
+    },
+
     androidWebp: function(test) {
 
         test.expect(2);

@@ -133,6 +133,27 @@ exports.tests = {
         test.done();
     },
 
+    permissions: function(test) {
+
+        test.expect(4);
+
+        var manifest;
+        var path = createManifest();
+        manifest = new AndroidManifest(_output, path);
+        manifest.permissions = ["CAMERA", "INTERNET"];
+
+        manifest = new AndroidManifest(_output, path);
+        var permissions = manifest.permissions;
+        test.equal(permissions instanceof Array, true);
+        test.equal(permissions.length === 2, true);
+        test.equal(permissions.indexOf("CAMERA") > -1, true);
+        test.equal(permissions.indexOf("INTERNET") > -1, true);
+
+        ShellJS.rm("-f", path);
+
+        test.done();
+    },
+
     screenOrientation: function(test) {
 
         test.expect(18);

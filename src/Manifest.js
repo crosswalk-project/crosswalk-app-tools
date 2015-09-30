@@ -176,6 +176,21 @@ function Manifest(output, path) {
         }
     }
 
+    // Android permissions
+    this._androidPermissions = Manifest.ANDROID_DEFAULT_PERMISSIONS.concat([]); // clone array
+    if (json.xwalk_android_permissions) {
+        if (json.xwalk_android_permissions instanceof Array) {
+            // Merge permissions to the default ones.
+            json.xwalk_android_permissions.forEach(function (permission) {
+                if (this._androidPermissions.indexOf(permission) < 0) {
+                    this._androidPermissions.push(permission);
+                }
+            }.bind(this));
+        } else {
+            output.warning("Invalid android permissions '" + json.xwalk_android_permissions + "'");
+        }
+    }
+
     // Android webp
     this._androidWebp = false;
     if (json.xwalk_android_webp) {
@@ -220,6 +235,11 @@ function Manifest(output, path) {
         }
     }
 }
+
+/**
+ * Default permissions needed on android.
+ */
+Manifest.ANDROID_DEFAULT_PERMISSIONS = [ "ACCESS_NETWORK_STATE", "ACCESS_WIFI_STATE", "INTERNET" ];
 
 /**
  * Create manifest at project creation stage.
@@ -276,6 +296,8 @@ function(path, packageId) {
         // Android fields
         "xwalk_android_animatable_view": false,
         "xwalk_android_keep_screen_on": false,
+        // Set external storage by default, needed for shared mode/fallback.
+        "xwalk_android_permissions": Manifest.ANDROID_DEFAULT_PERMISSIONS,
         // Windows fields
         "xwalk_windows_update_id": windowsUpdateId
     });
@@ -470,6 +492,18 @@ Object.defineProperty(Manifest.prototype, "androidAnimatableView", {
 Object.defineProperty(Manifest.prototype, "androidKeepScreenOn", {
                       get: function() {
                                 return this._androidKeepScreenOn;
+                           }
+                      });
+
+/**
+ * Android permissions.
+ * @member {String} androidPermissions
+ * @instance
+ * @memberOf Manifest
+ */
+Object.defineProperty(Manifest.prototype, "androidPermissions", {
+                      get: function() {
+                                return this._androidPermissions;
                            }
                       });
 

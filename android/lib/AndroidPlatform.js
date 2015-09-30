@@ -1066,6 +1066,9 @@ function(callback) {
     default:
         output.warning("Unsupported orientation value in web manifest: " + this.application.manifest.orientation);
     }
+
+    // Update permissions
+    manifest.permissions = this.application.manifest.androidPermissions;
 };
 
 /**

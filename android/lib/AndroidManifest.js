@@ -196,6 +196,57 @@ Object.defineProperty(AndroidManifest.prototype, "screenOrientation", {
                       });
 
 /**
+ * Permissions
+ * @member {Array} permissions Android permissisons
+ * @instance
+ * @memberOf AndroidManifest
+ */
+Object.defineProperty(AndroidManifest.prototype, "permissions", {
+                      get: function() {
+
+                                var permissions = [];
+                                var doc = this.read();
+                                for (var idx in doc.documentElement.childNodes) {
+                                    var n = doc.documentElement.childNodes[idx];
+                                    if (n.nodeName === "uses-permission") {
+                                        var value = n.getAttribute("android:name");
+                                        // e.g. android.permissions.CAMERA, index 2 is actual value
+                                        var suffix = value.split(".")[2];
+                                        permissions.push(suffix);
+                                    }
+                                }
+                                return permissions;
+                           },
+                      set: function(permissions) {
+
+                                if (!(permissions instanceof Array)) {
+                                    this._output.warning("Invalid permissions: " + permissions);
+                                    return;
+                                }
+
+                                var doc = this.read();
+
+                                // Remove permissions
+                                var child;
+                                for (var idx in doc.documentElement.childNodes) {
+                                    var n = doc.documentElement.childNodes[idx];
+                                    if (n.nodeName === "uses-permission") {
+                                        doc.removeChild(n);
+                                    }
+                                }
+
+                                // Add new permissions
+                                permissions.forEach(function (permission) {
+                                    child = doc.createElement("uses-permission");
+                                    child.setAttribute("android:name", "android.permission." + permission);
+                                    doc.documentElement.appendChild(child);
+                                });
+
+                                this.write(doc);
+                           }
+                      });
+
+/**
  * Read AndroidManifest.xml
  * @returns {xmldom.Document} XML Document
  * @protected
