@@ -5,6 +5,7 @@
 var FS = require("fs");
 
 var FormatJson = require("format-json");
+var ShellJS = require("shelljs");
 
 var CommandParser = require("./CommandParser");
 var IllegalAccessException = require("./util/exceptions").IllegalAccessException;
@@ -242,28 +243,20 @@ function Manifest(output, path) {
 Manifest.ANDROID_DEFAULT_PERMISSIONS = [ "ACCESS_NETWORK_STATE", "ACCESS_WIFI_STATE", "INTERNET" ];
 
 /**
- * Create manifest at project creation stage.
- * @param {OutputIface} output Output implementation
- * @param {String} path Path to manifest.json
+ * Create default manifest data.
  * @param {String} packageId Unique package identifier com.example.foo
- * @returns {Manifest} Loaded manifest instance.
+ * @returns {Object} Manifest JSON representation
  * @memberOf Manifest
  * @static
  */
-Manifest.create =
-function(path, packageId) {
+Manifest.createDefaultJson =
+function(packageId) {
 
     // Emulate old behaviour of using default backend,
     // Just put it into the manifest now, upon creation.
     var PlatformsManager = require("./PlatformsManager");
     var mgr = new PlatformsManager(require("./TerminalOutput").getInstance());
     var platformInfo = mgr.loadDefault();
-
-    // Default icon
-    var icon = {
-        src: "icon.png",
-        sizes: "72x72"
-    };
 
     // Create windows update id
     // Format is: 12345678-1234-1234-1234-111111111111
@@ -280,13 +273,12 @@ function(path, packageId) {
                           digits.substring(16, 20) + "-" +
                           digits.substring(20, 32);
 
-    var buffer = FormatJson.plain({
+    return {
         // Standard fields
         "name": packageId,
         "short_name": packageId.split(".").pop(),
         "display": "standalone",
         "orientation": "any",
-        "icons": [ icon ],
         "start_url": "index.html",
         // Crosswalk fields
         "xwalk_app_version": "0.1",
@@ -300,7 +292,61 @@ function(path, packageId) {
         "xwalk_android_permissions": Manifest.ANDROID_DEFAULT_PERMISSIONS,
         // Windows fields
         "xwalk_windows_update_id": windowsUpdateId
-    });
+    };
+};
+
+/**
+ * Create manifest at project creation stage.
+ * @param {String} path Path to manifest.json
+ * @param {String} packageId Unique package identifier com.example.foo
+ * @memberOf Manifest
+ * @static
+ */
+Manifest.create =
+function(path, packageId) {
+
+    var json = Manifest.createDefaultJson(packageId);
+
+    // Default icon
+    var icon = {
+        src: "icon.png",
+        sizes: "72x72"
+    };
+
+    json.icons = [ icon ];
+    FS.writeFileSync(path, FormatJson.plain(json));
+};
+
+/**
+ * Add missing default fields to manifest.
+ * @param {String} path Path to manifest.json
+ * @param {String} packageId Unique package identifier com.example.foo
+ * @memberOf Manifest
+ * @static
+ */
+Manifest.addDefaults =
+function(output, path, packageId) {
+
+    var buffer;
+    var json = {};
+    if (ShellJS.test("-f", path)) {
+        buffer = FS.readFileSync(path, {"encoding": "utf8"});
+        json = JSON.parse(buffer);
+    } else {
+        output.warning("File not found " + path);
+        output.warning("Using default manifest.json");
+    }
+
+    // Just a shallow assignment of missing fields.
+    var defaultsJson = Manifest.createDefaultJson(packageId);
+    for (var key in defaultsJson) {
+        if (!json[key]) {
+            json[key] = defaultsJson[key];
+        }
+    }
+
+    // Write back
+    buffer = FormatJson.plain(json);
     FS.writeFileSync(path, buffer);
 };
 

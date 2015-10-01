@@ -1,0 +1,159 @@
+#!/usr/bin/env node
+
+// Copyright © 2014 Intel Corporation. All rights reserved.
+// Use  of this  source  code is  governed by  an Apache v2
+// license that can be found in the LICENSE-APACHE-V2 file.
+
+var FS = require("fs");
+var Path = require("path");
+var OS = require("os");
+
+var MkTemp = require("mktemp");
+var ShellJS = require("shelljs");
+
+var Application = require("./Application");
+var CommandParser = require("./CommandParser");
+var Manifest = require("./Manifest");
+
+var cat = require("./Main");
+var output = require("./TerminalOutput").getInstance();
+var util = require("./util/index.js");
+
+
+if (!process.argv[2]) {
+    console.log("Usage: crosswalk-package <path>\n");
+    process.exit(0);
+}
+
+// Check html app path
+var appPath = Path.resolve(Path.normalize(process.argv[2]));
+if (ShellJS.test("-d", appPath)) {
+    output.highlight("Packaging " + appPath);
+} else {
+    output.error("Directory does not exist: " + appPath);
+}
+
+// Determine packageId
+var packageId = null;
+var manifestPath = Path.join(appPath, "manifest.json");
+var buffer = null;
+if (ShellJS.test("-f", manifestPath)) {
+    buffer = FS.readFileSync(manifestPath, {"encoding": "utf8"});
+}
+if (!buffer) {
+    output.error("Failed to read manifest.json in " + appPath);
+    output.info("Please create a minimal manifest.json by pasting the following content");
+    output.info('{ "xwalk_package_id": "com.example.foo" }');
+    process.exit(cat.EXIT_CODE_ERROR);
+}
+var json = JSON.parse(buffer);
+if (!json) {
+    output.error("Failed to parse manifest.json");
+    process.exit(cat.EXIT_CODE_ERROR);
+}
+if (!json.xwalk_package_id) {
+    output.error("Missing field 'xwalk_package_id' in the form of 'com.example.foo' in manifest.json");
+    process.exit(cat.EXIT_CODE_ERROR);
+}
+var packageId = CommandParser.validatePackageId(json.xwalk_package_id, output);
+if (!packageId) {
+    process.exit(cat.EXIT_CODE_ERROR);
+}
+
+// Check platform
+function check(app, output, callback) {
+
+    output.highlight("Checking host setup");
+    app.check([], output, callback);
+}
+
+// Initialize app tools
+function init(app, packageId, callback) {
+
+    // Create temp path
+    ShellJS.pushd(OS.tmpdir());
+    var tmpDirName = MkTemp.createDirSync("XXXXXX");
+    ShellJS.popd();
+    var buildPath = Path.join(OS.tmpdir(), tmpDirName);
+    output.highlight("Initializing build dir " + buildPath);
+
+    var errno = cat.EXIT_CODE_OK;
+    try {
+        Application.call(app, buildPath, packageId);
+    } catch (e) {
+        output.error(e.message);
+        errno = cat.EXIT_CODE_ERROR;
+    }
+    callback(errno);
+}
+
+// Create skeleton
+function create(app, packageId, extraArgs, callback) {
+
+    app.create(packageId, extraArgs, callback);
+}
+
+// Copy
+function copy(app, appPath, callback) {
+
+    // Replace skeleton app with actual one
+    app.output.highlight("Importing web application");
+    app.output.info("Source " + appPath);
+    app.output.info("Destination " + app.appPath);
+
+    ShellJS.rm("-rf", Path.join(app.appPath, "*"));
+    ShellJS.cp("-r", Path.join(appPath, "*"), app.appPath);
+
+    // Init web manifest
+    Manifest.addDefaults(output, Path.join(app.appPath, "manifest.json"), app.packageId);
+
+    callback(cat.EXIT_CODE_OK);
+}
+
+// Build
+function build(app, configId, extraArgs, callback) {
+
+    app.output.highlight("Building package(s)");
+    app.build(configId, extraArgs, callback);
+}
+
+// Cleanup
+function clean(app, callback) {
+
+    var basePath = Path.dirname(app.rootPath);
+    output.info("Deleting build dir " + basePath);
+    ShellJS.rm("-rf", basePath);
+
+    callback(cat.EXIT_CODE_OK);
+}
+
+// Build steps
+var extraArgs = {};
+var tasks = [
+    { func: check,  args: [ cat, output               ] },
+    { func: init,   args: [ cat, packageId            ] },
+    { func: create, args: [ cat, packageId, extraArgs ] },
+    { func: copy,   args: [ cat, appPath              ] },
+    { func: build,  args: [ cat, null, extraArgs      ] },
+    { func: clean,  args: [ cat                       ] }
+];
+
+util.iterate(
+    tasks,
+    function(task, next) {
+
+        // Callback function for the call into app-tools.
+        function callback(errno) {
+            if (errno) {
+                throw new Error("Packaging failed");
+            } else {
+                next();
+            }
+        }
+
+        // Add callback to args array.
+        task.args.push(callback);
+
+        // Run async task.
+        task.func.apply(null, task.args)
+    });

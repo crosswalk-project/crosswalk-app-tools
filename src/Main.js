@@ -14,9 +14,6 @@ var PlatformsManager = require("./PlatformsManager");
 var TerminalOutput = require("./TerminalOutput");
 var util = require("./util/index.js");
 
-var MAIN_EXIT_CODE_OK = 0;
-var MAIN_EXIT_CODE_ERROR = 127;
-
 /**
  * Callback signature for toplevel operations.
  * @param {Number} errno 0 on operation completion, otherwise error number
@@ -41,6 +38,9 @@ function Main() {
 }
 Main.prototype = Object.create(Application.prototype);
 Main.prototype.constructor = Main;
+
+Main.EXIT_CODE_OK = 0;
+Main.EXIT_CODE_ERROR = 127;
 
 /* TODO move to android project
 function workingDirectoryIsProject() {
@@ -112,7 +112,7 @@ function(platformIds, output, callback) {
             } else {
                 output.error(errormsg);
                 output.error("Failed to load platform '" + platformId + "'");
-                callback(MAIN_EXIT_CODE_ERROR);
+                callback(Main.EXIT_CODE_ERROR);
                 return;
             }
         });
@@ -123,7 +123,7 @@ function(platformIds, output, callback) {
 
     if (!platforms || platforms.length === 0) {
         output.error("Failed to load platform modules");
-        callback(MAIN_EXIT_CODE_ERROR);
+        callback(Main.EXIT_CODE_ERROR);
         return;
     }
 
@@ -145,7 +145,7 @@ function(platformIds, output, callback) {
     util.iterate(platforms, checkPlatform,
                  function () {
 
-        callback(MAIN_EXIT_CODE_OK);
+        callback(Main.EXIT_CODE_OK);
     });
 };
 
@@ -191,7 +191,7 @@ function(packageId, extraArgs, callback) {
             this.manifest.targetPlatforms = platform;
         } catch (e) {
             output.error("Invalid target platform '" + platform + "'");
-            callback(MAIN_EXIT_CODE_ERROR);
+            callback(Main.EXIT_CODE_ERROR);
             return;
         }
     }
@@ -200,7 +200,7 @@ function(packageId, extraArgs, callback) {
     var templatePath = Path.normalize(Path.join(__dirname, "..", "app-template"));
     if (!ShellJS.test("-d", templatePath)) {
         output.error("Could not find app template in " + templatePath);
-        callback(MAIN_EXIT_CODE_ERROR);
+        callback(Main.EXIT_CODE_ERROR);
         return;
     }
     output.info("Copying app template from " + templatePath);
@@ -208,7 +208,7 @@ function(packageId, extraArgs, callback) {
 
     var project = this.instantiatePlatform();
     if (!project) {
-        callback(MAIN_EXIT_CODE_ERROR);
+        callback(Main.EXIT_CODE_ERROR);
         return;
     }
 
@@ -224,10 +224,10 @@ function(packageId, extraArgs, callback) {
         if (errormsg) {
             output.error(errormsg);
             output.info("Logfiles at " + this.logPath);
-            callback(MAIN_EXIT_CODE_ERROR);
+            callback(Main.EXIT_CODE_ERROR);
             return;
         } else {
-            callback(MAIN_EXIT_CODE_OK);
+            callback(Main.EXIT_CODE_OK);
             return;
         }
     }.bind(this));
@@ -247,7 +247,7 @@ function(version, extraArgs, callback) {
 
     var project = this.instantiatePlatform();
     if (!project) {
-        callback(MAIN_EXIT_CODE_ERROR);
+        callback(Main.EXIT_CODE_ERROR);
         return;
     }
 
@@ -263,10 +263,10 @@ function(version, extraArgs, callback) {
         if (errormsg) {
             output.error(errormsg);
             output.info("Logfiles at " + this.logPath);
-            callback(MAIN_EXIT_CODE_ERROR);
+            callback(Main.EXIT_CODE_ERROR);
             return;
         } else {
-            callback(MAIN_EXIT_CODE_OK);
+            callback(Main.EXIT_CODE_OK);
             return;
         }
     }.bind(this));
@@ -295,7 +295,7 @@ function(configId, extraArgs, callback) {
 
     var project = this.instantiatePlatform();
     if (!project) {
-        callback(MAIN_EXIT_CODE_ERROR);
+        callback(Main.EXIT_CODE_ERROR);
         return;
     }
 
@@ -312,10 +312,10 @@ function(configId, extraArgs, callback) {
         if (errormsg) {
             output.error(errormsg);
             output.info("Logfiles at " + this.logPath);
-            callback(MAIN_EXIT_CODE_ERROR);
+            callback(Main.EXIT_CODE_ERROR);
             return;
         } else {
-            callback(MAIN_EXIT_CODE_OK);
+            callback(Main.EXIT_CODE_OK);
             return;
         }
     }.bind(this));
@@ -411,7 +411,7 @@ function(callback) {
     if (process.argv.length < 3) {
         // No command given, print help and exit without error code.
         app.printHelp(parser, output);
-        callback(MAIN_EXIT_CODE_OK);
+        callback(Main.EXIT_CODE_OK);
         return;
     }
 
@@ -419,7 +419,7 @@ function(callback) {
     var cmd = parser.getCommand();
     if (!cmd) {
         output.error("Unhandled command '" + process.argv[2] + "'");
-        callback(MAIN_EXIT_CODE_ERROR);
+        callback(Main.EXIT_CODE_ERROR);
         return;
     }
 
@@ -470,8 +470,10 @@ function(callback) {
 
     default:
         output.error("Unhandled command " + cmd);
-        callback(MAIN_EXIT_CODE_ERROR);
+        callback(Main.EXIT_CODE_ERROR);
     }
 };
 
 module.exports = new Main();
+module.exports.EXIT_CODE_OK = Main.EXIT_CODE_OK;
+module.exports.EXIT_CODE_ERROR = Main.EXIT_CODE_ERROR;

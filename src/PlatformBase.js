@@ -191,7 +191,10 @@ function(packagePath) {
         throw new InvalidPathException("Package could not be found " + this.pkgPath);
     }
 
-    ShellJS.mv('-f', packagePath, this.pkgPath);
+    // ShellJS.mv() gives weird can not link error when moving
+    // across file systems, so play save and copy/delete.
+    ShellJS.cp(packagePath, this.pkgPath);
+    ShellJS.rm("-f", packagePath);
 };
 
 /**

@@ -26,22 +26,15 @@ var util = {
      */
     iterate: function(a, callback, done) {
 
-        if (a instanceof Array && a.length === 0) {
-            return;
-        }
-
         var i = -1;
-
         function next() {
-
             i++;
             if (i < a.length) {
                 callback(a[i], next);
-            } else {
+            } else if (done) {
                 done();
             }
         }
-
         next();
     }
 };

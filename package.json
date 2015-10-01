@@ -8,7 +8,8 @@
     "node" : ">=0.12"
   },
   "bin": {
-    "crosswalk-app": "./src/crosswalk-app"
+    "crosswalk-app": "./src/crosswalk-app",
+    "crosswalk-package": "./src/crosswalk-package"
   },
   "scripts": {
     "test": "node_modules/grunt-cli/bin/grunt test"
