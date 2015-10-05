@@ -374,13 +374,27 @@ function(versionSpec, platformPath, callback) {
     var channel = null;
     var version = null;
 
-    if (AndroidDependencies.CHANNELS.indexOf(versionSpec) > -1) {
+    if (ShellJS.test("-f", versionSpec)) {
+
+        // versionSpec is a filename, import directly
+        var filename = Path.normalize(Path.resolve(versionSpec));
+        output.info("Using " + versionSpec);
+        errormsg = null;
+        var importedVersion = this.importCrosswalkFromZip(filename, platformPath);
+        if (!importedVersion) {
+            errormsg = "Failed to extract " + filename;
+        }
+        callback(importedVersion, errormsg);
+        return;
+
+    } else if (AndroidDependencies.CHANNELS.indexOf(versionSpec) > -1) {
         // versionSpec is a channel name
         channel = versionSpec;
     } else {
         version = versionSpec;
     }
 
+    // Download
     this.findCrosswalkVersion(version, channel,
                               function(version, channel, errormsg) {
 
