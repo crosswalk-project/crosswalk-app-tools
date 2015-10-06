@@ -13,6 +13,7 @@ var AndroidDependencies = require("./AndroidDependencies");
 var AndroidManifest = require("./AndroidManifest");
 var AndroidSDK = require("./AndroidSDK");
 var JavaActivity = require("./JavaActivity");
+var ProjectProperties = require("./ProjectProperties");
 var XmlTheme = require("./XmlTheme");
 
 /**
@@ -41,9 +42,16 @@ function AndroidPlatform(PlatformBase, baseData) {
     instance._sdk = new AndroidSDK(instance.application);
     instance._channel = "stable";
     instance._shared = false;
+    instance._apiTarget = null;
 
     return instance;
 }
+
+/**
+ * Minimal API level.
+ * FIXME: this is not the optimal way to specify this.
+ */
+AndroidPlatform.MIN_API_LEVEL = 21;
 
 /**
  * Accessor function for platform-specific command-line argument spec.
@@ -159,39 +167,49 @@ function(output, callback) {
             }
         }
     };
-    sdk.generateProjectSkeleton(path, dummyPackageId, "android-21",
-                                function (path, logmsg, errormsg) {
 
-        dummyLog += logmsg;
+    sdk.queryTarget(AndroidPlatform.MIN_API_LEVEL,
+                    function(apiTarget, errormsg) {
 
-        if (!path || errormsg) {
-            output.error(errormsg);
-            ShellJS.rm("-rf", path);
-            output.error("Generating project failed");
-            if (dummyLog) {
-                FS.writeFileSync(path, dummyLog);
-                output.error("Consult logfile " + path);
-            }
-            callback(false);
+        if (errormsg) {
+            callback(errormsg);
             return;
         }
 
-        // Build
-        ShellJS.pushd(path);
-        sdk.buildProject(false,
-                         function(success) {
+        sdk.generateProjectSkeleton(path, dummyPackageId, apiTarget,
+                                    function (path, logmsg, errormsg) {
 
-            ShellJS.popd();
-            ShellJS.rm("-rf", path);
-            indicator.done();
-            if (!success) {
-                output.error("Building project failed");
+            dummyLog += logmsg;
+
+            if (!path || errormsg) {
+                output.error(errormsg);
+                ShellJS.rm("-rf", path);
+                output.error("Generating project failed");
                 if (dummyLog) {
                     FS.writeFileSync(path, dummyLog);
                     output.error("Consult logfile " + path);
                 }
+                callback(false);
+                return;
             }
-            callback(success);
+
+            // Build
+            ShellJS.pushd(path);
+            sdk.buildProject(false,
+                             function(success) {
+
+                ShellJS.popd();
+                ShellJS.rm("-rf", path);
+                indicator.done();
+                if (!success) {
+                    output.error("Building project failed");
+                    if (dummyLog) {
+                        FS.writeFileSync(path, dummyLog);
+                        output.error("Consult logfile " + path);
+                    }
+                }
+                callback(success);
+            });
         });
     });
 };
@@ -287,9 +305,9 @@ function(crosswalkPath, platformPath) {
     // Extract xwalk_core_library or xwalk_shared_library
     var path;
     var xwalkLibrary = this._shared ?
-                            "xwalk_shared_library/" :
-                            "xwalk_core_library/";
-    var name = zip.root + xwalkLibrary;
+                            "xwalk_shared_library" :
+                            "xwalk_core_library";
+    var name = zip.root + xwalkLibrary + "/";
     entry = zip.getEntry(name);
     if (entry) {
         path = Path.join(platformPath, xwalkLibrary);
@@ -302,8 +320,14 @@ function(crosswalkPath, platformPath) {
         return null;
     }
 
-    // Extract jars
     indicator.update(0.5);
+
+    // Update project properties
+    var props = new ProjectProperties(Path.join(this.platformPath, "project.properties"), output);
+    props.androidLibraryReference1 = xwalkLibrary;
+
+    props = new ProjectProperties(Path.join(this.platformPath, xwalkLibrary, "project.properties"), output);
+    props.target = this._apiTarget;
 
     indicator.update(0.6);
 
@@ -443,8 +467,7 @@ function(packageId, args, callback) {
         this._shared = true;
     }
 
-    var minApiLevel = 21;
-    this._sdk.queryTarget(minApiLevel,
+    this._sdk.queryTarget(AndroidPlatform.MIN_API_LEVEL,
                           function(apiTarget, errormsg) {
 
         if (errormsg) {
@@ -452,6 +475,7 @@ function(packageId, args, callback) {
             return;
         }
 
+        this._apiTarget = apiTarget;
         output.info("Building against API level " + apiTarget);
 
         this._sdk.generateProjectSkeleton(this.platformPath, this.packageId, apiTarget,
@@ -571,18 +595,29 @@ function(versionSpec, args, callback) {
 
     var output = this.application.output;
 
-    this.importCrosswalk(versionSpec, this.platformPath,
-                         function(version, errormsg) {
+    var sdk = new AndroidSDK(this.application);
+    sdk.queryTarget(AndroidPlatform.MIN_API_LEVEL,
+                    function(apiTarget, errormsg) {
 
         if (errormsg) {
-            output.error(errormsg);
-            callback("Updating crosswalk to '" + version + "' failed");
+            callback(errormsg);
             return;
         }
+        this._apiTarget = apiTarget;
 
-        output.info("Project updated to crosswalk '" + version + "'");
-        callback(null);
-    });
+        this.importCrosswalk(versionSpec, this.platformPath,
+                             function(version, errormsg) {
+    
+            if (errormsg) {
+                output.error(errormsg);
+                callback("Updating crosswalk to '" + version + "' failed");
+                return;
+            }
+    
+            output.info("Project updated to crosswalk '" + version + "'");
+            callback(null);
+        });
+    }.bind(this));
 };
 
 AndroidPlatform.prototype.refresh =
