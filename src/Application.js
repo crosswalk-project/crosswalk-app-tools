@@ -91,9 +91,13 @@ function Application(cwd, packageId) {
 
     this._output = new OutputTee(this._logfileOutput, TerminalOutput.getInstance());
 
-    this._manifest = new Manifest(this._output, Path.join(this._appPath, "manifest.json"));
+    this.loadManifest(Path.join(this._appPath, "manifest.json"));
 }
 
+/**
+ * Initialize paths.
+ * @param {String} rootPath Root path inside the project
+ */
 function initMembers(rootPath) {
 
     this._rootPath = rootPath;
@@ -111,6 +115,20 @@ function initMembers(rootPath) {
     this._prjPath = this._rootPath + Path.sep + "prj";
     ShellJS.mkdir(this._prjPath);
 }
+
+/**
+ * Load web manifest.
+ * @param {String} path Path to web manifest file
+ */
+Application.prototype.loadManifest =
+function(path) {
+
+    if (!ShellJS.test("-f", path)) {
+        throw new Error("File not found: ", path);
+    }
+
+    this._manifest = new Manifest(this._output, path);
+};
 
 /**
  * Package identifier in reverse host format, i.e. com.example.foo.

@@ -104,8 +104,10 @@ function copy(app, appPath, callback) {
     ShellJS.rm("-rf", Path.join(app.appPath, "*"));
     ShellJS.cp("-r", Path.join(appPath, "*"), app.appPath);
 
-    // Init web manifest
-    Manifest.addDefaults(output, Path.join(app.appPath, "manifest.json"), app.packageId);
+    // Init and load manifest
+    var manifestPath = Path.join(app.appPath, "manifest.json");
+    Manifest.addDefaults(output, manifestPath, app.packageId);
+    app.loadManifest(manifestPath);
 
     callback(cat.EXIT_CODE_OK);
 }

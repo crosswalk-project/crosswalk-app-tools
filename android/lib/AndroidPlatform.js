@@ -1032,8 +1032,13 @@ function(androidManifest, callback) {
     } else {
         output.warning("No usable icons found in manifest.json");
         output.warning("Using builtin default icon");
+
         // Fall back to the default icon
         androidManifest.applicationIcon = "@drawable/crosswalk";
+
+        // Make sure the icon is present.
+        ShellJS.cp(Path.join(__dirname, "..", "..", "app-template", "icon.png"),
+                   Path.join(this.platformPath, "res", "drawable-hdpi", "crosswalk.png"));
     }
 
     return nUpdated;
