@@ -8,6 +8,7 @@ var FS = require("fs");
 var Path = require("path");
 var OS = require("os");
 
+var Minimist = require("minimist");
 var MkTemp = require("mktemp");
 var ShellJS = require("shelljs");
 
@@ -20,13 +21,26 @@ var output = require("./TerminalOutput").getInstance();
 var util = require("./util/index.js");
 
 
-if (!process.argv[2]) {
-    console.log("Usage: crosswalk-package <path>\n");
+
+// Parse args
+var argv = Minimist(process.argv.slice(2));
+if (!process.argv[2] ||
+    argv.h ||
+    argv.help) {
+    help();
+    process.exit(0);
+}
+
+// Version
+if (argv.v ||
+    argv.version) {
+    var Package = require("../package.json");
+    output.write(Package.version + "\n");
     process.exit(0);
 }
 
 // Check html app path
-var appPath = Path.resolve(Path.normalize(process.argv[2]));
+var appPath = Path.resolve(Path.normalize(argv._[0]));
 if (ShellJS.test("-d", appPath)) {
     output.highlight("Packaging " + appPath);
 } else {
@@ -58,6 +72,31 @@ if (!json.xwalk_package_id) {
 var packageId = CommandParser.validatePackageId(json.xwalk_package_id, output);
 if (!packageId) {
     process.exit(cat.EXIT_CODE_ERROR);
+}
+
+// Display help output
+function help() {
+
+    var help = "" +
+        "  Crosswalk Project Packaging Tool -- https://crosswalk-project.org\n" +
+        "  Usage: crosswalk-package <options> <path>\n" +
+        "\n" +
+        "  <options>\n" +
+        "    -c --crosswalk=<version-spec>: Runtime version\n" +
+        "    -h --help: Print usage information\n" +
+        "    -r --release=true: Build release packages\n" +
+        "    -v --version: Print tool version\n" +
+        "\n" +
+        "  <path>\n" +
+        "    Path to directory that contains a web app\n" +
+        "\n" +
+        "  <version-spec>\n" +
+        "    * Channel name, i.e. stable/beta/canary\n" +
+        "    * Version number, i.e. 14.43.343.25\n" +
+        "    * Path to release, i.e. $HOME/Downloads/crosswalk-14.43.343.25.zip\n" +
+        "\n";
+
+    output.write(help);
 }
 
 // Check platform
@@ -129,15 +168,32 @@ function clean(app, callback) {
     callback(cat.EXIT_CODE_OK);
 }
 
-// Build steps
+// Arguments
 var extraArgs = {};
+if (argv.c) {
+    // TODO implement way to pass through parameters w/o platform prefix
+    extraArgs["android-crosswalk"] = argv.c;
+    extraArgs["windows-crosswalk"] = argv.c;
+}
+if (argv.crosswalk) {
+    // TODO implement way to pass through parameters w/o platform prefix
+    extraArgs["android-crosswalk"] = argv.crosswalk;
+    extraArgs["windows-crosswalk"] = argv.crosswalk;
+}
+
+var buildConfig = null;
+if (argv.r || argv.release) {
+    buildConfig = "release";
+}
+
+// Build steps
 var tasks = [
-    { func: check,  args: [ cat, output               ] },
-    { func: init,   args: [ cat, packageId            ] },
-    { func: create, args: [ cat, packageId, extraArgs ] },
-    { func: copy,   args: [ cat, appPath              ] },
-    { func: build,  args: [ cat, null, extraArgs      ] },
-    { func: clean,  args: [ cat                       ] }
+    { func: check,  args: [ cat, output                 ] },
+    { func: init,   args: [ cat, packageId              ] },
+    { func: create, args: [ cat, packageId, extraArgs   ] },
+    { func: copy,   args: [ cat, appPath                ] },
+    { func: build,  args: [ cat, buildConfig, extraArgs ] },
+    { func: clean,  args: [ cat                         ] }
 ];
 
 util.iterate(
