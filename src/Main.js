@@ -185,7 +185,12 @@ function(packageId, extraArgs, callback) {
 
     // Handle "platform" arg to set default platform
     // for new project.
-    var platform = extraArgs.platforms;
+    var platform = null;
+    if (typeof extraArgs.platforms === "string") {
+        platform = extraArgs.platforms;
+    } else if (extraArgs.platforms instanceof Array) {
+        platform = extraArgs.platforms[0];
+    }
     if (platform) {
         try {
             this.manifest.targetPlatforms = platform;

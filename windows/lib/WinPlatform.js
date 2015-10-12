@@ -286,9 +286,6 @@ function(configId, args, callback) {
         }
         return;
     }.bind(this));
-
-    // Null means success, error string means failure.
-    callback(null);
 };
 
 module.exports = WinPlatform;
