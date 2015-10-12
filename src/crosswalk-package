@@ -84,6 +84,7 @@ function help() {
         "  <options>\n" +
         "    -c --crosswalk=<version-spec>: Runtime version\n" +
         "    -h --help: Print usage information\n" +
+        "    -p --platforms=<android|windows>: Target platform\n" +
         "    -r --release=true: Build release packages\n" +
         "    -v --version: Print tool version\n" +
         "\n" +
@@ -100,10 +101,10 @@ function help() {
 }
 
 // Check platform
-function check(app, output, callback) {
+function check(app, extraArgs, output, callback) {
 
     output.highlight("Checking host setup");
-    app.check([], output, callback);
+    app.check(extraArgs.platforms, output, callback);
 }
 
 // Initialize app tools
@@ -133,7 +134,7 @@ function create(app, packageId, extraArgs, callback) {
 }
 
 // Copy
-function copy(app, appPath, callback) {
+function copy(app, appPath, extraArgs, callback) {
 
     // Replace skeleton app with actual one
     app.output.highlight("Importing web application");
@@ -147,6 +148,11 @@ function copy(app, appPath, callback) {
     var manifestPath = Path.join(app.appPath, "manifest.json");
     Manifest.addDefaults(output, manifestPath, app.packageId);
     app.loadManifest(manifestPath);
+
+    // Propagate target platform cause we just nuked the manifest
+    if (extraArgs.platforms) {
+        app.manifest.targetPlatforms = extraArgs.platforms[0];
+    }
 
     callback(cat.EXIT_CODE_OK);
 }
@@ -170,6 +176,7 @@ function clean(app, callback) {
 
 // Arguments
 var extraArgs = {};
+
 if (argv.c) {
     // TODO implement way to pass through parameters w/o platform prefix
     extraArgs["android-crosswalk"] = argv.c;
@@ -181,6 +188,14 @@ if (argv.crosswalk) {
     extraArgs["windows-crosswalk"] = argv.crosswalk;
 }
 
+extraArgs.platforms = [];
+if (argv.p) {
+    extraArgs.platforms = [ argv.p ];
+}
+if (argv.platforms) {
+    extraArgs.platforms = [ argv.platforms ];
+}
+
 var buildConfig = null;
 if (argv.r || argv.release) {
     buildConfig = "release";
@@ -188,10 +203,10 @@ if (argv.r || argv.release) {
 
 // Build steps
 var tasks = [
-    { func: check,  args: [ cat, output                 ] },
+    { func: check,  args: [ cat, extraArgs, output      ] },
     { func: init,   args: [ cat, packageId              ] },
     { func: create, args: [ cat, packageId, extraArgs   ] },
-    { func: copy,   args: [ cat, appPath                ] },
+    { func: copy,   args: [ cat, appPath, extraArgs     ] },
     { func: build,  args: [ cat, buildConfig, extraArgs ] },
     { func: clean,  args: [ cat                         ] }
 ];
