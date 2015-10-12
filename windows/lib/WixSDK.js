@@ -22,7 +22,7 @@ function WixSDK(output) {
 WixSDK.prototype.convertPath =
 function(path) {
 
-    return path.replace("\\\\", "/").replace("\\", "/");
+    return path.replace(/\\\\/g, "/").replace(/\\/g, "/");
 };
 
 /**
