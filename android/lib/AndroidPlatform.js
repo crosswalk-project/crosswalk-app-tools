@@ -1313,6 +1313,7 @@ function() {
     var output = this.application.output;
 
     var extensionsConfig = [];
+    var extensionsPerms = [];
     this.application.manifest.extensions.forEach(function (extPath) {
 
         // Test integrity
@@ -1352,6 +1353,15 @@ function() {
         configJson.jsapi = [ "xwalk-extensions", configJson.jsapi ].join("/");
         extensionsConfig.push(configJson);
 
+        // Accumulate permissions
+        for (var i = 0; configJson.permissions && i < configJson.permissions.length; i++) {
+            var perm = configJson.permissions[i];
+            // Support both android.permission.FOO namespaced and plain
+            // version by using last component.
+            perm = perm.split(".").pop();
+            extensionsPerms.push(perm);
+        }
+
     }.bind(this));
 
     // Write config
@@ -1359,6 +1369,14 @@ function() {
         var configJsonPath = Path.join(this.platformPath, "assets", "extensions-config.json");
         FS.writeFileSync(configJsonPath, FormatJson.plain(extensionsConfig));
     }
+
+    // Add permissions to manifest, so they end up in AndroidManifest.xml later
+    extensionsPerms.forEach(function (perm) {
+        var perms = this.application.manifest.androidPermissions;
+        if (perms.indexOf(perm) < 0) {
+            perms.push(perm);
+        }
+    }.bind(this));
 };
 
 /**
@@ -1378,10 +1396,10 @@ function(configId, args, callback) {
     }
 
     this.updateEngine();
+    this.importExtensions();
     this.updateManifest(callback);
     this.updateJavaActivity(configId === "release");
     this.updateWebApp(this.application.manifest.androidWebp);
-    this.importExtensions();
 
     var closure = {
         abis: this._shared ? ["shared"] : ["armeabi-v7a", "x86"], // TODO export option
