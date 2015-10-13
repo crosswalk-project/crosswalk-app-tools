@@ -95,6 +95,9 @@ function help() {
         "    * Channel name, i.e. stable/beta/canary\n" +
         "    * Version number, i.e. 14.43.343.25\n" +
         "    * Path to release, i.e. $HOME/Downloads/crosswalk-14.43.343.25.zip\n" +
+        "\n" +
+        "  Environment variables\n" +
+        "    CROSSWALK_APP_TOOLS_CACHE_DIR=<path>: Keep downloaded files in this dir\n" +
         "\n";
 
     output.write(help);
