@@ -79,7 +79,7 @@ function help() {
 
     var help = "" +
         "  Crosswalk Project Packaging Tool -- https://crosswalk-project.org\n" +
-        "  Usage: crosswalk-package <options> <path>\n" +
+        "  Usage: crosswalk-pkg <options> <path>\n" +
         "\n" +
         "  <options>\n" +
         "    -c --crosswalk=<version-spec>: Runtime version\n" +
