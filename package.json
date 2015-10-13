@@ -9,7 +9,7 @@
   },
   "bin": {
     "crosswalk-app": "./src/crosswalk-app",
-    "crosswalk-package": "./src/crosswalk-package"
+    "crosswalk-pkg": "./src/crosswalk-pkg"
   },
   "scripts": {
     "test": "node_modules/grunt-cli/bin/grunt test"
@@ -61,6 +61,7 @@
     "README.md",
     "src",
     "test",
-    "test-util"
+    "test-util",
+    "windows"
   ]
 }
