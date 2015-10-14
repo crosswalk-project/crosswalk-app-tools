@@ -196,6 +196,7 @@ function() {
         output.warning("No icon in '.ico' format found in the manifest");
         output.warning("Using default crosswalk.ico");
         winIcon = Path.join(this.appPath, "crosswalk.ico");
+        ShellJS.cp(Path.join(__dirname, "..", "..", "app-template", "crosswalk.ico"), winIcon);
     }
 
     return winIcon;
