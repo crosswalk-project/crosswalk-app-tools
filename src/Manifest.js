@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var FS = require("fs");
+var Path = require("path");
 
 var FormatJson = require("format-json");
 var ShellJS = require("shelljs");
@@ -140,6 +141,24 @@ function Manifest(output, path) {
         this._packageId = json.xwalk_package_id;
     } else {
         throw new Error("manifest.json: Invalid package ID '" + json.xwalk_package_id + "'");
+    }
+
+    // Extensions
+    this._extensions = [];
+    if (json.xwalk_extensions) {
+        if (json.xwalk_extensions instanceof Array) {
+            json.xwalk_extensions.forEach(function (path) {
+                var absPath = Path.resolve(this._path, path);
+                absPath = Path.normalize(absPath);
+                if (ShellJS.test("-e", absPath)) {
+                    this._extensions.push(absPath);
+                } else {
+                    output.warning("Skipping extension because dir not found: " + absPath);
+                }
+            }.bind(this));
+        } else {
+            output.warning("Invalid extensions " + json.xwalk_extensions);
+        }
     }
 
     // Target platforms
@@ -562,6 +581,18 @@ Object.defineProperty(Manifest.prototype, "androidPermissions", {
 Object.defineProperty(Manifest.prototype, "androidWebp", {
                       get: function() {
                                 return this._androidWebp;
+                           }
+                      });
+
+/**
+ * Extensions.
+ * @member {String} extensions
+ * @instance
+ * @memberOf Manifest
+ */
+Object.defineProperty(Manifest.prototype, "extensions", {
+                      get: function() {
+                                return this._extensions;
                            }
                       });
 

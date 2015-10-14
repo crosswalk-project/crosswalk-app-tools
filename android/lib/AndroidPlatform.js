@@ -6,6 +6,7 @@ var ChildProcess = require("child_process");
 var FS = require("fs");
 var Path = require('path');
 
+var FormatJson = require("format-json");
 var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
 
@@ -250,7 +251,7 @@ function(apiTarget, platformPath) {
     // Make html5 app dir and copy sample content
     var wwwPath = Path.join(platformPath, "assets", "www");
     ShellJS.mkdir("-p", wwwPath);
-    ShellJS.cp("-r", this.appPath + Path.sep + "*", wwwPath);
+    ShellJS.cp("-rf", this.appPath + Path.sep + "*", wwwPath);
 
     // TODO check for errors
     return true;
@@ -952,7 +953,7 @@ function(srcPath, dstDir, iconFilename, callback) {
             ShellJS.rm(curPath);
         }
         var dstPath = Path.join(dstDir, iconFilename + Path.extname(srcPath));
-        ShellJS.cp(srcPath, dstPath);
+        ShellJS.cp("-f", srcPath, dstPath);
     }
 
     return true;
@@ -1184,7 +1185,7 @@ function() {
     var wwwPath = Path.join(this.platformPath, "assets", "www");
     ShellJS.rm("-rf", wwwPath + Path.sep + "*");
     output.info("Copying app to " + wwwPath);
-    ShellJS.cp("-r", this.appPath + Path.sep + "*", wwwPath);
+    ShellJS.cp("-rf", this.appPath + Path.sep + "*", wwwPath);
 
     var params = this.application.manifest.androidWebp;
     if (!params) {
@@ -1292,6 +1293,93 @@ function() {
 };
 
 /**
+ * Import extensions.
+ * The directory of one external extension should be like:
+ *   myextension/
+ *     myextension.jar
+ *     myextension.js
+ *     myextension.json
+ * That means the name of the internal files should be the same as the
+ * directory name.
+ * For .jar files, they'll be copied to libs/ and then
+ * built into classes.dex in the APK.
+ * For .js files, they'll be copied into assets/xwalk-extensions/.
+ * For .json files, the'll be merged into one file called
+ * extensions-config.json and copied into assets/.
+ */
+AndroidPlatform.prototype.importExtensions =
+function() {
+
+    var output = this.application.output;
+
+    var extensionsConfig = [];
+    var extensionsPerms = [];
+    this.application.manifest.extensions.forEach(function (extPath) {
+
+        // Test integrity
+        if (!ShellJS.test("-d", extPath)) {
+            output.warning("Skipping invalid extension dir " + extPath);
+            return;
+        }
+        var extName = Path.basename(extPath);
+
+        var jarPath = Path.join(extPath, extName + ".jar");
+        if (!ShellJS.test("-f", jarPath)) {
+            output.warning("Skipping extension, file not found " + jarPath);
+            return;
+        }
+
+        var jsPath = Path.join(extPath, extName + ".js");
+        if (!ShellJS.test("-f", jsPath)) {
+            output.warning("Skipping extension, file not found " + jsPath);
+            return;
+        }
+
+        var jsonPath = Path.join(extPath, extName + ".json");
+        if (!ShellJS.test("-f", jsonPath)) {
+            output.warning("Skipping extension, file not found " + jsonPath);
+            return;
+        }
+
+        // Copy
+        ShellJS.cp("-f", jarPath, Path.join(this.platformPath, "libs"));
+        var jsDstPath = Path.join(this.platformPath, "assets", "xwalk-extensions");
+        ShellJS.mkdir(jsDstPath);
+        ShellJS.cp("-f", jsPath, jsDstPath);
+
+        // Accumulate config
+        var jsonBuf = FS.readFileSync(jsonPath, {"encoding": "utf8"});
+        var configJson = JSON.parse(jsonBuf);
+        configJson.jsapi = [ "xwalk-extensions", configJson.jsapi ].join("/");
+        extensionsConfig.push(configJson);
+
+        // Accumulate permissions
+        for (var i = 0; configJson.permissions && i < configJson.permissions.length; i++) {
+            var perm = configJson.permissions[i];
+            // Support both android.permission.FOO namespaced and plain
+            // version by using last component.
+            perm = perm.split(".").pop();
+            extensionsPerms.push(perm);
+        }
+
+    }.bind(this));
+
+    // Write config
+    if (extensionsConfig.length > 0) {
+        var configJsonPath = Path.join(this.platformPath, "assets", "extensions-config.json");
+        FS.writeFileSync(configJsonPath, FormatJson.plain(extensionsConfig));
+    }
+
+    // Add permissions to manifest, so they end up in AndroidManifest.xml later
+    extensionsPerms.forEach(function (perm) {
+        var perms = this.application.manifest.androidPermissions;
+        if (perms.indexOf(perm) < 0) {
+            perms.push(perm);
+        }
+    }.bind(this));
+};
+
+/**
  * Implements {@link PlatformBase.build}
  */
 AndroidPlatform.prototype.build =
@@ -1308,6 +1396,7 @@ function(configId, args, callback) {
     }
 
     this.updateEngine();
+    this.importExtensions();
     this.updateManifest(callback);
     this.updateJavaActivity(configId === "release");
     this.updateWebApp(this.application.manifest.androidWebp);

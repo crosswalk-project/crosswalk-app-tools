@@ -153,7 +153,7 @@ function copy(app, appPath, extraArgs, callback) {
     app.loadManifest(manifestPath);
 
     // Propagate target platform cause we just nuked the manifest
-    if (extraArgs.platforms) {
+    if (extraArgs.platforms.length > 0) {
         app.manifest.targetPlatforms = extraArgs.platforms[0];
     }
 
