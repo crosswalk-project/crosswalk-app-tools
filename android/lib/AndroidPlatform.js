@@ -251,7 +251,7 @@ function(apiTarget, platformPath) {
     // Make html5 app dir and copy sample content
     var wwwPath = Path.join(platformPath, "assets", "www");
     ShellJS.mkdir("-p", wwwPath);
-    ShellJS.cp("-r", this.appPath + Path.sep + "*", wwwPath);
+    ShellJS.cp("-rf", this.appPath + Path.sep + "*", wwwPath);
 
     // TODO check for errors
     return true;
@@ -953,7 +953,7 @@ function(srcPath, dstDir, iconFilename, callback) {
             ShellJS.rm(curPath);
         }
         var dstPath = Path.join(dstDir, iconFilename + Path.extname(srcPath));
-        ShellJS.cp(srcPath, dstPath);
+        ShellJS.cp("-f", srcPath, dstPath);
     }
 
     return true;
@@ -1185,7 +1185,7 @@ function() {
     var wwwPath = Path.join(this.platformPath, "assets", "www");
     ShellJS.rm("-rf", wwwPath + Path.sep + "*");
     output.info("Copying app to " + wwwPath);
-    ShellJS.cp("-r", this.appPath + Path.sep + "*", wwwPath);
+    ShellJS.cp("-rf", this.appPath + Path.sep + "*", wwwPath);
 
     var params = this.application.manifest.androidWebp;
     if (!params) {
@@ -1342,10 +1342,10 @@ function() {
         }
 
         // Copy
-        ShellJS.cp(jarPath, Path.join(this.platformPath, "libs"));
+        ShellJS.cp("-f", jarPath, Path.join(this.platformPath, "libs"));
         var jsDstPath = Path.join(this.platformPath, "assets", "xwalk-extensions");
         ShellJS.mkdir(jsDstPath);
-        ShellJS.cp(jsPath, jsDstPath);
+        ShellJS.cp("-f", jsPath, jsDstPath);
 
         // Accumulate config
         var jsonBuf = FS.readFileSync(jsonPath, {"encoding": "utf8"});

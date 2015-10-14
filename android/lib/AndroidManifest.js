@@ -228,14 +228,14 @@ Object.defineProperty(AndroidManifest.prototype, "permissions", {
 
                                 // Remove permissions
                                 var child;
-                                for (var idx in doc.documentElement.childNodes) {
-                                    var n = doc.documentElement.childNodes[idx];
-                                    if (n.nodeName === "uses-permission") {
-                                        doc.removeChild(n);
-                                    }
+                                var permNodes = doc.getElementsByTagName("uses-permission");
+                                for (var i = 0; permNodes[i]; i++) {
+                                    child = permNodes[i];
+                                    doc.documentElement.removeChild(child);
                                 }
 
                                 // Add new permissions
+                                this._output.info("Adding permissions " + permissions.join(","));
                                 permissions.forEach(function (permission) {
                                     child = doc.createElement("uses-permission");
                                     child.setAttribute("android:name", "android.permission." + permission);
