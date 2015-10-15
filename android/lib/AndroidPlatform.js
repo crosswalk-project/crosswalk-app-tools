@@ -1101,10 +1101,10 @@ function(callback) {
         manifest.screenOrientation = "sensor";
         break;
     case "landscape":
-        manifest.screenOrientation = "userLandscape";
+        manifest.screenOrientation = "sensorLandscape";
         break;
     case "portrait":
-        manifest.screenOrientation = "userPortrait";
+        manifest.screenOrientation = "sensorPortrait";
         break;
     case "portrait-primary":
         manifest.screenOrientation = "portrait";
