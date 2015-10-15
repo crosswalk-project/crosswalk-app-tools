@@ -56,7 +56,7 @@ function Application(cwd, packageId) {
     } else {
 
         // Get packageId from manifest
-        var manifest = new Manifest(this._output, Path.join(cwd, "app", "manifest.json"));
+        var manifest = new Manifest(TerminalOutput.getInstance(), Path.join(cwd, "app", "manifest.json"));
         this._packageId = manifest.packageId;
         if (!this._packageId) {
             throw new InvalidPathException("Path does not seem to be a project toplevel: " + cwd);

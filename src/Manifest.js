@@ -148,7 +148,7 @@ function Manifest(output, path) {
     if (json.xwalk_extensions) {
         if (json.xwalk_extensions instanceof Array) {
             json.xwalk_extensions.forEach(function (path) {
-                var absPath = Path.resolve(this._path, path);
+                var absPath = Path.resolve(Path.dirname(this._path), path);
                 absPath = Path.normalize(absPath);
                 if (ShellJS.test("-e", absPath)) {
                     this._extensions.push(absPath);
