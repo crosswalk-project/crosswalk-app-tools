@@ -79,7 +79,7 @@ This sets up a skeleton project, downloads and imports Crosswalk, and creates a 
 
 ### Next steps and limitations
 * Android release packages will have to be signed manually before they are published on Google's Play Store, as that functionality is not yet integrated.
-* We encourage everyone trying this softare and appreciate feedback, as we are looking to improve user friendliness and integration with Crosswalk in the coming releases.
+* We encourage everyone to use this app-tools and appreciate feedback, as we are looking to improve user friendliness and integration with Crosswalk in the coming releases.
 
 
 ### Run development versions from git
