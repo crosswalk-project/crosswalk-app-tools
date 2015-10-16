@@ -205,7 +205,7 @@ JavaActivity.prototype.insertIfMissing =
 function(lines, i, stmt, outBuf) {
 
     found = false;
-    while (lines[i] !== "    }") {
+    while (lines[i] !== "        super.onCreate(savedInstanceState);") {
         outBuf.push(lines[i]);
         i++;
         if (lines[i] === stmt) {
