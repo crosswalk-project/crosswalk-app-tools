@@ -9,7 +9,6 @@ var ShellJS = require("shelljs");
 
 var CommandParser = require("./CommandParser");
 var IllegalAccessException = require("./util/exceptions").IllegalAccessException;
-var InvalidPathException = require("./util/exceptions").InvalidPathException;
 var LogfileOutput = require("./LogfileOutput");
 var Manifest = require("./Manifest");
 var OutputIface = require("./OutputIface");
@@ -23,18 +22,22 @@ var TerminalOutput = require("./TerminalOutput");
  * @constructor
  * @param {String} cwd Current working directory
  * @param {String} [packageId] Package ID in com.example.foo format, or null
- * @throws {InvalidPathException} If packageId not passed and current working dir not a project.
+ * @throws {Error} If packageId not passed and current working dir not a project.
  * @protected
  */
 function Application(cwd, packageId) {
 
+    var output = TerminalOutput.getInstance();
+
     // cwd must be absolute and exist.
     if (!cwd ||
         Path.resolve(cwd) != Path.normalize(cwd)) {
-        throw new InvalidPathException("Path not absolute: " + cwd);
+        output.error("Path not absolute: " + cwd);
+        throw new Error("Path not absolute: " + cwd);
     }
     if (!ShellJS.test("-d", cwd)) {
-        throw new InvalidPathException("Path does not exist: " + cwd);
+        output.error("Path does not exist: " + cwd);
+        throw new Error("Path does not exist: " + cwd);
     }
 
     // PackageId is only passed when a new project is created.
@@ -45,7 +48,8 @@ function Application(cwd, packageId) {
         // Check that project dir not already exists
         var rootPath = Path.join(cwd, this._packageId);
         if (ShellJS.test("-d", rootPath)) {
-            throw new InvalidPathException("Failed to create project, path already exists: " + rootPath);
+            output.error("Failed to create project, path already exists: " + rootPath);
+            throw new Error("Failed to create project, path already exists: " + rootPath);
         }
 
         initMembers.call(this, rootPath);
@@ -59,7 +63,8 @@ function Application(cwd, packageId) {
         var manifest = new Manifest(TerminalOutput.getInstance(), Path.join(cwd, "app", "manifest.json"));
         this._packageId = manifest.packageId;
         if (!this._packageId) {
-            throw new InvalidPathException("Path does not seem to be a project toplevel: " + cwd);
+            output.error("Path does not seem to be a project toplevel: " + cwd);
+            throw new Error("Path does not seem to be a project toplevel: " + cwd);
         }
 
         initMembers.call(this, cwd);
@@ -67,19 +72,24 @@ function Application(cwd, packageId) {
 
     // Check all paths exist.
     if (!ShellJS.test("-d", this._rootPath)) {
-        throw new InvalidPathException("Failed to load, invalid path: " + this._rootPath);
+        output.error("Failed to load, invalid path: " + this._rootPath);
+        throw new Error("Failed to load, invalid path: " + this._rootPath);
     }
     if (!ShellJS.test("-d", this._appPath)) {
-        throw new InvalidPathException("Failed to load, invalid path: " + this._appPath);
+        output.error("Failed to load, invalid path: " + this._appPath);
+        throw new Error("Failed to load, invalid path: " + this._appPath);
     }
     if (!ShellJS.test("-d", this._logPath)) {
-        throw new InvalidPathException("Failed to load, invalid path: " + this._logPath);
+        output.error("Failed to load, invalid path: " + this._logPath);
+        throw new Error("Failed to load, invalid path: " + this._logPath);
     }
     if (!ShellJS.test("-d", this._pkgPath)) {
-        throw new InvalidPathException("Failed to load, invalid path: " + this._pkgPath);
+        output.error("Failed to load, invalid path: " + this._pkgPath);
+        throw new Error("Failed to load, invalid path: " + this._pkgPath);
     }
     if (!ShellJS.test("-d", this._prjPath)) {
-        throw new InvalidPathException("Failed to load, invalid path: " + this._prjPath);
+        output.error("Failed to load, invalid path: " + this._prjPath);
+        throw new Error("Failed to load, invalid path: " + this._prjPath);
     }
 
     // Set up logging, always start a new file for each time the app is run.

@@ -1419,7 +1419,11 @@ function(configId, args, callback) {
                     var packagePath = Path.join(this.platformPath, "bin", closure.apks[i]);
                     this.exportPackage(packagePath);
 
-                    output.highlight("    + " + closure.apks[i]);
+                    output.write("    + " + closure.apks[i] + "\n");
+                }
+                if (configId === "release") {
+                    output.highlight("  Sign APKs before publishing: " +
+                                     "https://developer.android.com/tools/publishing/app-signing.html#signing-manually");
                 }
             }
             callback(errormsg);
