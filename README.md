@@ -25,6 +25,8 @@ on the system. If this does not work, then building Crosswalk apps will not succ
 crosswalk-app check android
 ```
 
+Two executables are provided, `crosswalk-app` implements low level helper commands, `crosswalk-pkg` is the main tool for creating packages.
+
 ### Usage
 
 ```
