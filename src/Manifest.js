@@ -55,7 +55,7 @@ function Manifest(output, path) {
 
     if (!this._appVersion) {
         output.error("Invalid app version '" + json.xwalk_app_version + "' in the manifest");
-        // TODO maybe exception
+        throw new Error("Invalid app version '" + json.xwalk_app_version + "' in the manifest");
     }
 
     // Name
