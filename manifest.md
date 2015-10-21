@@ -14,7 +14,6 @@ Manifest.json fields
 * `display`:	http://w3c.github.io/manifest/ Values "standalone" and "fullscreen" are supported on Android.
 * `orientation`:	http://w3c.github.io/manifest/
 * `short_name`:	http://w3c.github.io/manifest/ Value has no effect on Android, as `name` is used for the launcher label.
-* `xwalk_android_animatable_view: true/false`: Whether to allow pinch zooming, currently out of order: https://crosswalk-project.org/jira/browse/XWALK-4681.
 * `xwalk_android_keep_screen_on: true/false`: Whether to keep the screen on while app is in the foreground.
 * `xwalk_android_webp: "x y z"`: Convert assets to webp, needs "cwebp" from google. Values between 1 and 100, e.g. `80 80 80`. See https://developers.google.com/speed/webp/.
 * `xwalk_command_line: "command-line"`: Extra parameters to pass to the crosswalk engine, e.g. for overriding blacklisted GPU drivers. 
