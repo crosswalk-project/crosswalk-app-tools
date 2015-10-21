@@ -55,6 +55,7 @@
     "app-template",
     "examples",
     "Gruntfile.js",
+    "index.js",
     "LICENSE-APACHE-V2",
     "package.json",
     "manifest.md",
