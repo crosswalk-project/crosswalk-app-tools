@@ -63,7 +63,9 @@ function() {
     return {
         create: {
             "crosswalk": "\t\t\tChannel name (stable/beta/canary)\n" +
-                         "\t\t\t\t\t\tor version number (w.x.y.z)",
+                         "\t\t\t\t\t\tor version number (w.x.y.z)\n" +
+                         "\t\t\t\t\t\tor crosswalk zip\n" +
+                         "\t\t\t\t\t\tor xwalk_app_template dir",
             "shared": "                    Depend on shared crosswalk installation"
         }
     };
@@ -259,12 +261,11 @@ function(apiTarget, platformPath) {
 
 /**
  * Import Crosswalk libraries and auxiliary files into the project.
- * @param {String} crosswalkPath Location of unpacked Crosswalk distribution
- * @param {String} platformPath Location of project to import Crosswalk into
+ * @param {String} crosswalkPath Location of Crosswalk zip or xwalk_app_template build dir
  * @returns {String} Imported version on success, otherwise null.
  */
-AndroidPlatform.prototype.importCrosswalkFromZip =
-function(crosswalkPath, platformPath) {
+AndroidPlatform.prototype.importCrosswalkFromDisk =
+function(crosswalkPath) {
 
     // Namespace util
     var util = this.application.util;
@@ -274,30 +275,37 @@ function(crosswalkPath, platformPath) {
     var indicator = output.createFiniteProgress("Extracting " + crosswalkPath);
 
     // Extract contents
-    var zip = null;
+    var xwalk = null;
     try {
-        zip = new util.CrosswalkZip(crosswalkPath);
+        if (ShellJS.test("-d", crosswalkPath)) {
+            xwalk = new util.CrosswalkDir(crosswalkPath);
+        } else {
+            xwalk = new util.CrosswalkZip(crosswalkPath);
+        }
     } catch (e) {
         // HACK we're in the midst of a progress display, force line break
-        ShellJS.rm("-f", crosswalkPath);
         output.write("\n");
-        output.error("Failed to open " + crosswalkPath);
-        output.error("Invalid file has been deleted, please try again");
+        output.error("Failed to read " + crosswalkPath);
+        if (ShellJS.test("-f", crosswalkPath)) {
+            // Remove incomplete/corrupted zip so next time we start over downloading.
+            ShellJS.rm("-f", crosswalkPath);
+            output.error("Invalid file has been deleted, please try again");
+        }
         return null;
     }
 
     indicator.update(0.2);
 
-    if (zip.version.major < 9) {
-        output.error("Crosswalk version " + zip.version.major + " not supported. Use 8+.");
+    if (xwalk.version.major < 9) {
+        output.error("Crosswalk version " + xwalk.version.major + " not supported. Use 8+.");
         return null;
-    } else if (zip.version.major > 15) {
-        output.warning("This tool has not been tested with Crosswalk " + zip.version.major + ".");
+    } else if (xwalk.version.major > 15) {
+        output.warning("This tool has not been tested with Crosswalk " + xwalk.version.major + ".");
     }
 
-    var entry = zip.getEntry(zip.root);
+    var entry = xwalk.getEntry(xwalk.root);
     if (!entry) {
-        output.error("Failed to find root entry " + zip.root);
+        output.error("Failed to find root entry " + xwalk.root);
         return null;
     }
 
@@ -308,14 +316,14 @@ function(crosswalkPath, platformPath) {
     var xwalkLibrary = this._shared ?
                             "xwalk_shared_library" :
                             "xwalk_core_library";
-    var name = zip.root + xwalkLibrary + "/";
-    entry = zip.getEntry(name);
+    var name = xwalk.root + xwalkLibrary + "/";
+    entry = xwalk.getEntry(name);
     if (entry) {
-        path = Path.join(platformPath, xwalkLibrary);
+        path = Path.join(this.platformPath, xwalkLibrary);
         // Remove existing dir to prevent stale files when updating crosswalk
         ShellJS.rm("-rf", path);
         ShellJS.mkdir(path);
-        zip.extractEntryTo(entry, path);
+        xwalk.extractEntryTo(entry, path);
     } else {
         output.error("Failed to find entry " + name);
         return null;
@@ -332,10 +340,10 @@ function(crosswalkPath, platformPath) {
 
     indicator.update(0.6);
 
-    name = zip.root + "template/libs/xwalk_app_runtime_java.jar";
-    entry = zip.getEntry(name);
+    name = xwalk.root + "template/libs/xwalk_app_runtime_java.jar";
+    entry = xwalk.getEntry(name);
     if (entry) {
-        zip.extractEntryTo(entry, platformPath + Path.sep + "libs");
+        xwalk.extractEntryTo(entry, this.platformPath + Path.sep + "libs");
     } else {
         output.error("Failed to find entry " + name);
         return null;
@@ -344,12 +352,12 @@ function(crosswalkPath, platformPath) {
     indicator.update(0.7);
 
     // Extract main activity java file
-    name = zip.root + "template/src/org/xwalk/app/template/AppTemplateActivity.java";
-    entry = zip.getEntry(name);
+    name = xwalk.root + "template/src/org/xwalk/app/template/AppTemplateActivity.java";
+    entry = xwalk.getEntry(name);
     if (entry) {
 
         // Create path
-        var activityDirPath = JavaActivity.pathForPackage(platformPath, this.packageId);
+        var activityDirPath = JavaActivity.pathForPackage(this.platformPath, this.packageId);
         ShellJS.mkdir("-p", activityDirPath);
         if (!ShellJS.test("-d", activityDirPath)) {
             output.error("Failed to create activity dir " + activityDirPath);
@@ -369,10 +377,10 @@ function(crosswalkPath, platformPath) {
     indicator.update(0.8);
 
     // Extract res
-    name = zip.root + "template/res/";
-    entry = zip.getEntry(name);
+    name = xwalk.root + "template/res/";
+    entry = xwalk.getEntry(name);
     if (entry) {
-        zip.extractEntryTo(entry, platformPath + Path.sep + "res");
+        xwalk.extractEntryTo(entry, this.platformPath + Path.sep + "res");
     } else {
         output.error("Failed to find entry " + name);
         return null;
@@ -381,7 +389,7 @@ function(crosswalkPath, platformPath) {
     indicator.update(1);
     indicator.done();
 
-    return zip.version.toString();
+    return xwalk.version.toString();
 };
 
 /**
@@ -399,15 +407,15 @@ function(versionSpec, platformPath, callback) {
     var channel = null;
     var version = null;
 
-    if (ShellJS.test("-f", versionSpec)) {
+    if (ShellJS.test("-e", versionSpec)) {
 
         // versionSpec is a filename, import directly
         var filename = Path.normalize(Path.resolve(versionSpec));
         output.info("Using " + versionSpec);
         errormsg = null;
-        var importedVersion = this.importCrosswalkFromZip(filename, platformPath);
+        var importedVersion = this.importCrosswalkFromDisk(filename);
         if (!importedVersion) {
-            errormsg = "Failed to extract " + filename;
+            errormsg = "Failed to import from " + filename;
         }
         callback(importedVersion, errormsg);
         return;
@@ -446,7 +454,7 @@ function(versionSpec, platformPath, callback) {
             }
 
             errormsg = null;
-            var importedVersion = this.importCrosswalkFromZip(filename, platformPath);
+            var importedVersion = this.importCrosswalkFromDisk(filename);
             if (!importedVersion) {
                 errormsg = "Failed to extract " + filename;
             }
@@ -608,13 +616,13 @@ function(versionSpec, args, callback) {
 
         this.importCrosswalk(versionSpec, this.platformPath,
                              function(version, errormsg) {
-    
+
             if (errormsg) {
                 output.error(errormsg);
                 callback("Updating crosswalk to '" + version + "' failed");
                 return;
             }
-    
+
             output.info("Project updated to crosswalk '" + version + "'");
             callback(null);
         });
