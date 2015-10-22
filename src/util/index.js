@@ -7,6 +7,8 @@
  */
 var util = {
     /** {@link CrosswalkZip} */
+    CrosswalkDir: require("./CrosswalkDir"),
+    /** {@link CrosswalkZip} */
     CrosswalkZip: require("./CrosswalkZip"),
     /** {@link Downloader} */
     Downloader: require("./Downloader"),
