@@ -9,6 +9,7 @@ var ShellJS = require("shelljs");
 
 var Application = require("./Application");
 var CommandParser = require("./CommandParser");
+var Manifest = require("./Manifest");
 var PlatformBase = require("./PlatformBase");
 var PlatformsManager = require("./PlatformsManager");
 var TerminalOutput = require("./TerminalOutput");
@@ -147,6 +148,43 @@ function(platformIds, output, callback) {
 
         callback(Main.EXIT_CODE_OK);
     });
+};
+
+/**
+ * Initialise web manifest.
+ * @param {String} path Path to dir or manifest.json
+ * @param {Object} extraArgs Unparsed extra arguments passed by command-line
+ * @param {OutputIface} output Output to write to
+ * @param {Main~mainOperationCb} callback Callback function
+ * @static
+ */
+Main.prototype.initManifest =
+function(path, extraArgs, output, callback) {
+
+    if (ShellJS.test("-d", path)) {
+        path = Path.join(path, "manifest.json");
+    } else if (Path.basename(path) != "manifest.json") {
+        output.error("Path needs to point to directory or manifest.json: " + path);
+        callback(Main.EXIT_CODE_ERROR);
+        return;
+    }
+
+    var packageId = null;
+    if (extraArgs["package-id"]) {
+        if (CommandParser.validatePackageId(extraArgs["package-id"], output)) {
+            packageId = extraArgs["package-id"];
+        } else {
+            callback(Main.EXIT_CODE_ERROR);
+            return;
+        }
+    } else {
+        output.warning("Using default package-id 'com.example.foo'");
+        packageId = "com.example.foo";
+    }
+
+    Manifest.addDefaults(output, path, packageId);
+    output.info("Initialized " + path);
+    callback(Main.EXIT_CODE_OK);
 };
 
 /**
@@ -433,6 +471,11 @@ function(callback) {
     case "check":
         var platforms = parser.checkGetPlatforms();
         app.check(platforms, output, callback);
+        break;
+
+    case "manifest":
+        var path = parser.manifestGetPath();
+        app.initManifest(path, extraArgs, output, callback);
         break;
 
     case "create":

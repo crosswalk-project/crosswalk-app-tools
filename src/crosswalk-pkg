@@ -49,27 +49,33 @@ if (ShellJS.test("-d", appPath)) {
 
 // Determine packageId
 var packageId = null;
-var manifestPath = Path.join(appPath, "manifest.json");
-var buffer = null;
-if (ShellJS.test("-f", manifestPath)) {
-    buffer = FS.readFileSync(manifestPath, {"encoding": "utf8"});
+if (argv.m || argv.manifest) {
+    // packageId from command-line?
+    packageId = CommandParser.validatePackageId(argv.m ? argv.m : argv.manifest, output);
+} else {
+    // packageId from existing web manifest?
+    var manifestPath = Path.join(appPath, "manifest.json");
+    var buffer = null;
+    if (ShellJS.test("-f", manifestPath)) {
+        buffer = FS.readFileSync(manifestPath, {"encoding": "utf8"});
+    }
+    if (!buffer) {
+        output.error("Failed to read manifest.json in " + appPath);
+        output.info("Please create a minimal manifest.json by pasting the following content");
+        output.info('{ "xwalk_package_id": "com.example.foo" }');
+        process.exit(cat.EXIT_CODE_ERROR);
+    }
+    var json = JSON.parse(buffer);
+    if (!json) {
+        output.error("Failed to parse manifest.json");
+        process.exit(cat.EXIT_CODE_ERROR);
+    }
+    if (!json.xwalk_package_id) {
+        output.error("Missing field 'xwalk_package_id' in the form of 'com.example.foo' in manifest.json");
+        process.exit(cat.EXIT_CODE_ERROR);
+    }
+    packageId = CommandParser.validatePackageId(json.xwalk_package_id, output);
 }
-if (!buffer) {
-    output.error("Failed to read manifest.json in " + appPath);
-    output.info("Please create a minimal manifest.json by pasting the following content");
-    output.info('{ "xwalk_package_id": "com.example.foo" }');
-    process.exit(cat.EXIT_CODE_ERROR);
-}
-var json = JSON.parse(buffer);
-if (!json) {
-    output.error("Failed to parse manifest.json");
-    process.exit(cat.EXIT_CODE_ERROR);
-}
-if (!json.xwalk_package_id) {
-    output.error("Missing field 'xwalk_package_id' in the form of 'com.example.foo' in manifest.json");
-    process.exit(cat.EXIT_CODE_ERROR);
-}
-var packageId = CommandParser.validatePackageId(json.xwalk_package_id, output);
 if (!packageId) {
     process.exit(cat.EXIT_CODE_ERROR);
 }
@@ -84,12 +90,18 @@ function help() {
         "  <options>\n" +
         "    -c --crosswalk=<version-spec>: Runtime version\n" +
         "    -h --help: Print usage information\n" +
+        "    -m --manifest=<package-id>: Fill manifest.json with crosswalk defaults\n" +
         "    -p --platforms=<android|windows>: Target platform\n" +
         "    -r --release=true: Build release packages\n" +
         "    -v --version: Print tool version\n" +
         "\n" +
         "  <path>\n" +
         "    Path to directory that contains a web app\n" +
+        "\n" +
+        "  <package-id>\n" +
+        "    Canonical application name, e.g. com.example.foo, needs to\n" +
+        "    * Comprise of 3 or more period-separated parts\n" +
+        "    * Begin with lowecase letters\n" +
         "\n" +
         "  <version-spec>\n" +
         "    * Channel name, i.e. stable/beta/canary\n" +
@@ -109,6 +121,18 @@ function check(app, extraArgs, output, callback) {
 
     output.highlight("Checking host setup");
     app.check(extraArgs.platforms, output, callback);
+}
+
+// Initialize app tools
+function manifest(app, fill, appPath, packageId, output, callback) {
+
+    if (fill) {
+        output.highlight("Filling manifest.json in " + appPath);
+        app.initManifest(appPath, {"package-id": packageId}, output, callback);
+        return;
+    }
+
+    callback(cat.EXIT_CODE_OK);
 }
 
 // Initialize app tools
@@ -200,6 +224,8 @@ if (argv.platforms) {
     extraArgs.platforms = [ argv.platforms ];
 }
 
+var fill = argv.m || argv.manifest;
+
 var buildConfig = null;
 if (argv.r || argv.release) {
     buildConfig = "release";
@@ -207,12 +233,13 @@ if (argv.r || argv.release) {
 
 // Build steps
 var tasks = [
-    { func: check,  args: [ cat, extraArgs, output      ] },
-    { func: init,   args: [ cat, packageId              ] },
-    { func: create, args: [ cat, packageId, extraArgs   ] },
-    { func: copy,   args: [ cat, appPath, extraArgs     ] },
-    { func: build,  args: [ cat, buildConfig, extraArgs ] },
-    { func: clean,  args: [ cat                         ] }
+    { func: check,    args: [ cat, extraArgs, output                ] },
+    { func: manifest, args: [ cat, fill, appPath, packageId, output ] },
+    { func: init,     args: [ cat, packageId                        ] },
+    { func: create,   args: [ cat, packageId, extraArgs             ] },
+    { func: copy,     args: [ cat, appPath, extraArgs               ] },
+    { func: build,    args: [ cat, buildConfig, extraArgs           ] },
+    { func: clean,    args: [ cat                                   ] }
 ];
 
 util.iterate(

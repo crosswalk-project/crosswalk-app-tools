@@ -38,6 +38,9 @@ function() {
 "    crosswalk-app check [<platforms>]           Check host setup\n" +
 "                                                Check all platforms if none given\n" +
 "\n" +
+"    crosswalk-app manifest <path>               Initialize web manifest in <path>\n" +
+"                  --package-id=<package-id>     Canonical package name e.g. com.example.foo\n" +
+"\n" +
 "    crosswalk-app create <package-id>           Create project <package-id>\n" +
 "                  --platforms=<target>          Optional, e.g. \"windows\"\n" +
 "\n" +
@@ -66,8 +69,6 @@ function() {
 
     var cmd = this.peekCommand();
     switch (cmd) {
-    case "check":
-        return cmd;
     case "create":
         var packageId = this.createGetPackageId();
         return packageId !== null ? cmd : null;
@@ -81,6 +82,8 @@ function() {
     case "build":
         var type = this.buildGetType();
         return type !== null ? cmd : null;
+    case "check":
+    case "manifest":
     case "platforms":
     case "help":
     case "version":
@@ -113,7 +116,7 @@ function() {
         return "help";
     }
 
-    if (["check", "create", "update", "refresh", "build", "platforms"].indexOf(command) > -1) {
+    if (["check", "manifest", "create", "update", "refresh", "build", "platforms"].indexOf(command) > -1) {
         return command;
     }
 
@@ -132,6 +135,19 @@ function() {
     // So we take everything from the third index
     var platforms = this._argv.slice(3);
     return platforms;
+};
+
+/**
+ * Get path where to initialize manifest.
+ * @returns {String} Path
+ */
+CommandParser.prototype.manifestGetPath =
+function() {
+
+    // Command goes like this
+    // node crosswalk-app manifest <path> ...
+    // So we take the 3rd element.
+    return this._argv[3];
 };
 
 /**
