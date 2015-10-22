@@ -364,6 +364,9 @@ function(output, path, packageId) {
         }
     }
 
+    // Always overwrite xwalk_package_id
+    json.xwalk_package_id = packageId;
+
     // Write back
     buffer = FormatJson.plain(json);
     FS.writeFileSync(path, buffer);
