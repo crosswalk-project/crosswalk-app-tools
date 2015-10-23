@@ -392,85 +392,13 @@ function(crosswalkPath) {
 };
 
 /**
- * Turn a freshly created empty Android project into a Crosswalk project.
- * @param {String} versionSpec Crosswalk version or channel (stable, beta, canary)
- * @param {String} platformPath Path to root dir of project
- * @param {Function} callback Callback(version, errormsg)
- * @returns {Boolean} True on success.
- */
-AndroidPlatform.prototype.importCrosswalk =
-function(versionSpec, platformPath, callback) {
-
-    var output = this.application.output;
-    var util = this.application.util;
-
-    var channel = null;
-    var version = null;
-
-    if (ShellJS.test("-e", versionSpec)) {
-
-        // versionSpec is a filename, import directly
-        var filename = Path.normalize(Path.resolve(versionSpec));
-        output.info("Using " + versionSpec);
-        errormsg = null;
-        var importedVersion = this.importCrosswalkFromDisk(filename);
-        if (!importedVersion) {
-            errormsg = "Failed to import from " + filename;
-        }
-        callback(importedVersion, errormsg);
-        return;
-
-    } else if (util.Download01Org.CHANNELS.indexOf(versionSpec) > -1) {
-        // versionSpec is a channel name
-        channel = versionSpec;
-    } else {
-        version = versionSpec;
-    }
-
-    // Download
-    var deps = new util.Download01Org(this.application, channel);
-    deps.findCrosswalkVersion(version, channel,
-                              function(version, channel, errormsg) {
-
-        if (errormsg) {
-            callback(null, errormsg);
-            return;
-        }
-
-        output.info("Found version '" + version + "' in channel '" + channel + "'");
-
-        // Download latest Crosswalk
-        var deps = new util.Download01Org(this.application, channel);
-        deps.download(version, ".",
-                      function(filename, errormsg) {
-
-            if (errormsg) {
-                callback(null, errormsg);
-                return;
-            }
-
-            if (!filename) {
-                callback(null, "Failed to download Crosswalk");
-                return;
-            }
-
-            errormsg = null;
-            var importedVersion = this.importCrosswalkFromDisk(filename);
-            if (!importedVersion) {
-                errormsg = "Failed to extract " + filename;
-            }
-            callback(importedVersion, errormsg);
-
-        }.bind(this));
-    }.bind(this));
-};
-
-/**
  * Implements {@link PlatformBase.create}
  */
 AndroidPlatform.prototype.create =
 function(packageId, args, callback) {
 
+    // Namespace util
+    var util = this.application.util;
     var output = this.application.output;
 
     if (args.shared) {
@@ -517,7 +445,11 @@ function(packageId, args, callback) {
                 return;
             }
 
-            this.importCrosswalk(versionSpec, path,
+            var deps = new util.Download01Org(this.application, "stable" /* FIXME this is just a placeholder */);
+            deps.importCrosswalk(versionSpec,
+                                 function(path) {
+                                     return this.importCrosswalkFromDisk(path);
+                                 }.bind(this),
                                  function(version, errormsg) {
 
                 if (errormsg) {
@@ -539,6 +471,8 @@ function(packageId, args, callback) {
 AndroidPlatform.prototype.update =
 function(versionSpec, args, callback) {
 
+    // Namespace util
+    var util = this.application.util;
     var output = this.application.output;
 
     var sdk = new AndroidSDK(this.application);
@@ -551,7 +485,11 @@ function(versionSpec, args, callback) {
         }
         this._apiTarget = apiTarget;
 
-        this.importCrosswalk(versionSpec, this.platformPath,
+        var deps = new util.Download01Org(this.application,  "stable" /* FIXME this is just a placeholder */);
+        deps.importCrosswalk(versionSpec,
+                             function(path) {
+                                 return this.importCrosswalkFromDisk(path);
+                             }.bind(this),
                              function(version, errormsg) {
 
             if (errormsg) {

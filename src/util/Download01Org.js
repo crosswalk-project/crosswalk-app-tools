@@ -257,6 +257,78 @@ function(version, channel, callback) {
     }.bind(this));
 };
 
+/**
+ * Look up and download correct crosswalk release.
+ * @param {String} versionSpec Crosswalk version or channel (stable, beta, canary)
+ * @param {Function} importCrosswalkFromDisk(path) function to extract downloaded release
+ * @param {Function} callback Callback(version, errormsg)
+ */
+Download01Org.prototype.importCrosswalk =
+function(versionSpec, importCrosswalkFromDisk, callback) {
+
+    var output = this._application.output;
+
+    var channel = null;
+    var version = null;
+
+    if (ShellJS.test("-e", versionSpec)) {
+
+        // versionSpec is a filename, import directly
+        var filename = Path.normalize(Path.resolve(versionSpec));
+        output.info("Using " + versionSpec);
+        errormsg = null;
+        var importedVersion = importCrosswalkFromDisk(filename);
+        if (!importedVersion) {
+            errormsg = "Failed to import from " + filename;
+        }
+        callback(importedVersion, errormsg);
+        return;
+
+    } else if (Download01Org.CHANNELS.indexOf(versionSpec) > -1) {
+        // versionSpec is a channel name
+        channel = versionSpec;
+    } else {
+        version = versionSpec;
+    }
+
+    // Download
+    var deps = new Download01Org(this._application, channel);
+    deps.findCrosswalkVersion(version, channel,
+                              function(version, channel, errormsg) {
+
+        if (errormsg) {
+            callback(null, errormsg);
+            return;
+        }
+
+        output.info("Found version '" + version + "' in channel '" + channel + "'");
+
+        // Download latest Crosswalk
+        var deps = new Download01Org(this._application, channel);
+        deps.download(version, ".",
+                      function(filename, errormsg) {
+
+            if (errormsg) {
+                callback(null, errormsg);
+                return;
+            }
+
+            if (!filename) {
+                callback(null, "Failed to download Crosswalk");
+                return;
+            }
+
+            errormsg = null;
+            var importedVersion = importCrosswalkFromDisk(filename);
+            if (!importedVersion) {
+                errormsg = "Failed to extract " + filename;
+            }
+            callback(importedVersion, errormsg);
+
+        }.bind(this));
+    }.bind(this));
+};
+
 
 
 /**
