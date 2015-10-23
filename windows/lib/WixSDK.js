@@ -172,7 +172,6 @@ function(app_path, xwalk_path, meta_data, callback) {
     AddFileComponent(app_root_folder, xwalk_path, 'xwalk.exe');
     AddFileComponent(app_root_folder, xwalk_path, 'xwalk.pak');
     AddFileComponent(app_root_folder, xwalk_path, 'icudtl.dat');
-    AddFileComponent(app_root_folder, xwalk_path, 'ffmpegsumo.dll');
     AddFileComponent(app_root_folder, xwalk_path, 'natives_blob.bin');
     AddFileComponent(app_root_folder, xwalk_path, 'snapshot_blob.bin');
 
