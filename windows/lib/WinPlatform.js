@@ -82,31 +82,31 @@ function(output, callback) {
 /**
  * Import Crosswalk libraries and auxiliary files into the project.
  * @param {String} crosswalkPath Location of unpacked Crosswalk distribution
- * @returns {String} Imported version on success, otherwise null.
+ * @returns {Boolean} True on success.
  */
-WinPlatform.prototype.importCrosswalkFromZip =
-function(crosswalkPath, callback) {
+WinPlatform.prototype.importCrosswalkFromDisk =
+function(crosswalkPath) {
 
     // Namespace util
     var util = this.application.util;
     var output = this.output;
 
     if (!crosswalkPath) {
-        callback("Use --windows-crosswalk=<path> to pass crosswalk zip");
-        return;
+        output.error("Use --windows-crosswalk=<path> to pass crosswalk zip");
+        return false;
     } else if (!ShellJS.test("-f", crosswalkPath)) {
-        callback("Crosswalk zip could not be found: " + crosswalkPath);
-        return;
+        output.error("Crosswalk zip could not be found: " + crosswalkPath);
+        return false;
     }
 
     var zip = new util.CrosswalkZip(crosswalkPath);
     zip.extractEntryTo(zip.root, this.platformPath);
     if (!ShellJS.test("-d", this.platformPath)) {
-        callback("Failed to extract " + crosswalkPath);
-        return;
+        output.error("Failed to extract " + crosswalkPath);
+        return false;
     }
 
-    callback(null);
+    return true;
 };
 
 /**
@@ -115,16 +115,34 @@ function(crosswalkPath, callback) {
 WinPlatform.prototype.create =
 function(packageId, args, callback) {
 
+    // Namespace util
+    var util = this.application.util;
     var output = this.output;
 
-    var crosswalkPath = args.crosswalk;
-    this.importCrosswalkFromZip(crosswalkPath,
-                                function (errormsg) {
+    var versionSpec = null;
+    if (args.crosswalk) {
+        // TODO verify version/channel
+        versionSpec = args.crosswalk;
+    } else {
+        versionSpec = "stable";
+        output.info("Defaulting to download channel " + versionSpec);
+    }
 
-        if (!errormsg) {
-            output.info("Successfully imported " + crosswalkPath);
+    var deps = new util.Download01Org(this.application, "windows", "stable" /* FIXME this is just a placeholder */);
+    deps.importCrosswalk(versionSpec,
+                         function(path) {
+                             return this.importCrosswalkFromDisk(path);
+                         }.bind(this),
+                         function(version, errormsg) {
+
+        if (errormsg) {
+            output.error(errormsg);
+            callback("Creating project template failed");
+            return;
         }
-        callback(errormsg);
+
+        output.info("Project template created at '" + this.platformPath + "'");
+        callback(null);
     }.bind(this));
 };
 
@@ -140,21 +158,21 @@ function(versionSpec, args, callback) {
     var oldPath = this.platformPath + ".bak";
     ShellJS.mv(this.platformPath, oldPath);
 
+    var errormsg = null;
     var crosswalkPath = args.crosswalk;
-    this.importCrosswalkFromZip(crosswalkPath,
-                                function (errormsg) {
+    var ret = this.importCrosswalkFromDisk(crosswalkPath);
+    if (ret) {
+        // Delete old project
+        ShellJS.rm("-rf", oldPath);
+        output.info("Successfully imported " + crosswalkPath);
+    } else {
+        // Restore previous project
+        ShellJS.rm("-rf", this.platformPath);
+        ShellJS.mv(oldPath, this.platformPath);
+        errormsg = "Updating project failed";
+    }
 
-        if (errormsg) {
-            // Restore previous project
-            ShellJS.rm("-rf", this.platformPath);
-            ShellJS.mv(oldPath, this.platformPath);
-        } else {
-            // Delete old project
-            ShellJS.rm("-rf", oldPath);
-            output.info("Successfully imported " + crosswalkPath);
-        }
-        callback(errormsg);
-    }.bind(this));
+    callback(errormsg);
 };
 
 WinPlatform.prototype.refresh =

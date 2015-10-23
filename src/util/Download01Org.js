@@ -10,11 +10,6 @@ var ShellJS = require("shelljs");
 
 var IndexParser = require("./IndexParser");
 
-var BASE_URL = "https://download.01.org/crosswalk/releases/crosswalk/android/";
-
-// Channels are in preferred search order.
-var CHANNELS = ["stable", "beta", "canary"];
-
 
 
 /**
@@ -41,19 +36,39 @@ function downloadFinishedCb(path, errormsg) {}
  * Crosswalk release lookup and download.
  * @constructor
  * @param {Application} application application instance
+ * @param {String} platform Crosswalk release platform android/windows
  * @param {String} channel Crosswalk channel beta/canary/stable
- * @throws {Download01Org~InvalidChannelError} If no valid channel was specified.
+ * @throws {Error} If no valid channel was specified.
  */
-function Download01Org(application, channel) {
+function Download01Org(application, platform, channel) {
 
     this._application = application;
 
-    if (CHANNELS.indexOf(channel) == -1) {
-        throw new InvalidChannelError("Unknown channel " + channel);
+    if (Download01Org.PLATFORMS.indexOf(platform) == -1) {
+        throw new Error("Unknown platform " + platform);
     }
+    this._platform = platform;
 
+    if (Download01Org.CHANNELS.indexOf(channel) == -1) {
+        throw new Error("Unknown channel " + channel);
+    }
     this._channel = channel;
 }
+
+/**
+ * Base download URL on https://download.01.org .
+ * @member {String[]} BASE_URL
+ * @static
+ * @memberOf Download01Org
+ */
+Object.defineProperty(Download01Org, "BASE_URL", {
+                      get: function() {
+                                return "https://download.01.org/crosswalk/releases/crosswalk/";
+                           },
+                      set: function(config) {
+                                // Empty because read-only
+                           }
+                      });
 
 /**
  * Read-only array of valid release channels (stable, beta, canary).
@@ -63,7 +78,22 @@ function Download01Org(application, channel) {
  */
 Object.defineProperty(Download01Org, "CHANNELS", {
                       get: function() {
-                                return CHANNELS;
+                                return ["stable", "beta", "canary"];
+                           },
+                      set: function(config) {
+                                // Empty because read-only
+                           }
+                      });
+
+/**
+ * Read-only array of valid release platforms (android, windows).
+ * @member {String[]} PLATFORMS
+ * @static
+ * @memberOf Download01Org
+ */
+Object.defineProperty(Download01Org, "PLATFORMS", {
+                      get: function() {
+                                return ["android", "windows"];
                            },
                       set: function(config) {
                                 // Empty because read-only
@@ -80,7 +110,9 @@ function(callback) {
     // Namespace util
     var util = this._application.util;
     var output = this._application.output;
-    var url = BASE_URL + this._channel + "/";
+    var url = Download01Org.BASE_URL +
+              this._platform + "/" +
+              this._channel + "/";
 
     // Download
     var stream = new MemoryStream();
@@ -152,7 +184,8 @@ function(version, defaultPath, callback) {
 
     var output = this._application.output;
     var filename = "crosswalk-" + version + ".zip";
-    var url = BASE_URL +
+    var url = Download01Org.BASE_URL +
+              this._platform + "/" +
               this._channel + "/" +
               version + "/" +
               filename;
@@ -216,7 +249,7 @@ function(version, channel, callback) {
 
     output.info("Looking for " + versionName + " in channel '" + channel + "'");
 
-    var deps = new Download01Org(this._application, channel);
+    var deps = new Download01Org(this._application, this._platform, channel);
     deps.fetchVersions(function(versions, errormsg) {
 
         if (errormsg) {
@@ -292,7 +325,7 @@ function(versionSpec, importCrosswalkFromDisk, callback) {
     }
 
     // Download
-    var deps = new Download01Org(this._application, channel);
+    var deps = new Download01Org(this._application, this._platform, channel);
     deps.findCrosswalkVersion(version, channel,
                               function(version, channel, errormsg) {
 
@@ -304,7 +337,7 @@ function(versionSpec, importCrosswalkFromDisk, callback) {
         output.info("Found version '" + version + "' in channel '" + channel + "'");
 
         // Download latest Crosswalk
-        var deps = new Download01Org(this._application, channel);
+        var deps = new Download01Org(this._application, this._platform, channel);
         deps.download(version, ".",
                       function(filename, errormsg) {
 
@@ -328,24 +361,6 @@ function(versionSpec, importCrosswalkFromDisk, callback) {
         }.bind(this));
     }.bind(this));
 };
-
-
-
-/**
- * Creates a new InvalidChannelError.
- * @extends Error
- * @constructor
- * @param {String} message Error message
- * @inner
- * @memberOf Download01Org
- */
-function InvalidChannelError(message) {
-    Error.call(this, message);
-}
-InvalidChannelError.prototype = Object.create(Error.prototype);
-InvalidChannelError.prototype.constructor = InvalidChannelError;
-
-Download01Org.prototype.InvalidChannelError = InvalidChannelError;
 
 
 
