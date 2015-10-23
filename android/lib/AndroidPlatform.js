@@ -10,7 +10,6 @@ var FormatJson = require("format-json");
 var MkTemp = require('mktemp');
 var ShellJS = require("shelljs");
 
-var AndroidDependencies = require("./AndroidDependencies");
 var AndroidManifest = require("./AndroidManifest");
 var AndroidSDK = require("./AndroidSDK");
 var JavaActivity = require("./JavaActivity");
@@ -403,6 +402,7 @@ AndroidPlatform.prototype.importCrosswalk =
 function(versionSpec, platformPath, callback) {
 
     var output = this.application.output;
+    var util = this.application.util;
 
     var channel = null;
     var version = null;
@@ -420,7 +420,7 @@ function(versionSpec, platformPath, callback) {
         callback(importedVersion, errormsg);
         return;
 
-    } else if (AndroidDependencies.CHANNELS.indexOf(versionSpec) > -1) {
+    } else if (util.Download01Org.CHANNELS.indexOf(versionSpec) > -1) {
         // versionSpec is a channel name
         channel = versionSpec;
     } else {
@@ -439,7 +439,7 @@ function(versionSpec, platformPath, callback) {
         output.info("Found version '" + version + "' in channel '" + channel + "'");
 
         // Download latest Crosswalk
-        var deps = new AndroidDependencies(this.application, channel);
+        var deps = new util.Download01Org(this.application, channel);
         deps.download(version, ".",
                       function(filename, errormsg) {
 
@@ -550,12 +550,12 @@ function(version, channel, callback) {
 
     // Start with first channel if not given.
     if (!channel) {
-        channel = AndroidDependencies.CHANNELS[0];
+        channel = util.Download01Org.CHANNELS[0];
     }
 
     this.output.info("Looking for " + versionName + " in channel '" + channel + "'");
 
-    var deps = new AndroidDependencies(this.application, channel);
+    var deps = new util.Download01Org(this.application, channel);
     deps.fetchVersions(function(versions, errormsg) {
 
         if (errormsg) {
@@ -573,11 +573,11 @@ function(version, channel, callback) {
         } else if (version) {
 
             // Try next channel.
-            var channelIndex = AndroidDependencies.CHANNELS.indexOf(channel);
-            if (channelIndex < AndroidDependencies.CHANNELS.length - 1) {
+            var channelIndex = util.Download01Org.CHANNELS.indexOf(channel);
+            if (channelIndex < util.Download01Org.CHANNELS.length - 1) {
                 this.output.info("Version " + version + " not found in '" + channel + "', trying next channel");
                 channelIndex++;
-                channel = AndroidDependencies.CHANNELS[channelIndex];
+                channel = util.Download01Org.CHANNELS[channelIndex];
                 this.findCrosswalkVersion(version, channel, callback);
             } else {
                 // Already at last channel, version not found

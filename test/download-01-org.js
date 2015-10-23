@@ -6,10 +6,10 @@ var OS = require('os');
 
 var ShellJS = require("shelljs");
 
-var AndroidDependencies = require("../lib/AndroidDependencies");
-var Util = require("../../test-util/Util.js");
+var Download01Org = require("../src/util/Download01Org");
+var Util = require("../test-util/Util.js");
 
-var _output = require("../../src/TerminalOutput").getInstance();
+var _output = require("../src/TerminalOutput").getInstance();
 
 
 exports.tests = {
@@ -19,7 +19,7 @@ exports.tests = {
         test.expect(2);
 
         var app = Util.createTmpApplication("com.example.foo");
-        var deps = new AndroidDependencies(app, "stable");
+        var deps = new Download01Org(app, "stable");
         deps.fetchVersions(function(versions, errormsg) {
 
             if (errormsg)
@@ -37,7 +37,7 @@ exports.tests = {
         test.expect(2);
 
         var app = Util.createTmpApplication("com.example.foo");
-        var deps = new AndroidDependencies(app, "stable");
+        var deps = new Download01Org(app, "stable");
         var tmpDir = Util.createTmpDir();
         deps.download("9.38.208.10", tmpDir, function(filename, errormsg) {
 

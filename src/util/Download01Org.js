@@ -16,33 +16,33 @@ var CHANNELS = ["stable", "beta", "canary"];
 
 
 /**
- * Callback signature for {@link AndroidDependencies.fetchVersions}
+ * Callback signature for {@link Download01Org.fetchVersions}
  * @param {String[]} versions Array of available Crosswalk versions sorted oldest - newest
  * @param {String} errormsg Message in case of Error
  * @inner
- * @memberOf AndroidDependencies
+ * @memberOf Download01Org
  */
 function fetchVersionsFinishedCb(versions, errormsg) {}
 
 /**
- * Callback signature for {@link AndroidDependencies.download}.
+ * Callback signature for {@link Download01Org.download}.
  * @param {String} path Path to downloaded file, or null on error
  * @param {String} errormsg null if success, otherwise error message
  * @inner
- * @memberOf AndroidDependencies
+ * @memberOf Download01Org
  */
 function downloadFinishedCb(path, errormsg) {}
 
 
 
 /**
- * Android project dependencies download and lookup.
+ * Crosswalk release lookup and download.
  * @constructor
  * @param {Application} application application instance
  * @param {String} channel Crosswalk channel beta/canary/stable
- * @throws {AndroidDependencies~InvalidChannelError} If no valid channel was specified.
+ * @throws {Download01Org~InvalidChannelError} If no valid channel was specified.
  */
-function AndroidDependencies(application, channel) {
+function Download01Org(application, channel) {
 
     this._application = application;
 
@@ -57,9 +57,9 @@ function AndroidDependencies(application, channel) {
  * Read-only array of valid release channels (stable, beta, canary).
  * @member {String[]} CHANNELS
  * @static
- * @memberOf AndroidDependencies
+ * @memberOf Download01Org
  */
-Object.defineProperty(AndroidDependencies, "CHANNELS", {
+Object.defineProperty(Download01Org, "CHANNELS", {
                       get: function() {
                                 return CHANNELS;
                            },
@@ -70,9 +70,9 @@ Object.defineProperty(AndroidDependencies, "CHANNELS", {
 
 /**
  * Fetch available Crosswalk versions index.
- * @param {AndroidDependencies~fetchVersionsFinishedCb} callback callback function
+ * @param {Download01Org~fetchVersionsFinishedCb} callback callback function
  */
-AndroidDependencies.prototype.fetchVersions =
+Download01Org.prototype.fetchVersions =
 function(callback) {
 
     // Namespace util
@@ -119,7 +119,7 @@ function(callback) {
  * @param {String} version Crosswalk version to look for
  * @returns {String} Relative path to zip file.
  */
-AndroidDependencies.prototype.findLocally =
+Download01Org.prototype.findLocally =
 function(version) {
 
     var filename = "crosswalk-" + version + ".zip";
@@ -138,10 +138,10 @@ function(version) {
  * Download crosswalk zip, checks for already existing file, and returns it in case.
  * @param {String} version Crosswalk version string
  * @param {String} defaultPath Directory to download to if not already exists
- * @param {AndroidDependencies~downloadFinishedCb} callback callback function
+ * @param {Download01Org~downloadFinishedCb} callback callback function
  * @throws {FileCreationFailed} If download file could not be written.
  */
-AndroidDependencies.prototype.download =
+Download01Org.prototype.download =
 function(version, defaultPath, callback) {
 
     // Namespaces
@@ -200,7 +200,7 @@ function(version, defaultPath, callback) {
  * @constructor
  * @param {String} message Error message
  * @inner
- * @memberOf AndroidDependencies
+ * @memberOf Download01Org
  */
 function InvalidChannelError(message) {
     Error.call(this, message);
@@ -208,8 +208,8 @@ function InvalidChannelError(message) {
 InvalidChannelError.prototype = Object.create(Error.prototype);
 InvalidChannelError.prototype.constructor = InvalidChannelError;
 
-AndroidDependencies.prototype.InvalidChannelError = InvalidChannelError;
+Download01Org.prototype.InvalidChannelError = InvalidChannelError;
 
 
 
-module.exports = AndroidDependencies;
+module.exports = Download01Org;

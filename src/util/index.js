@@ -12,6 +12,8 @@ var util = {
     CrosswalkZip: require("./CrosswalkZip"),
     /** {@link Downloader} */
     Downloader: require("./Downloader"),
+    /** {@link Download01Org} */
+    Download01Org: require("./Download01Org"),
     /** {@link DownloadHandler} */
     DownloadHandler: require("./DownloadHandler"),
     /** {@link IndexParser} */
