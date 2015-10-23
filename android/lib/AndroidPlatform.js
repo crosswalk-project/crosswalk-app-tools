@@ -428,7 +428,8 @@ function(versionSpec, platformPath, callback) {
     }
 
     // Download
-    this.findCrosswalkVersion(version, channel,
+    var deps = new util.Download01Org(this.application, channel);
+    deps.findCrosswalkVersion(version, channel,
                               function(version, channel, errormsg) {
 
         if (errormsg) {
@@ -529,70 +530,6 @@ function(packageId, args, callback) {
                 callback(null);
             }.bind(this));
         }.bind(this));
-    }.bind(this));
-};
-
-/**
- * Find a specific version in a specific channel.
- * @param {String} version Version to look for, pick lastest if null is given
- * @param {String} channel Release channel to seach in, null for all channels
- * @param {Function} callback Callback (version, channel, errormsg)
- */
-AndroidPlatform.prototype.findCrosswalkVersion =
-function(version, channel, callback) {
-
-    // Namespace util
-    var util = this.application.util;
-
-    var versionName = version ?
-                        version :
-                        "latest version";
-
-    // Start with first channel if not given.
-    if (!channel) {
-        channel = util.Download01Org.CHANNELS[0];
-    }
-
-    this.output.info("Looking for " + versionName + " in channel '" + channel + "'");
-
-    var deps = new util.Download01Org(this.application, channel);
-    deps.fetchVersions(function(versions, errormsg) {
-
-        if (errormsg) {
-            callback(null, null, errormsg);
-            return;
-        }
-
-        // Look for specific version?
-        if (version &&
-            versions.indexOf(version) > -1) {
-
-            callback(version, channel, null);
-            return;
-
-        } else if (version) {
-
-            // Try next channel.
-            var channelIndex = util.Download01Org.CHANNELS.indexOf(channel);
-            if (channelIndex < util.Download01Org.CHANNELS.length - 1) {
-                this.output.info("Version " + version + " not found in '" + channel + "', trying next channel");
-                channelIndex++;
-                channel = util.Download01Org.CHANNELS[channelIndex];
-                this.findCrosswalkVersion(version, channel, callback);
-            } else {
-                // Already at last channel, version not found
-                this.output.info("Version " + version + " not found in '" + channel + "', search failed");
-                callback(null, null, "Version " + version + " seems not to be available on the server");
-                return;
-            }
-        } else {
-            // Use latest from current channel.
-            version = util.IndexParser.pickLatest(versions, function (errmsg) {
-                errormsg = errmsg;
-            });
-            callback(version, channel, errormsg);
-            return;
-        }
     }.bind(this));
 };
 

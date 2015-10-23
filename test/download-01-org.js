@@ -50,5 +50,57 @@ exports.tests = {
             Util.deleteTmpApplication(app);
             test.done();
         });
+    },
+
+    stableLatest: function(test) {
+
+        test.expect(1);
+
+        var application = Util.createTmpApplication("com.example.foo");
+        var deps = new Download01Org(application, "stable");
+        deps.findCrosswalkVersion(null, "stable",
+                                     function(version, channel, errormsg) {
+
+            test.equal(typeof version, "string");
+
+            Util.deleteTmpApplication(application);
+            test.done();
+        });
+    },
+
+    beta: function(test) {
+
+        test.expect(2);
+
+        var application = Util.createTmpApplication("com.example.foo");
+        var versionSought = "12.41.296.4";
+        var channelSought = "beta";
+        var deps = new Download01Org(application, channelSought);
+        deps.findCrosswalkVersion(versionSought, null,
+                                     function(version, channel, errormsg) {
+
+            test.equal(version, versionSought);
+            test.equal(channel, channelSought);
+
+            Util.deleteTmpApplication(application);
+            test.done();
+        });
+    },
+
+    invalid: function(test) {
+
+        test.expect(2);
+
+        var application = Util.createTmpApplication("com.example.foo");
+        var deps = new Download01Org(application, "stable");
+        deps.findCrosswalkVersion("0.0.0.0", null,
+                                     function(version, channel, errormsg) {
+
+            test.equal(version, null);
+            test.equal(channel, null);
+
+            Util.deleteTmpApplication(application);
+            test.done();
+        });
     }
 };
