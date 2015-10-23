@@ -19,7 +19,7 @@ exports.tests = {
         test.expect(2);
 
         var app = Util.createTmpApplication("com.example.foo");
-        var deps = new Download01Org(app, "stable");
+        var deps = new Download01Org(app, "android", "stable");
         deps.fetchVersions(function(versions, errormsg) {
 
             if (errormsg)
@@ -37,7 +37,7 @@ exports.tests = {
         test.expect(2);
 
         var app = Util.createTmpApplication("com.example.foo");
-        var deps = new Download01Org(app, "stable");
+        var deps = new Download01Org(app, "android", "stable");
         var tmpDir = Util.createTmpDir();
         deps.download("9.38.208.10", tmpDir, function(filename, errormsg) {
 
@@ -57,7 +57,7 @@ exports.tests = {
         test.expect(1);
 
         var application = Util.createTmpApplication("com.example.foo");
-        var deps = new Download01Org(application, "stable");
+        var deps = new Download01Org(application, "android", "stable");
         deps.findCrosswalkVersion(null, "stable",
                                      function(version, channel, errormsg) {
 
@@ -75,7 +75,7 @@ exports.tests = {
         var application = Util.createTmpApplication("com.example.foo");
         var versionSought = "12.41.296.4";
         var channelSought = "beta";
-        var deps = new Download01Org(application, channelSought);
+        var deps = new Download01Org(application, "android", channelSought);
         deps.findCrosswalkVersion(versionSought, null,
                                      function(version, channel, errormsg) {
 
@@ -92,7 +92,7 @@ exports.tests = {
         test.expect(2);
 
         var application = Util.createTmpApplication("com.example.foo");
-        var deps = new Download01Org(application, "stable");
+        var deps = new Download01Org(application, "android", "stable");
         deps.findCrosswalkVersion("0.0.0.0", null,
                                      function(version, channel, errormsg) {
 

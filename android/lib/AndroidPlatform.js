@@ -445,7 +445,7 @@ function(packageId, args, callback) {
                 return;
             }
 
-            var deps = new util.Download01Org(this.application, "stable" /* FIXME this is just a placeholder */);
+            var deps = new util.Download01Org(this.application, "android", "stable" /* FIXME this is just a placeholder */);
             deps.importCrosswalk(versionSpec,
                                  function(path) {
                                      return this.importCrosswalkFromDisk(path);
@@ -485,7 +485,7 @@ function(versionSpec, args, callback) {
         }
         this._apiTarget = apiTarget;
 
-        var deps = new util.Download01Org(this.application,  "stable" /* FIXME this is just a placeholder */);
+        var deps = new util.Download01Org(this.application, "android", "stable" /* FIXME this is just a placeholder */);
         deps.importCrosswalk(versionSpec,
                              function(path) {
                                  return this.importCrosswalkFromDisk(path);
