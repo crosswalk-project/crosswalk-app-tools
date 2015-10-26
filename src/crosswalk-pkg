@@ -124,11 +124,12 @@ function check(app, extraArgs, output, callback) {
 }
 
 // Initialize app tools
-function manifest(app, fill, appPath, packageId, output, callback) {
+function manifest(app, appPath, extraArgs, output, callback) {
 
-    if (fill) {
-        output.highlight("Filling manifest.json in " + appPath);
-        app.initManifest(appPath, {"package-id": packageId}, output, callback);
+    if (extraArgs.manifest) {
+        output.highlight("Initializing manifest.json in " + appPath);
+        extraArgs["package-id"] = extraArgs.manifest;
+        app.initManifest(appPath, extraArgs, output, callback);
         return;
     }
 
@@ -223,8 +224,12 @@ if (argv.p) {
 if (argv.platforms) {
     extraArgs.platforms = [ argv.platforms ];
 }
-
-var fill = argv.m || argv.manifest;
+if (argv.m) {
+    extraArgs.manifest = argv.m;
+}
+if (argv.manifest) {
+    extraArgs.manifest = argv.manifest;
+}
 
 var buildConfig = null;
 if (argv.r || argv.release) {
@@ -233,13 +238,13 @@ if (argv.r || argv.release) {
 
 // Build steps
 var tasks = [
-    { func: check,    args: [ cat, extraArgs, output                ] },
-    { func: manifest, args: [ cat, fill, appPath, packageId, output ] },
-    { func: init,     args: [ cat, packageId                        ] },
-    { func: create,   args: [ cat, packageId, extraArgs             ] },
-    { func: copy,     args: [ cat, appPath, extraArgs               ] },
-    { func: build,    args: [ cat, buildConfig, extraArgs           ] },
-    { func: clean,    args: [ cat                                   ] }
+    { func: check,    args: [ cat, extraArgs, output          ] },
+    { func: manifest, args: [ cat, appPath, extraArgs, output ] },
+    { func: init,     args: [ cat, packageId                  ] },
+    { func: create,   args: [ cat, packageId, extraArgs       ] },
+    { func: copy,     args: [ cat, appPath, extraArgs         ] },
+    { func: build,    args: [ cat, buildConfig, extraArgs     ] },
+    { func: clean,    args: [ cat                             ] }
 ];
 
 util.iterate(
