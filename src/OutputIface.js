@@ -71,6 +71,16 @@ function(message) {
     throw new Error("OutputIface.write() not implemented.");
 };
 
+/**
+ * Extra message, only to logfile by default.
+ * @param {String} message
+ */
+OutputIface.prototype.verbose =
+function(message) {
+
+    throw new Error("OutputIface.verbose() not implemented.");
+};
+
 
 
 module.exports = OutputIface;

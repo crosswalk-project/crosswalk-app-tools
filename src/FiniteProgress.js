@@ -68,14 +68,16 @@ function(progress) {
 FiniteProgress.prototype.done =
 function(message) {
 
-    if (typeof message == "undefined")
-        message = "";
+    if (this._active) {
+        if (typeof message == "undefined")
+            message = "";
 
-    // Also prints \r\n so we're ready for the next output.
-    this._output.write(" " + message + "\n");
+        // Also prints \r\n so we're ready for the next output.
+        this._output.write(" " + message + "\n");
 
-    this._output.endProgress();
-    this._active = false;
+        this._output.endProgress();
+        this._active = false;
+    }
 };
 
 module.exports = FiniteProgress;

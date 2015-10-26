@@ -85,6 +85,14 @@ function(message) {
     }
 };
 
+TerminalOutput.prototype.verbose =
+function(message) {
+
+    // Not printed by default.
+    // FIXME maybe make this configurable
+    // through verbosity or something.
+};
+
 /**
  * Create progress indicator.
  * @param {String} [label] Descriptive label

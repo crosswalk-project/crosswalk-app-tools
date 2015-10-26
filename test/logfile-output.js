@@ -17,17 +17,17 @@ var _output = require("../src/TerminalOutput").getInstance();
 
 
 function testMethod(func, message) {
-    
+
     // Setup
     var tmpfile = Util.createTmpFile();
     var log = new LogfileOutput(tmpfile);
-    
+
     // Test
     var output = func.call(log, message);
-    
+
     // Read back results to check
     var input = FS.readFileSync(tmpfile, {"encoding": "utf8"});
-    
+
     ShellJS.rm("-f", tmpfile);
 
     return output == input;
@@ -38,7 +38,7 @@ function testMethod(func, message) {
 exports.tests = {
 
     error: function(test) {
-        
+
         test.expect(1);
         var ret = testMethod(LogfileOutput.prototype.error, "error message");
         test.equal(ret, true);
@@ -46,7 +46,7 @@ exports.tests = {
     },
 
     warning: function(test) {
-        
+
         test.expect(1);
         var ret = testMethod(LogfileOutput.prototype.warning, "warning message");
         test.equal(ret, true);
@@ -54,25 +54,33 @@ exports.tests = {
     },
 
     info: function(test) {
-        
+
         test.expect(1);
         var ret = testMethod(LogfileOutput.prototype.info, "info message");
         test.equal(ret, true);
         test.done();
     },
-    
+
     highlight: function(test) {
-        
+
         test.expect(1);
         var ret = testMethod(LogfileOutput.prototype.highlight, "highlight message");
         test.equal(ret, true);
         test.done();
     },
 
-    print: function(test) {
-        
+    write: function(test) {
+
         test.expect(1);
-        var ret = testMethod(LogfileOutput.prototype.write, "print message");
+        var ret = testMethod(LogfileOutput.prototype.write, "write message");
+        test.equal(ret, true);
+        test.done();
+    },
+
+    verbose: function(test) {
+
+        test.expect(1);
+        var ret = testMethod(LogfileOutput.prototype.verbose, "verbose message");
         test.equal(ret, true);
         test.done();
     }

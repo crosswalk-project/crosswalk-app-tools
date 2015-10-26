@@ -184,7 +184,7 @@ function(path, extraArgs, output, callback) {
 
     Manifest.addDefaults(output, path, packageId);
     var manifest = new Manifest(output, path);
-    if (extraArgs.platforms) {
+    if (extraArgs.platforms && extraArgs.platforms.length > 0) {
         manifest.targetPlatforms = extraArgs.platforms[0];
     }
     output.info("Initialized " + path);
@@ -230,7 +230,8 @@ function(packageId, extraArgs, callback) {
     var platform = null;
     if (typeof extraArgs.platforms === "string") {
         platform = extraArgs.platforms;
-    } else if (extraArgs.platforms instanceof Array) {
+    } else if (extraArgs.platforms instanceof Array &&
+               extraArgs.platforms.length > 0) {
         platform = extraArgs.platforms[0];
     }
     if (platform) {
