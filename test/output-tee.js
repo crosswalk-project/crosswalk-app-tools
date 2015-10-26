@@ -93,5 +93,13 @@ exports.tests = {
         var ret = testFunction(OutputTee.prototype.write);
         test.equal(ret, true);
         test.done();
+    },
+
+    verbose: function(test) {
+
+        test.expect(1);
+        var ret = testFunction(OutputTee.prototype.verbose);
+        test.equal(ret, true);
+        test.done();
     }
 };

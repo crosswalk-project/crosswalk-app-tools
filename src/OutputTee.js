@@ -102,6 +102,16 @@ function(message) {
     });
 };
 
+// Implementation of OutputIface.verbose
+OutputTee.prototype.verbose =
+function(message) {
+
+    this._outputs.forEach(function(output) {
+        if (output)
+            output.verbose(message);
+    });
+};
+
 // TODO implement for logfile output also.
 OutputTee.prototype.createFiniteProgress =
 function(label) {

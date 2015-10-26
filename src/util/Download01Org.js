@@ -253,8 +253,10 @@ function(version, channel, callback) {
     deps.fetchVersions(function(versions, errormsg) {
 
         if (errormsg) {
-            callback(null, null, errormsg);
-            return;
+            // This is just an internal error.
+            // Try all channels as per below, if an appropriate version
+            // is not found, an error message will be created accordingly.
+            output.verbose(errormsg);
         }
 
         // Look for specific version?
@@ -264,7 +266,7 @@ function(version, channel, callback) {
             callback(version, channel, null);
             return;
 
-        } else if (version) {
+        } else if (version || !versions) {
 
             // Try next channel.
             var channelIndex = Download01Org.CHANNELS.indexOf(channel);

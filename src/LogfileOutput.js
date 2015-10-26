@@ -75,6 +75,13 @@ function(message) {
     return message;
 };
 
+LogfileOutput.prototype.verbose =
+function(message) {
+
+    FS.appendFileSync(this._path, message);
+    return message;
+};
+
 
 
 module.exports = LogfileOutput;

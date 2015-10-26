@@ -53,20 +53,22 @@ function(tag) {
 InfiniteProgress.prototype.done =
 function(message) {
 
-    if (typeof message == "undefined")
-        message = "";
+    if (this._active) {
+        if (typeof message == "undefined")
+            message = "";
 
-    // Clear line
-    this._output.write('\033[2K');
+        // Clear line
+        this._output.write('\033[2K');
 
-    // Go to column 0
-    this._output.write('\033[0G');
+        // Go to column 0
+        this._output.write('\033[0G');
 
-    var line = "  * " + this._label + " [done] " + message + "\n";
-    this._output.write(line);
+        var line = "  * " + this._label + " [done] " + message + "\n";
+        this._output.write(line);
 
-    this._output.endProgress();
-    this._active = false;
+        this._output.endProgress();
+        this._active = false;
+    }
 };
 
 module.exports = InfiniteProgress;
