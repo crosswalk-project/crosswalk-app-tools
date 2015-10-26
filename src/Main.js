@@ -183,6 +183,10 @@ function(path, extraArgs, output, callback) {
     }
 
     Manifest.addDefaults(output, path, packageId);
+    var manifest = new Manifest(output, path);
+    if (extraArgs.platforms) {
+        manifest.targetPlatforms = extraArgs.platforms[0];
+    }
     output.info("Initialized " + path);
     callback(Main.EXIT_CODE_OK);
 };
