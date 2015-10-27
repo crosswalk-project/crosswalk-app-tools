@@ -86,7 +86,7 @@ function Manifest(output, path) {
             // supported mode
             this._display = json.display;
         } else {
-            output.warning("Unsupported value '" + json.display + "' in manifest.json");
+            output.warning("Unsupported value '" + json.display + "' for 'display' in manifest.json");
         }
     }
 
@@ -107,7 +107,7 @@ function Manifest(output, path) {
             // supported mode
             this._orientation = json.orientation;
         } else {
-            output.warning("Unsupported value '" + json.orientation + "' in manifest.json");
+            output.warning("Unsupported value '" + json.orientation + "' for 'orientation' in manifest.json");
         }
     }
 
