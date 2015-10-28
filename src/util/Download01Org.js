@@ -221,7 +221,7 @@ function(version, defaultPath, callback) {
         localDirs.push(process.env.CROSSWALK_APP_TOOLS_CACHE_DIR);
     var localPath = handler.findLocally(localDirs);
     if (localPath) {
-        output.info("Using cached " + localPath);
+        output.info("Using cached", localPath);
         callback(localPath);
         return;
     }
@@ -337,7 +337,7 @@ function(versionSpec, importCrosswalkFromDisk, callback) {
 
         // versionSpec is a filename, import directly
         var filename = Path.normalize(Path.resolve(versionSpec));
-        output.info("Using " + versionSpec);
+        output.info("Using", versionSpec);
         errormsg = null;
         var importedVersion = importCrosswalkFromDisk(filename);
         if (!importedVersion) {

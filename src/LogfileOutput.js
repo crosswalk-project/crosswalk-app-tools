@@ -27,7 +27,7 @@ function LogfileOutput(path) {
 
     FS.writeFileSync(this._path, "");
 
-/* TODO    
+/* TODO
     if (!this._fp) {
         throw new FileCreationFailed("Could not open file " + path);
     }
@@ -49,13 +49,18 @@ function(message) {
 
     var output = " ** WARNING: " + message + "\n";
     FS.appendFileSync(this._path, output);
-    return output;    
+    return output;
 };
 
 LogfileOutput.prototype.info =
-function(message) {
+function(message, path) {
 
-    var output = "  * " + message + "\n";
+    var output;
+    if (path) {
+        output = "  * " + message + " " + path + "\n";
+    } else {
+        output = "  * " + message + "\n";
+    }
     FS.appendFileSync(this._path, output);
     return output;
 };

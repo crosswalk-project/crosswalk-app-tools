@@ -54,14 +54,33 @@ function(message) {
 };
 
 TerminalOutput.prototype.info =
-function(message) {
+function(message, path) {
 
     if (!_config.getSilentConsole()) {
+
         if (this._progress &&
             this._progress.isActive) {
             console.log("");
         }
-        console.log("  * " + message);
+
+        var output;
+        if (message.length > 75 && path) {
+            // Overflow, no point in abbreviating
+            output = "  * " + message + " " + path;
+        }
+        else if (path) {
+            output = "  * " + message + " " + path;
+            // Windows only takes 78 chars before breaking, although 80 wide.
+            if (output.length > 78) {
+                var remain = 78 - ("  *" + message + " ...").length;
+                var pathAbbrv = path.substring(path.length - remain);
+                output = "  * " + message + " ..." + pathAbbrv;
+            }
+        } else {
+            output = "  * " + message;
+        }
+
+        console.log(output);
     }
 };
 

@@ -44,7 +44,7 @@ function testFile(url, callback) {
 
     // HACK create and remove tmpfile just to allocate a name.
     var tmpfile = Util.createTmpFile();
-    _output.info("Tempfile: " + tmpfile);
+    _output.info("Tempfile:", tmpfile);
     ShellJS.rm(tmpfile);
 
     var options = {

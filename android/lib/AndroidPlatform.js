@@ -105,23 +105,23 @@ function(output, callback) {
 
     deps.forEach(function (dep) {
         var path = ShellJS.which(dep);
-        msg = "Checking for " + dep + "... " + path;
+        msg = "Checking for " + dep + "...";
         if (path) {
-            output.info(msg);
+            output.info(msg, path);
         } else {
             found = false;
-            output.error(msg);
+            output.error(msg + " " + path);
         }
     });
 
     // Checking env
     var androidHome = "ANDROID_HOME";
-    msg = "Checking for " + androidHome + "... ";
+    msg = "Checking for " + androidHome + "...";
     if (process.env[androidHome]) {
-        output.info(msg + process.env[androidHome]);
+        output.info(msg, process.env[androidHome]);
     } else {
         found = false;
-        output.info(msg + "empty");
+        output.info(msg + " empty");
         output.error(androidHome + " needs to be set for builds to work");
     }
 
@@ -142,7 +142,7 @@ function(output, callback) {
     ShellJS.popd();
 
     var path = Path.join(ShellJS.tempdir(), dir);
-    output.info("Testing dummy project in " + path);
+    output.info("Testing dummy project in", path);
 
     var dummyPackageId = "com.example.foo";
     var dummyLog = "";
@@ -273,7 +273,16 @@ function(crosswalkPath) {
 
     var output = this.application.output;
 
-    var indicator = output.createFiniteProgress("Extracting " + crosswalkPath);
+    // "  * Extracting /home/robsta/Devel/tmp/crosswalk/crosswalk-15.44.384.12.zip [##########]"
+    // Length of decorations/text is 28, so max length of path is 80-28,
+    // plus nother 3 for ellipsis is 59.
+    var indicator;
+    if (crosswalkPath.length > 49) {
+        var abbrv = crosswalkPath.substring(crosswalkPath.length - 49);
+        indicator = output.createFiniteProgress("Extracting ..." + abbrv);
+    } else {
+        indicator = output.createFiniteProgress("Extracting " + crosswalkPath);
+    }
 
     // Extract contents
     var xwalk = null;
@@ -472,7 +481,7 @@ function(packageId, args, callback) {
                     return;
                 }
 
-                output.info("Project template created at '" + path + "'");
+                output.info("Project template created at", path);
                 callback(null);
             }.bind(this));
         }.bind(this));
@@ -1081,7 +1090,7 @@ function() {
     // Always copy over the app tree to the android project
     var wwwPath = Path.join(this.platformPath, "assets", "www");
     ShellJS.rm("-rf", wwwPath + Path.sep + "*");
-    output.info("Copying app to " + wwwPath);
+    output.info("Copying app to", wwwPath);
     ShellJS.cp("-rf", this.appPath + Path.sep + "*", wwwPath);
 
     var params = this.application.manifest.androidWebp;
@@ -1094,7 +1103,7 @@ function() {
 
     // Check for conversion tool
     var cwebp = ShellJS.which("cwebp");
-    output.info("Checking for cwebp ... " + cwebp);
+    output.info("Checking for cwebp ...", cwebp);
     if (!cwebp) {
         output.warning("Webp conversion tool not found, install from http://downloads.webmproject.org/releases/webp");
         output.warning("Webp conversion failed, packaging unconverted assets");

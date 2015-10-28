@@ -204,7 +204,7 @@ function(path, extraArgs, output, callback) {
             }
         }
     }
-    output.info("Initialized " + path);
+    output.info("Initialized", path);
     callback(Main.EXIT_CODE_OK);
 };
 
@@ -268,7 +268,7 @@ function(packageId, extraArgs, callback) {
         callback(Main.EXIT_CODE_ERROR);
         return;
     }
-    output.info("Copying app template from " + templatePath);
+    output.info("Copying app template from", templatePath);
     ShellJS.cp("-r", Path.join(templatePath, "*"), this.appPath);
 
     var project = this.instantiatePlatform();
@@ -288,6 +288,7 @@ function(packageId, extraArgs, callback) {
 
         if (errormsg) {
             output.error(errormsg);
+            // Print full path here, because we want to copy/paste it.
             output.info("Logfiles at " + this.logPath);
             callback(Main.EXIT_CODE_ERROR);
             return;
@@ -327,6 +328,7 @@ function(version, extraArgs, callback) {
 
         if (errormsg) {
             output.error(errormsg);
+            // Print full path here, because we want to copy/paste it.
             output.info("Logfiles at " + this.logPath);
             callback(Main.EXIT_CODE_ERROR);
             return;
@@ -376,6 +378,7 @@ function(configId, extraArgs, callback) {
 
         if (errormsg) {
             output.error(errormsg);
+            // Print full path here, because we want to copy/paste it.
             output.info("Logfiles at " + this.logPath);
             callback(Main.EXIT_CODE_ERROR);
             return;
