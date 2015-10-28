@@ -287,6 +287,7 @@ function(version, channel, callback) {
 
         // Look for specific version?
         if (version &&
+            versions &&
             versions.indexOf(version) > -1) {
 
             callback(version, channel, null);
