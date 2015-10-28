@@ -53,6 +53,8 @@ function Download01Org(application, platform, channel) {
         throw new Error("Unknown channel " + channel);
     }
     this._channel = channel;
+
+    this._flavor = "crosswalk";
 }
 
 /**
@@ -63,7 +65,7 @@ function Download01Org(application, platform, channel) {
  */
 Object.defineProperty(Download01Org, "BASE_URL", {
                       get: function() {
-                                return "https://download.01.org/crosswalk/releases/crosswalk/";
+                                return "https://download.01.org/crosswalk/releases/";
                            },
                       set: function(config) {
                                 // Empty because read-only
@@ -101,6 +103,26 @@ Object.defineProperty(Download01Org, "PLATFORMS", {
                       });
 
 /**
+ * Android type crosswalk or crosswalk-lite.
+ * @member {String[]} androidFlavor
+ * @memberOf Download01Org
+ */
+Object.defineProperty(Download01Org.prototype, "androidFlavor", {
+                      get: function() {
+                                return this._flavor;
+                           },
+                      set: function(flavor) {
+                                if (this._platform === "android" &&
+                                    ["crosswalk", "crosswalk-lite"].indexOf(flavor) > -1) {
+                                    this._flavor = flavor;
+                                } else {
+                                    this._application.output.error("Invalid flavor '" + flavor + "' " +
+                                                                   "for platform " + this._platform);
+                                }
+                           }
+                      });
+
+/**
  * Fetch available Crosswalk versions index.
  * @param {Download01Org~fetchVersionsFinishedCb} callback callback function
  */
@@ -111,6 +133,7 @@ function(callback) {
     var util = this._application.util;
     var output = this._application.output;
     var url = Download01Org.BASE_URL +
+              this._flavor + "/" +
               this._platform + "/" +
               this._channel + "/";
 
@@ -185,6 +208,7 @@ function(version, defaultPath, callback) {
     var output = this._application.output;
     var filename = "crosswalk-" + version + ".zip";
     var url = Download01Org.BASE_URL +
+              this._flavor + "/" +
               this._platform + "/" +
               this._channel + "/" +
               version + "/" +
@@ -247,9 +271,11 @@ function(version, channel, callback) {
         channel = Download01Org.CHANNELS[0];
     }
 
-    output.info("Looking for " + versionName + " in channel '" + channel + "'");
+    output.info("Looking for " + versionName + " in " + this._flavor + "/" + channel);
 
     var deps = new Download01Org(this._application, this._platform, channel);
+    if (this.androidFlavor === "crosswalk-lite")
+        deps.androidFlavor = "crosswalk-lite";
     deps.fetchVersions(function(versions, errormsg) {
 
         if (errormsg) {
@@ -303,7 +329,7 @@ function(versionSpec, importCrosswalkFromDisk, callback) {
 
     var output = this._application.output;
 
-    var channel = null;
+    var channel = "stable";
     var version = null;
 
     if (ShellJS.test("-e", versionSpec)) {
@@ -328,6 +354,8 @@ function(versionSpec, importCrosswalkFromDisk, callback) {
 
     // Download
     var deps = new Download01Org(this._application, this._platform, channel);
+    if (this.androidFlavor === "crosswalk-lite")
+        deps.androidFlavor = "crosswalk-lite";
     deps.findCrosswalkVersion(version, channel,
                               function(version, channel, errormsg) {
 
@@ -340,6 +368,8 @@ function(versionSpec, importCrosswalkFromDisk, callback) {
 
         // Download latest Crosswalk
         var deps = new Download01Org(this._application, this._platform, channel);
+        if (this.androidFlavor === "crosswalk-lite")
+            deps.androidFlavor = "crosswalk-lite";
         deps.download(version, ".",
                       function(filename, errormsg) {
 

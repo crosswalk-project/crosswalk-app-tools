@@ -87,6 +87,23 @@ exports.tests = {
         });
     },
 
+    lite: function(test) {
+
+        test.expect(1);
+
+        var application = Util.createTmpApplication("com.example.foo");
+        var deps = new Download01Org(application, "android", "stable");
+        deps.androidFlavor = "crosswalk-lite";
+        deps.findCrosswalkVersion(null, null,
+                                  function(version, channel, errormsg) {
+
+            test.equal(typeof version, "string");
+
+            Util.deleteTmpApplication(application);
+            test.done();
+        });
+    },
+
     invalid: function(test) {
 
         test.expect(2);
