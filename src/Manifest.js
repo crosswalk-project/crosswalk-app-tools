@@ -352,8 +352,7 @@ function(output, path, packageId) {
         buffer = FS.readFileSync(path, {"encoding": "utf8"});
         json = JSON.parse(buffer);
     } else {
-        output.warning("File not found " + path);
-        output.warning("Using default manifest.json");
+        output.warning("File does not exist, creating default manifest.json");
     }
 
     // Just a shallow assignment of missing fields.
