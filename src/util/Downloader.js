@@ -122,6 +122,10 @@ function(urlInfo, callback) {
     getFunc(urlInfo, function(res) {
 
         if (res.statusCode != 200) {
+            this._stream.end();
+            this._stream = null;
+            this._url = null;
+            res.req.abort();
             callback("Download failed: HTTP Status " + res.statusCode);
             return;
         }

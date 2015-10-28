@@ -41,6 +41,7 @@ function AndroidPlatform(PlatformBase, baseData) {
 
     instance._sdk = new AndroidSDK(instance.application);
     instance._channel = "stable";
+    instance._lite = false;
     instance._shared = false;
     instance._apiTarget = null;
 
@@ -65,6 +66,7 @@ function() {
                          "\t\t\t\t\t\tor version number (w.x.y.z)\n" +
                          "\t\t\t\t\t\tor crosswalk zip\n" +
                          "\t\t\t\t\t\tor xwalk_app_template dir",
+            "lite": "                      Use crosswalk-lite, see Crosswalk Wiki for details",
             "shared": "                    Depend on shared crosswalk installation"
         }
     };
@@ -401,6 +403,15 @@ function(packageId, args, callback) {
     var util = this.application.util;
     var output = this.application.output;
 
+    if (args.lite && args.shared) {
+        callback("Options \"lite\" and \"shared\" can not be used together");
+        return;
+    }
+
+    if (args.lite) {
+        this._lite = true;
+    }
+
     if (args.shared) {
         this._shared = true;
     }
@@ -446,6 +457,9 @@ function(packageId, args, callback) {
             }
 
             var deps = new util.Download01Org(this.application, "android", "stable" /* FIXME this is just a placeholder */);
+            if (this._lite) {
+                deps.androidFlavor = "crosswalk-lite";
+            }
             deps.importCrosswalk(versionSpec,
                                  function(path) {
                                      return this.importCrosswalkFromDisk(path);
