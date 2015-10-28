@@ -61,6 +61,26 @@ exports.tests = {
         test.done();
     },
 
+    info2: function(test) {
+
+        test.expect(1);
+
+        // Setup
+        var tmpfile = Util.createTmpFile();
+        var log = new LogfileOutput(tmpfile);
+
+        // Test
+        var output = log.info("info message", "path");
+
+        // Read back results to check
+        var input = FS.readFileSync(tmpfile, {"encoding": "utf8"});
+
+        ShellJS.rm("-f", tmpfile);
+
+        test.equal(input, output);
+        test.done();
+    },
+
     highlight: function(test) {
 
         test.expect(1);

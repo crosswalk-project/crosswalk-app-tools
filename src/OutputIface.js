@@ -40,9 +40,10 @@ function(message) {
 * such as the completion of a step when creating a project or
 * building packages.
 * @param {String} message
+* @param {String} [path]
 */
 OutputIface.prototype.info =
-function(message) {
+function(message, path) {
 
     throw new Error("OutputIface.info() not implemented.");
 };

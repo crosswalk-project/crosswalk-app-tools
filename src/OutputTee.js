@@ -74,11 +74,11 @@ function(message) {
 
 // Implementation of OutputIface.info
 OutputTee.prototype.info =
-function(message) {
+function(message, path) {
 
     this._outputs.forEach(function(output) {
         if (output)
-            output.info(message);
+            output.info(message, path);
     });
 };
 

@@ -39,7 +39,7 @@ exports.tests = {
             var tpl = new TemplateFile(__dirname + "/data/template-file.in");
 
             var tmpfile = Util.createTmpFile();
-            _output.info("Tempfile: " + tmpfile);
+            _output.info("Tempfile:", tmpfile);
 
             tpl.render({bar: "maman"}, tmpfile);
 

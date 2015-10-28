@@ -188,8 +188,8 @@ function copy(app, appPath, extraArgs, callback) {
 
     // Replace skeleton app with actual one
     app.output.highlight("Importing web application");
-    app.output.info("Source " + appPath);
-    app.output.info("Destination " + app.appPath);
+    app.output.info("Source", appPath);
+    app.output.info("Destination", app.appPath);
 
     ShellJS.rm("-rf", Path.join(app.appPath, "*"));
     ShellJS.cp("-r", Path.join(appPath, "*"), app.appPath);
@@ -218,7 +218,7 @@ function build(app, configId, extraArgs, callback) {
 function clean(app, callback) {
 
     var basePath = Path.dirname(app.rootPath);
-    output.info("Deleting build dir " + basePath);
+    output.info("Deleting build dir", basePath);
     ShellJS.rm("-rf", basePath);
 
     callback(cat.EXIT_CODE_OK);

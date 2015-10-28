@@ -67,12 +67,12 @@ function(output, callback) {
     var found = true;
     deps.forEach(function (dep) {
         var path = ShellJS.which(dep);
-        var msg = "Checking for " + dep + "... " + path;
+        var msg = "Checking for " + dep + "...";
         if (path) {
-            output.info(msg);
+            output.info(msg, path);
         } else {
             found = false;
-            output.error(msg);
+            output.error(msg + " " + path);
         }
     });
 
@@ -146,7 +146,7 @@ function(packageId, args, callback) {
             return;
         }
 
-        output.info("Project template created at '" + this.platformPath + "'");
+        output.info("Project template created at", this.platformPath);
         callback(null);
     }.bind(this));
 };
@@ -169,7 +169,7 @@ function(versionSpec, args, callback) {
     if (ret) {
         // Delete old project
         ShellJS.rm("-rf", oldPath);
-        output.info("Successfully imported " + crosswalkPath);
+        output.info("Successfully imported", crosswalkPath);
     } else {
         // Restore previous project
         ShellJS.rm("-rf", this.platformPath);
