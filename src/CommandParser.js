@@ -40,6 +40,7 @@ function() {
 "\n" +
 "    crosswalk-app manifest <path>               Initialize web manifest in <path>\n" +
 "                  --package-id=<package-id>     Canonical package name e.g. com.example.foo\n" +
+"                  --platforms=<target>          Optional, e.g. \"windows\"\n" +
 "\n" +
 "    crosswalk-app create <package-id>           Create project <package-id>\n" +
 "                  --platforms=<target>          Optional, e.g. \"windows\"\n" +

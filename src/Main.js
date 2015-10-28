@@ -184,8 +184,25 @@ function(path, extraArgs, output, callback) {
 
     Manifest.addDefaults(output, path, packageId);
     var manifest = new Manifest(output, path);
-    if (extraArgs.platforms && extraArgs.platforms.length > 0) {
-        manifest.targetPlatforms = extraArgs.platforms[0];
+    if (extraArgs.platforms) {
+        // FIXME, only single-platform at the moment
+        var platform = null;
+        if (extraArgs.platforms instanceof Array &&
+            extraArgs.platforms.length > 0) {
+            platform = extraArgs.platforms[0];
+        } else if (typeof extraArgs.platforms === "string") {
+            platform = extraArgs.platforms;
+        }
+        // Check
+        if (platform) {
+            try {
+                manifest.targetPlatforms = platform;
+            } catch (e) {
+                output.error("Invalid target platform '" + platform + "'");
+                callback(Main.EXIT_CODE_ERROR);
+                return;
+            }
+        }
     }
     output.info("Initialized " + path);
     callback(Main.EXIT_CODE_OK);
