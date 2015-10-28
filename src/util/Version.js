@@ -2,6 +2,8 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var Path = require("path");
+
 /**
  * Representation of a four part Crosswalk version number.
  * @param {Number} major
@@ -32,6 +34,58 @@ function Version(major, minor, micro, build) {
     else
         throw new Error("Invalid build version number '" + build + "'");
 }
+
+/**
+ * Create Version instance from VERSION file.
+ * @param {String} versionFilePath Path to VERSION file
+ * @throws {Error} If file could not be found or read
+ * @returns {Version} instance.
+ */
+Version.createFromFile =
+function(versionFilePath) {
+
+    // Extract version
+    var buffer = FS.readFileSync(Path.join(path, "VERSION"), {"encoding": "utf8"});
+    var lines = buffer.split("\n");
+    if (lines.length != 5) {
+        throw new Error("Invalid VERSION file, expected 4 lines, got " + lines.length);
+    }
+
+    var names = ["major", "minor", "build", "patch"];
+    var numbers = {};
+    lines.forEach(function (line) {
+        // Skip trailing empty line
+        if (!line)
+            return;
+        var a = line.split("=");
+        var name = a[0].toLowerCase();
+        if (names.indexOf(name) < 0) {
+            throw new Error("Invalid version number in VERSION file: " + name);
+        }
+        numbers[name] = +a[1];
+    });
+
+    return new Version(+numbers.major, +numbers.minor, +numbers.build, +numbers.patch);                    
+};
+
+/**
+ * Create Version instance from path, by extracting version numbers.
+ * @param {String} path Path to crosswalk directory
+ * @throws {Error} If version numbers could not be extracted
+ * @returns {Version} instance.
+ */
+Version.createFromPath =
+function(path) {
+
+    var basename = Path.basename(path);
+    var a = basename.split("-");
+    if (a[0] === "crosswalk") {
+        var numbers = a[1].split(".");
+        return new Version(+numbers[0], +numbers[1], +numbers[2], +numbers[3]);                    
+    }
+
+    throw new Error("Path doesn not seem to be a crosswalk directory " + path);
+};
 
 /**
  * Major version.
