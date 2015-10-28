@@ -44,7 +44,7 @@ if (argv.v ||
 // Check html app path
 var appPath = Path.resolve(Path.normalize(argv._[0]));
 if (ShellJS.test("-d", appPath)) {
-    output.highlight("Packaging " + appPath);
+    _highlight(output, "Packaging", appPath);
 } else {
     output.error("Directory does not exist: " + appPath);
 }
@@ -80,6 +80,18 @@ if (argv.m || argv.manifest) {
 }
 if (!packageId) {
     process.exit(cat.EXIT_CODE_ERROR);
+}
+
+// Ensure highlight message fits standard terminal width.
+// (Windows breaks at > 78)
+function _highlight(output, message, path) {
+    var info = message + " " + path;
+    if (info.length > 78) {
+        var remain = 78 - (message + " ...").length;
+        var pathAbbrv = path.substring(path.length - remain);
+        info = message + " ..." + pathAbbrv;
+    }
+    output.highlight(info);
 }
 
 // Display help output
@@ -135,7 +147,7 @@ function check(app, extraArgs, output, callback) {
 function manifest(app, appPath, extraArgs, output, callback) {
 
     if (extraArgs.manifest) {
-        output.highlight("Initializing manifest.json in " + appPath);
+        _highlight(output, "Initializing manifest.json in", appPath);
         extraArgs["package-id"] = extraArgs.manifest;
         app.initManifest(appPath, extraArgs, output, callback);
         return;
@@ -152,7 +164,7 @@ function init(app, packageId, callback) {
     var tmpDirName = MkTemp.createDirSync("XXXXXX");
     ShellJS.popd();
     var buildPath = Path.join(OS.tmpdir(), tmpDirName);
-    output.highlight("Initializing build dir " + buildPath);
+    _highlight(output, "Initializing build dir", buildPath);
 
     var errno = cat.EXIT_CODE_OK;
     try {

@@ -72,7 +72,7 @@ function(message, path) {
             output = "  * " + message + " " + path;
             // Windows only takes 78 chars before breaking, although 80 wide.
             if (output.length > 78) {
-                var remain = 78 - ("  *" + message + " ...").length;
+                var remain = 78 - ("  * " + message + " ...").length;
                 var pathAbbrv = path.substring(path.length - remain);
                 output = "  * " + message + " ..." + pathAbbrv;
             }
