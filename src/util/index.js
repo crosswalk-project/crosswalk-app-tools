@@ -20,6 +20,8 @@ var util = {
     IndexParser: require("./IndexParser"),
     /** {@link TemplateFile} */
     TemplateFile: require("./TemplateFile"),
+    /** {@link Version} */
+    Version: require("./Version"),
 
     /**
      * Iterate an array with provisions for asynchronous processing of each item.

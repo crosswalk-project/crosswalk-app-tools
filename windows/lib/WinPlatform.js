@@ -94,19 +94,24 @@ function(crosswalkPath) {
     if (!crosswalkPath) {
         output.error("Use --windows-crosswalk=<path> to pass crosswalk zip");
         return false;
-    } else if (!ShellJS.test("-f", crosswalkPath)) {
+    } else if (!ShellJS.test("-e", crosswalkPath)) {
         output.error("Crosswalk zip could not be found: " + crosswalkPath);
         return false;
     }
 
-    var zip = new util.CrosswalkZip(crosswalkPath);
-    zip.extractEntryTo(zip.root, this.platformPath);
-    if (!ShellJS.test("-d", this.platformPath)) {
-        output.error("Failed to extract " + crosswalkPath);
-        return false;
+    var version = null;
+    if (ShellJS.test("-d", crosswalkPath)) {
+        ShellJS.mkdir(this.platformPath);
+        ShellJS.cp(Path.join(crosswalkPath, "*"), this.platformPath);
+        version = util.Version.createFromPath(crosswalkPath);
+    } else {
+        var xwalk = new util.CrosswalkZip(crosswalkPath);
+        var entry = xwalk.getEntry(xwalk.root);
+        xwalk.extractEntryTo(entry, this.platformPath);
+        version = xwalk.version;
     }
 
-    return true;
+    return version.toString();
 };
 
 /**

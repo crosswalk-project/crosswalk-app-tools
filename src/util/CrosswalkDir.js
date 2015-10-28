@@ -61,28 +61,16 @@ function CrosswalkDir(path) {
     this._path = path;
     this._root = "./";
 
-    // Extract version
-    var buffer = FS.readFileSync(Path.join(path, "VERSION"), {"encoding": "utf8"});
-    var lines = buffer.split("\n");
-    if (lines.length != 5) {
-        throw new Error("Invalid VERSION file, expected 4 lines, got " + lines.length);
+    var versionFilePath = Path.join(path, "VERSION");
+    if (ShellJS.test("-f", versionFilePath)) {
+        this._version = Version.createFromFile(versionFilePath);
+    } else {
+        this._version = Version.createFromPath(path);
     }
 
-    var names = ["major", "minor", "build", "patch"];
-    var numbers = {};
-    lines.forEach(function (line) {
-        // Skip trailing empty line
-        if (!line)
-            return;
-        var a = line.split("=");
-        var name = a[0].toLowerCase();
-        if (names.indexOf(name) < 0) {
-            throw new Error("Invalid version number in VERSION file: " + name);
-        }
-        numbers[name] = +a[1];
-    });
-
-    this._version = new Version(numbers.major, numbers.minor, numbers.build, numbers.patch);
+    if (!this._version) {
+        throw new Error("Failed to determine crosswalk version");
+    }
 }
 
 /**
