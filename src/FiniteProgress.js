@@ -13,6 +13,7 @@ function FiniteProgress(output, label) {
     this._output = output;
     this._label = label;
     this._active = false;
+    this._prefix = this._output.prefix;
 }
 
 /**
@@ -45,7 +46,7 @@ function(progress) {
     this._output.write('\033[0G');
 
     // Label
-    this._output.write("  * " + this._label);
+    this._output.write(this._prefix + this._label);
 
     // Progress
     this._output.write(" [");

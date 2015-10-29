@@ -274,11 +274,12 @@ function(crosswalkPath) {
     var output = this.application.output;
 
     // "  * Extracting /home/robsta/Devel/tmp/crosswalk/crosswalk-15.44.384.12.zip [##########]"
-    // Length of decorations/text is 28, so max length of path is 80-28,
-    // plus nother 3 for ellipsis is 59.
+    // Windows breaks at > 78.
+    // Length of decorations/text is 28, so max length of path is 78-28,
+    // minus nother 3 for ellipsis is 47.
     var indicator;
-    if (crosswalkPath.length > 49) {
-        var abbrv = crosswalkPath.substring(crosswalkPath.length - 49);
+    if (crosswalkPath.length > 47) {
+        var abbrv = crosswalkPath.substring(crosswalkPath.length - 47);
         indicator = output.createFiniteProgress("Extracting ..." + abbrv);
     } else {
         indicator = output.createFiniteProgress("Extracting " + crosswalkPath);
@@ -1317,15 +1318,13 @@ function(configId, args, callback) {
             if (!errormsg &&
                 closure.apks.length > 0) {
 
-                output.highlight("  * Built package(s):");
-
                 for (var i = 0; i < closure.apks.length; i++) {
 
                     // Export APKs to package folder
                     var packagePath = Path.join(this.platformPath, "bin", closure.apks[i]);
                     this.exportPackage(packagePath);
 
-                    output.write("    + " + closure.apks[i] + "\n");
+                    output.highlight("Package: " + closure.apks[i]);
                 }
                 if (configId === "release") {
                     output.highlight("  Sign APKs before publishing: " +

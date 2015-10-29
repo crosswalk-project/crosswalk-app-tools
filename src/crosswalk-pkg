@@ -83,11 +83,11 @@ if (!packageId) {
 }
 
 // Ensure highlight message fits standard terminal width.
-// (Windows breaks at > 78)
+// (Windows breaks at > 78, and we indent by 2, so 76)
 function _highlight(output, message, path) {
     var info = message + " " + path;
-    if (info.length > 78) {
-        var remain = 78 - (message + " ...").length;
+    if (info.length > 76) {
+        var remain = 76 - (message + " ...").length;
         var pathAbbrv = path.substring(path.length - remain);
         info = message + " ..." + pathAbbrv;
     }
@@ -222,7 +222,7 @@ function copy(app, appPath, extraArgs, callback) {
 // Build
 function build(app, configId, extraArgs, callback) {
 
-    app.output.highlight("Building package(s)");
+    app.output.highlight("Building packages");
     app.build(configId, extraArgs, callback);
 }
 

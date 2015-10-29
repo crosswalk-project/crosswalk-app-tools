@@ -29,6 +29,18 @@ function TerminalOutput() {
 TerminalOutput.prototype = Object.create(OutputIface.prototype);
 TerminalOutput.prototype.constructor = TerminalOutput;
 
+/**
+ * Prefix marker for console output lines.
+ * @member {String} prefix
+ * @instance
+ * @memberOf TerminalOutput
+ */
+Object.defineProperty(TerminalOutput.prototype, "prefix", {
+                      get: function() {
+                                return "  + ";
+                           }
+                      });
+
 TerminalOutput.prototype.error =
 function(message) {
 
@@ -66,18 +78,18 @@ function(message, path) {
         var output;
         if (message.length > 75 && path) {
             // Overflow, no point in abbreviating
-            output = "  * " + message + " " + path;
+            output = this.prefix + message + " " + path;
         }
         else if (path) {
-            output = "  * " + message + " " + path;
+            output = this.prefix + message + " " + path;
             // Windows only takes 78 chars before breaking, although 80 wide.
             if (output.length > 78) {
-                var remain = 78 - ("  * " + message + " ...").length;
+                var remain = 78 - (this.prefix + message + " ...").length;
                 var pathAbbrv = path.substring(path.length - remain);
-                output = "  * " + message + " ..." + pathAbbrv;
+                output = this.prefix + message + " ..." + pathAbbrv;
             }
         } else {
-            output = "  * " + message;
+            output = this.prefix + message;
         }
 
         console.log(output);
@@ -92,7 +104,7 @@ function(message) {
             this._progress.isActive) {
             console.log("");
         }
-        console.log('\033[1m' + message + '\033[0m');
+        console.log('\033[1m  ' + message + '\033[0m');
     }
 };
 

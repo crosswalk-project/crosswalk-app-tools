@@ -13,6 +13,7 @@ function InfiniteProgress(output, label) {
     this._output = output;
     this._label = label;
     this._active = false;
+    this._prefix = this._output.prefix;
 }
 
 /**
@@ -42,7 +43,7 @@ function(tag) {
     // Go to column 0
     this._output.write('\033[0G');
 
-    var line = "  * " + this._label + " [" + tag + "...]";
+    var line = this._prefix + this._label + " [" + tag + "...]";
     this._output.write(line);
 };
 
@@ -63,7 +64,7 @@ function(message) {
         // Go to column 0
         this._output.write('\033[0G');
 
-        var line = "  * " + this._label + " [done] " + message + "\n";
+        var line = this._prefix + this._label + " [done] " + message + "\n";
         this._output.write(line);
 
         this._output.endProgress();

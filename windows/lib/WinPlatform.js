@@ -300,9 +300,7 @@ function(configId, args, callback) {
 
         if (success) {
             indicator.done();
-            // TODO rename so they include version number
-            output.highlight("  * Built package(s):");
-            output.highlight("    + " + metaData.msi);
+            output.highlight("Package: " + metaData.msi);
             callback(null);
         } else {
             indicator.update("error");
