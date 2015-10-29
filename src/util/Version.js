@@ -2,6 +2,7 @@
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
+var FS = require("fs");
 var Path = require("path");
 
 /**
@@ -45,7 +46,7 @@ Version.createFromFile =
 function(versionFilePath) {
 
     // Extract version
-    var buffer = FS.readFileSync(Path.join(path, "VERSION"), {"encoding": "utf8"});
+    var buffer = FS.readFileSync(versionFilePath, {"encoding": "utf8"});
     var lines = buffer.split("\n");
     if (lines.length != 5) {
         throw new Error("Invalid VERSION file, expected 4 lines, got " + lines.length);
