@@ -97,7 +97,8 @@ function(output, callback) {
     var deps = [
         "android",
         "ant",
-        "java"
+        "java",
+        "lzma"
     ];
 
     var found = true;
@@ -1200,6 +1201,37 @@ function() {
 };
 
 /**
+ * Wrapper for ChildProcess.execSync to preserve some support for nodejs 0.10
+ * This can probably go away with Fedora 23.
+ */
+AndroidPlatform.prototype.execSync =
+function(cmd) {
+
+    var execSyncImpl;
+    if (ChildProcess.execSync) {
+        // Nodejs >= 0.12
+        execSyncImpl = ChildProcess.execSync;
+    } else {
+        // Try to use npm module.
+        try {
+            // Exec-sync does throw even though it works, so let's use this hack,
+            // it's just for nodejs 0.10 compat anyway.
+            execSyncImpl = function(cmd) { try { return require("exec-sync")(cmd); } catch (e) {} return null; };
+        } catch (e) {
+            output.error("NPM module 'exec-sync' not found");
+            output.error("Please install this package manually when on nodejs < 0.12");
+            execSyncImpl = null;
+        }
+    }
+
+    if (execSyncImpl !== null) {
+        return execSyncImpl(cmd);
+    }
+
+    return null;
+};
+
+/**
  * Import extensions.
  * The directory of one external extension should be like:
  *   myextension/
@@ -1308,8 +1340,20 @@ function(configId, args, callback) {
         ShellJS.ls(libPath).forEach(function (lib) {
             if (ShellJS.test("-d", Path.join(libPath, lib))) {
                 abis.push(lib);
+                // Extract lzma libxwalkcore, because we are not supporting
+                // compressed runtime yet.
+                lzmaLibPath = Path.join(libPath, lib, "libxwalkcore.so.lzma");
+                if (ShellJS.test("-f", lzmaLibPath)) {
+                    if (!ShellJS.which("lzma")) {
+                        var message = "the lzma utility is needed for crosswalk-lite";
+                        output.error(message);
+                        throw new Error(message);
+                    }
+                    output.info("lzma -d ", lzmaLibPath);
+                    this.execSync("lzma -d " + lzmaLibPath);
+                }
             }
-        });
+        }.bind(this));
     }
 
     this.updateEngine();
