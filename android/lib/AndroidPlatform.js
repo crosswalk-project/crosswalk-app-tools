@@ -310,7 +310,7 @@ function(crosswalkPath) {
     if (xwalk.version.major < 9) {
         output.error("Crosswalk version " + xwalk.version.major + " not supported. Use 8+.");
         return null;
-    } else if (xwalk.version.major > 15) {
+    } else if (xwalk.version.major > 16) {
         output.warning("This tool has not been tested with Crosswalk " + xwalk.version.major + ".");
     }
 
@@ -653,9 +653,9 @@ function(output, appVersion, abi) {
     var abiCodes = {
         "shared": 2, // use same as ARM, TODO check if correct.
         "armeabi-v7a": 2,
-//        "arm64": 3, TODO check name
-        "x86": 6
-//        "x86_64": 7, TODO check name
+        "arm64-v8a": 3,
+        "x86": 6,
+        "x86_64": 7
     };
     var versionNums = appVersion.split(".");
 
@@ -1298,8 +1298,18 @@ function(configId, args, callback) {
     process.chdir(this.platformPath);
 
     // Embedded or shared build?
+    var abis = [];
     if (ShellJS.test("-d", Path.join(this.platformPath, "xwalk_shared_library"))) {
         this._shared = true;
+        abis = [ "shared" ];
+    } else {
+        // FIXME we need an option not to build all the ABIs.
+        var libPath = Path.join(this.platformPath, "xwalk_core_library", "libs");
+        ShellJS.ls(libPath).forEach(function (lib) {
+            if (ShellJS.test("-d", Path.join(libPath, lib))) {
+                abis.push(lib);
+            }
+        });
     }
 
     this.updateEngine();
@@ -1309,7 +1319,7 @@ function(configId, args, callback) {
     this.updateWebApp(this.application.manifest.androidWebp);
 
     var closure = {
-        abis: this._shared ? ["shared"] : ["armeabi-v7a", "x86"], // TODO export option
+        abis: abis,
         abiIndex : 0,
         release: configId == "release", // TODO verify above
         apks: [],
