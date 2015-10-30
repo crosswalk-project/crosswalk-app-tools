@@ -142,10 +142,32 @@ function help() {
 }
 
 // Check platform
-function check(app, extraArgs, output, callback) {
+function check(app, appPath, extraArgs, output, callback) {
+
+    var platforms = extraArgs.platforms;
+    if (platforms.length === 0) {
+        // Try to load platforms from manifest, so we only check what's needed.
+        var manifestPath = Path.join(appPath, "manifest.json");
+        if (ShellJS.test("-f", manifestPath)) {
+            var buffer = FS.readFileSync(manifestPath, {"encoding": "utf8"});
+            if (buffer) {
+                var json = JSON.parse(buffer);
+                if (json) {
+                    if (json.xwalk_target_platforms instanceof Array) {
+                        platforms = json.xwalk_target_platforms;
+                    } else if (typeof json.xwalk_target_platforms === "string") {
+                        platforms = [ json.xwalk_target_platforms ];
+                    }
+                }
+            }
+        } else {
+            // No platforms given, no manifest default to android.
+            platforms = [ "android" ];
+        }
+    }
 
     output.highlight("Checking host setup");
-    app.check(extraArgs.platforms, output, callback);
+    app.check(platforms, output, callback);
 }
 
 // Initialize app tools
@@ -289,7 +311,7 @@ if (argv.r || argv.release) {
 
 // Build steps
 var tasks = [
-    { func: check,    args: [ cat, extraArgs, output          ] },
+    { func: check,    args: [ cat, appPath, extraArgs, output ] },
     { func: manifest, args: [ cat, appPath, extraArgs, output ] },
     { func: init,     args: [ cat, packageId                  ] },
     { func: create,   args: [ cat, packageId, extraArgs       ] },
