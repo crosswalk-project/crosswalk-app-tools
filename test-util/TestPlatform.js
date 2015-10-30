@@ -17,18 +17,6 @@ function TestPlatformScope(PlatformBase, baseData) {
         callback(null);
     };
 
-    TestPlatform.prototype.update =
-    function(versionSpec, args, callback) {
-        // Null means success, error string means failure.
-        callback(null);
-    };
-
-    TestPlatform.prototype.refresh =
-    function(callback) {
-        // Null means success, error string means failure.
-        callback(null);
-    };
-
     TestPlatform.prototype.build =
     function(configId, args, callback) {
         // Null means success, error string means failure.
@@ -43,9 +31,6 @@ TestPlatformScope.getArgs = function() {
         create: { // Extra options for command "create"
             foo: "Create option added by the platform",
             bar: "Another create option added by the platform"
-        },
-        update: { // Extra options for command "update"
-            baz: "Update option added by the platform"
         }
     };
 };

@@ -36,9 +36,6 @@ DemoPlatform.getArgs = function() {
         create: { // Extra options for command "create"
             foo: "Option added by the backend",
             bar: "Another option added by the backend"
-        },
-        update: { // Extra options for command "update"
-            baz: "Another option added by the backend"
         }
     };
 };
@@ -51,31 +48,6 @@ function(packageId, args, callback) {
 
     // TODO implement generation of project.
     this.output.write("DemoPlatform: Generating " + this.packageId + "\n");
-
-    // Null means success, error string means failure.
-    callback(null);
-};
-
-/**
- * Implements {@link PlatformBase.update}
- */
-DemoPlatform.prototype.update =
-function(versionSpec, args, callback) {
-
-    // TODO implement updating of project to new Crosswalk version.
-    // This function is not supported yet.
-    this.output.log("DemoPlatform: Updating project\n");
-
-    // Null means success, error string means failure.
-    callback(null);
-};
-
-DemoPlatform.prototype.refresh =
-function(callback) {
-
-    // TODO implement updating of project to new Crosswalk version.
-    // Maybe this function will be not needed, and removed in the future.
-    this.output.log("DemoPlatform: Refreshing project\n");
 
     // Null means success, error string means failure.
     callback(null);

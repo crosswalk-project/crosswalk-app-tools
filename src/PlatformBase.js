@@ -210,27 +210,6 @@ function(packageId, args, callback) {
 };
 
 /**
- * Update platform project to latest Crosswalk.
- * @param {String} versionSpec Channel name or version to update to, format w.x.y.z
- * @param {Object} args Extra options for the command
- * @param {PlatformBase~platformBaseOperationCb} callback callback function
- */
-PlatformBase.prototype.update =
-function(versionSpec, args, callback) {
-
-    throw new Error("PlatformBase.update() not implemented.");
-};
-
-/**
- * Refresh platform project after environment changes.
- */
-PlatformBase.prototype.refresh =
-function() {
-
-    throw new Error("PlatformBase.refresh() not implemented.");
-};
-
-/**
  * Build application package.
  * @param {String} release Configuration identifier for the build
  * @param {Object} args Extra options for the command

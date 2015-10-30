@@ -33,9 +33,9 @@ exports.tests = {
 
     getCommand: function(test) {
 
-        test.expect(8);
+        test.expect(6);
 
-        var commands = ["create", "update", "refresh", "build", "help", "version"];
+        var commands = ["create", "build", "help", "version"];
         var argv = ["foo", "bar"];
         var cp1;
         var cmd1;
@@ -112,83 +112,6 @@ exports.tests = {
         test.equal(cp2.getCommand(), null);
         pkg2 = cp2.createGetPackageId();
         test.equal(pkg2, null);
-
-        test.done();
-    },
-
-    updateGetVersion: function(test) {
-
-        test.expect(8);
-
-        // No version, good test, default to "stable"
-        var argv0 = ["node", "foo", "update"];
-        var cp0 = new CommandParser(_output, argv0);
-
-        test.equal(cp0.getCommand(), "update");
-
-        var cmd0 = cp0.getCommand();
-        test.equal(cmd0, argv0[2]);
-
-        var version0 = cp0.updateGetVersion();
-        test.equal(version0, "stable");
-
-        // Good test
-        var argv1 = ["node", "foo", "update", "12.34.56.78"];
-        var cp1 = new CommandParser(_output, argv1);
-
-        test.equal(cp1.getCommand(), "update");
-
-        var cmd1 = cp1.getCommand();
-        test.equal(cmd1, argv1[2]);
-
-        var version1 = cp1.updateGetVersion();
-        test.equal(version1, argv1[3]);
-
-        // Bad test, invalid version
-        var argv2 = ["node", "foo", "update", "12.34.x6.78"];
-        var cp2 = new CommandParser(_output, argv2);
-
-        test.equal(cp2.getCommand(), null);
-
-        var version2 = cp2.updateGetVersion();
-        test.equal(version2, null);
-
-        test.done();
-    },
-
-    updateGetDir: function(test) {
-
-        test.expect(8);
-
-        // build inside project
-        var argv0 = ["node", "foo", "update"];
-        var cp0 = new CommandParser(_output, argv0);
-
-        test.equal(cp0.getCommand(), "update");
-
-        var cmd0 = cp0.getCommand();
-        test.equal(cmd0, argv0[2]);
-
-        var version0 = cp0.updateGetVersion();
-        test.equal(version0, "stable");
-
-        var dir0 = cp0.updateGetDir();
-        test.equal(dir0, process.cwd());
-
-        // command-line with dir specified
-        var argv1 = ["node", "foo", "update", "beta", "com.example.foo"];
-        var cp1 = new CommandParser(_output, argv1);
-
-        test.equal(cp1.getCommand(), "update");
-
-        var cmd1 = cp1.getCommand();
-        test.equal(cmd1, argv1[2]);
-
-        var version1 = cp1.updateGetVersion();
-        test.equal(version1, argv1[3]);
-
-        var dir1 = cp1.updateGetDir();
-        test.equal(dir1, Path.join(process.cwd(), argv1[4]));
 
         test.done();
     },

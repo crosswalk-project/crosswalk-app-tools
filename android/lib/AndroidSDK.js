@@ -188,12 +188,6 @@ function(path, packageId, apiTarget, callback) {
     }.bind(this));
 };
 
-AndroidSDK.prototype.refreshProject =
-function() {
-
-    // TODO
-};
-
 /**
  * Build project by running "ant debug" or "ant release".
  * @param {Boolean} release Whether to build a release or debug package

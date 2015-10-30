@@ -57,7 +57,7 @@ exports.tests = {
 
     subclass: function(test) {
 
-        test.expect(4);
+        test.expect(2);
 
         var basePath = Util.createTmpDir();
         var application = new Application(basePath, _packageId);
@@ -69,14 +69,6 @@ exports.tests = {
         var platform = new TestPlatform(PlatformBase, platformData);
 
         platform.create(_platformId, null, function(errormsg) {
-            test.equal(errormsg, null);
-        });
-
-        platform.update(null, null, function(errormsg) {
-            test.equal(errormsg, null);
-        });
-
-        platform.refresh(function(errormsg) {
             test.equal(errormsg, null);
         });
 
