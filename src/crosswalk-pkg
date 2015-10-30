@@ -109,6 +109,7 @@ function help() {
         '    -a --android="<android-conf>"    Extra configurations for Android\n' +
         "    -c --crosswalk=<version-spec>    Specify Crosswalk version or path\n" +
         "    -h --help                        Print usage information\n" +
+        "    -k --keep                        Keep build tree for debugging\n" +
         "    -m --manifest=<package-id>       Fill manifest.json with default values\n" +
         "    -p --platforms=<android|windows> Specify target platform\n" +
         "    -r --release=true                Build release packages\n" +
@@ -231,11 +232,15 @@ function build(app, configId, extraArgs, callback) {
 }
 
 // Cleanup
-function clean(app, callback) {
+function clean(app, extraArgs, callback) {
 
-    var basePath = Path.dirname(app.rootPath);
-    output.info("Deleting build dir", basePath);
-    ShellJS.rm("-rf", basePath);
+    if (extraArgs.keep) {
+        app.output.info("Keeping build tree in", app.rootPath);
+    } else {
+        var basePath = Path.dirname(app.rootPath);
+        app.output.info("Deleting build dir", basePath);
+        ShellJS.rm("-rf", basePath);
+    }
 
     callback(cat.EXIT_CODE_OK);
 }
@@ -255,18 +260,23 @@ if (argv.crosswalk) {
     extraArgs["windows-crosswalk"] = argv.crosswalk;
 }
 
+if (argv.k || argv.keep) {
+    extraArgs.keep = true;
+}
+
+if (argv.m) {
+    extraArgs.manifest = argv.m;
+}
+if (argv.manifest) {
+    extraArgs.manifest = argv.manifest;
+}
+
 extraArgs.platforms = [];
 if (argv.p) {
     extraArgs.platforms = [ argv.p ];
 }
 if (argv.platforms) {
     extraArgs.platforms = [ argv.platforms ];
-}
-if (argv.m) {
-    extraArgs.manifest = argv.m;
-}
-if (argv.manifest) {
-    extraArgs.manifest = argv.manifest;
 }
 
 // Extra android config
@@ -285,7 +295,7 @@ var tasks = [
     { func: create,   args: [ cat, packageId, extraArgs       ] },
     { func: copy,     args: [ cat, appPath, extraArgs         ] },
     { func: build,    args: [ cat, buildConfig, extraArgs     ] },
-    { func: clean,    args: [ cat                             ] }
+    { func: clean,    args: [ cat, extraArgs                  ] }
 ];
 
 util.iterate(
