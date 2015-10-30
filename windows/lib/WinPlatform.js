@@ -41,9 +41,6 @@ WinPlatform.getArgs = function() {
     return {
         create: { // Extra options for command "create"
             crosswalk: "\t\t\tPath to crosswalk zip"
-        },
-        update: { // Extra options for command "update"
-            crosswalk: "\t\t\tPath to crosswalk zip"
         }
     };
 };
@@ -149,46 +146,6 @@ function(packageId, args, callback) {
         output.info("Project template created at", this.platformPath);
         callback(null);
     }.bind(this));
-};
-
-/**
- * Implements {@link PlatformBase.update}
- */
-WinPlatform.prototype.update =
-function(versionSpec, args, callback) {
-
-    var output = this.output;
-
-    // Rename current dir for backup.
-    var oldPath = this.platformPath + ".bak";
-    ShellJS.mv(this.platformPath, oldPath);
-
-    var errormsg = null;
-    var crosswalkPath = args.crosswalk;
-    var ret = this.importCrosswalkFromDisk(crosswalkPath);
-    if (ret) {
-        // Delete old project
-        ShellJS.rm("-rf", oldPath);
-        output.info("Successfully imported", crosswalkPath);
-    } else {
-        // Restore previous project
-        ShellJS.rm("-rf", this.platformPath);
-        ShellJS.mv(oldPath, this.platformPath);
-        errormsg = "Updating project failed";
-    }
-
-    callback(errormsg);
-};
-
-WinPlatform.prototype.refresh =
-function(callback) {
-
-    // TODO implement updating of project to new Crosswalk version.
-    // Maybe this function will be not needed, and removed in the future.
-    this.output.log("WinPlatform: TODO Refreshing project\n");
-
-    // Null means success, error string means failure.
-    callback(null);
 };
 
 /**

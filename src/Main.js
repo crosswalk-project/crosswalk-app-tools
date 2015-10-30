@@ -300,46 +300,6 @@ function(packageId, extraArgs, callback) {
 };
 
 /**
- * Update crosswalk in the application package.
- * @param {String} version Version to update to, or null for latest stable version
- * @param {Object} extraArgs Unparsed extra arguments passed by command-line
- * @param {Main~mainOperationCb} callback Callback function
- * @static
- */
-Main.prototype.update =
-function(version, extraArgs, callback) {
-
-    var output = this.output;
-
-    var project = this.instantiatePlatform();
-    if (!project) {
-        callback(Main.EXIT_CODE_ERROR);
-        return;
-    }
-
-    // Collect args for this command
-    var updateArgs = {};
-    var argSpec = project.argSpec;
-    if (argSpec && argSpec.update) {
-        updateArgs = this.collectArgs(project.platformId, extraArgs, argSpec.update);
-    }
-
-    project.update(version, updateArgs, function(errormsg) {
-
-        if (errormsg) {
-            output.error(errormsg);
-            // Print full path here, because we want to copy/paste it.
-            output.info("Logfiles at " + this.logPath);
-            callback(Main.EXIT_CODE_ERROR);
-            return;
-        } else {
-            callback(Main.EXIT_CODE_OK);
-            return;
-        }
-    }.bind(this));
-};
-
-/**
  * Build application package.
  * @param {String} configId Build "debug" or "release" configuration
  * @param {Object} extraArgs Unparsed extra arguments passed by command-line
@@ -509,15 +469,6 @@ function(callback) {
         // Chain up the constructor.
         Application.call(app, process.cwd(), packageId);
         app.create(packageId, extraArgs, callback);
-        break;
-
-    case "update":
-        var version = parser.updateGetVersion();
-        rootDir = parser.updateGetDir();
-
-        // Chain up the constructor.
-        Application.call(app, rootDir, null);
-        app.update(version, extraArgs, callback);
         break;
 
     case "build":

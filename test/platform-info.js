@@ -14,16 +14,13 @@ exports.tests = {
 
     args: function(test) {
 
-        test.expect(3);
+        test.expect(2);
 
         var platformInfo = new PlatformInfo(TestPlatform, "test");
 
         var createArgs = platformInfo.argSpec.create;
         test.equal(typeof createArgs["--test-foo"], "string");
         test.equal(typeof createArgs["--test-bar"], "string");
-
-        var updateArgs = platformInfo.argSpec.update;
-        test.equal(typeof updateArgs["--test-baz"], "string");
 
         test.done();
     },

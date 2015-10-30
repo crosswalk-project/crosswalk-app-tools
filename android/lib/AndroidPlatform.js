@@ -491,51 +491,6 @@ function(packageId, args, callback) {
 };
 
 /**
- * Implements {@link PlatformBase.update}
- */
-AndroidPlatform.prototype.update =
-function(versionSpec, args, callback) {
-
-    // Namespace util
-    var util = this.application.util;
-    var output = this.application.output;
-
-    var sdk = new AndroidSDK(this.application);
-    sdk.queryTarget(AndroidPlatform.MIN_API_LEVEL,
-                    function(apiTarget, errormsg) {
-
-        if (errormsg) {
-            callback(errormsg);
-            return;
-        }
-        this._apiTarget = apiTarget;
-
-        var deps = new util.Download01Org(this.application, "android", "stable" /* FIXME this is just a placeholder */);
-        deps.importCrosswalk(versionSpec,
-                             function(path) {
-                                 return this.importCrosswalkFromDisk(path);
-                             }.bind(this),
-                             function(version, errormsg) {
-
-            if (errormsg) {
-                output.error(errormsg);
-                callback("Updating crosswalk to '" + version + "' failed");
-                return;
-            }
-
-            output.info("Project updated to crosswalk '" + version + "'");
-            callback(null);
-        });
-    }.bind(this));
-};
-
-AndroidPlatform.prototype.refresh =
-function() {
-
-    // TODO implement
-};
-
-/**
  * Enable ABIs so they are built into the APK.
  * @param {String} [abi] ABI identifier "armeabi-v7a" / "x86". When not passed,
  *                       all ABIs are enabled

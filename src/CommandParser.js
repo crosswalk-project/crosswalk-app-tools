@@ -49,10 +49,6 @@ function() {
 "                                                Defaults to \"debug\" when not given\n" +
 "                                                Tries to build in current dir by default\n" +
 "\n" +
-"    crosswalk-app update [<version>] [<dir>]    Update Crosswalk to latest in named\n" +
-"                                                channel, or specific version\n" +
-"                                                Version is \"stable\" when not given" +
-"\n" +
 "    crosswalk-app platforms                     List available target platforms\n" +
 "\n" +
 "    crosswalk-app help                          Display usage information\n" +
@@ -73,13 +69,6 @@ function() {
     case "create":
         var packageId = this.createGetPackageId();
         return packageId !== null ? cmd : null;
-    case "update":
-        var version = this.updateGetVersion();
-        if (!version) {
-            // Error: version could not be parsed.
-            return null;
-        }
-        return cmd;
     case "build":
         var type = this.buildGetType();
         return type !== null ? cmd : null;
@@ -98,7 +87,7 @@ function() {
 
 /**
  * Get primary command.
- * @returns {String} One of "create", "update", "refresh", "build" or null.
+ * @returns {String} Returns command if valid, or null.
  */
 CommandParser.prototype.peekCommand =
 function() {
@@ -117,7 +106,7 @@ function() {
         return "help";
     }
 
-    if (["check", "manifest", "create", "update", "refresh", "build", "platforms"].indexOf(command) > -1) {
+    if (["check", "manifest", "create", "build", "platforms"].indexOf(command) > -1) {
         return command;
     }
 
@@ -168,30 +157,6 @@ function() {
     return packageId;
 };
 
-/**
- * Get version when command is "update".
- * @returns {String} Crosswalk version string when given and valid. Null when not given, false when invalid.
- * @see {@link https://crosswalk-project.org/documentation/downloads.html}
- */
-CommandParser.prototype.updateGetVersion =
-function() {
-
-    // argv is filled like this:
-    // node crosswalk-app update [version] [dir]
-    // So argv[3] is either version or dir.
-
-    if (this._argv.length < 4) {
-        return "stable";
-    }
-
-    var version = this._argv[3];
-    if (CommandParser.validateVersion(version, null)) {
-        return version;
-    }
-
-    return null;
-};
-
 // FIXME require node 0.12 and use Path.isAbsolute
 CommandParser.prototype.isAbsolute =
 function(path) {
@@ -203,30 +168,6 @@ function(path) {
 
     // Windows
     return path.match(/^[a-zA-z]:/) !== null;
-};
-
-/**
- * Get dir when command is "update". Defaults to current dir.
- */
-CommandParser.prototype.updateGetDir =
-function() {
-
-    // argv is filled like this:
-    // node crosswalk-app update [version] [dir]
-    // Dir can only be specified if version is given, though,
-    // no guessing around here.
-
-    if (this._argv.length < 5) {
-        // Dir not given.
-        return process.cwd();
-    }
-
-    var path = this._argv[4];
-    if (this.isAbsolute(path)) {
-        return Path.resolve(Path.normalize(path));
-    }
-
-    return Path.resolve(Path.normalize(Path.join(process.cwd(), path)));
 };
 
 /**
