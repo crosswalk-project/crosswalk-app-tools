@@ -112,7 +112,7 @@ function help() {
         "    -k --keep                        Keep build tree for debugging\n" +
         "    -m --manifest=<package-id>       Fill manifest.json with default values\n" +
         "    -p --platforms=<android|windows> Specify target platform\n" +
-        "    -r --release=true                Build release packages\n" +
+        "    -r --release                     Build release packages\n" +
         "    -v --version                     Print tool version\n" +
         "\n" +
         "  <path>\n" +
