@@ -1381,8 +1381,8 @@ function(configId, args, callback) {
                     output.highlight("Package: " + closure.apks[i]);
                 }
                 if (configId === "release") {
-                    output.highlight("  Sign APKs before publishing: " +
-                                     "https://developer.android.com/tools/publishing/app-signing.html#signing-manually");
+                    output.highlight("APKs need to be signed before publishing, see");
+                    output.highlight("https://developer.android.com/tools/publishing/app-signing.html#signing-manually");
                 }
             }
             callback(errormsg);

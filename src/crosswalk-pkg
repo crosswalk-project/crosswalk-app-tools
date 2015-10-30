@@ -26,11 +26,12 @@ var util = require("./util/index.js");
 var argv = Minimist(process.argv.slice(2));
 
 // Help
-if (!process.argv[2] ||
+if (process.argv.length < 3 ||
+    process.argv[2] === "help" ||
     argv.h ||
     argv.help) {
     help();
-    process.exit(0);
+    process.exit(cat.EXIT_CODE_OK);
 }
 
 // Version
@@ -38,15 +39,18 @@ if (argv.v ||
     argv.version) {
     var Package = require("../package.json");
     output.write(Package.version + "\n");
-    process.exit(0);
+    process.exit(cat.EXIT_CODE_OK);
 }
 
-// Check html app path
-var appPath = Path.resolve(Path.normalize(argv._[0]));
+// Check html app path.
+// Path needs to be the last argument.
+var appPath = Path.resolve(Path.normalize(process.argv[process.argv.length - 1]));
 if (ShellJS.test("-d", appPath)) {
     _highlight(output, "Packaging", appPath);
 } else {
     output.error("Directory does not exist: " + appPath);
+    output.error("Path to html app directory needs to be passed as final argument");
+    process.exit(cat.EXIT_CODE_ERROR);
 }
 
 // Determine packageId
@@ -103,10 +107,10 @@ function help() {
         "\n" +
         "  <options>\n" +
         '    -a --android="<android-conf>"    Extra configurations for Android\n' +
-        "    -c --crosswalk=<version-spec>    Runtime version\n" +
+        "    -c --crosswalk=<version-spec>    Specify Crosswalk version or path\n" +
         "    -h --help                        Print usage information\n" +
         "    -m --manifest=<package-id>       Fill manifest.json with default values\n" +
-        "    -p --platforms=<android|windows> Target platform\n" +
+        "    -p --platforms=<android|windows> Specify target platform\n" +
         "    -r --release=true                Build release packages\n" +
         "    -v --version                     Print tool version\n" +
         "\n" +
