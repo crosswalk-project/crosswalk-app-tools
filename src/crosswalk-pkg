@@ -8,6 +8,7 @@ var FS = require("fs");
 var Path = require("path");
 var OS = require("os");
 
+var FormatJson = require("format-json");
 var Minimist = require("minimist");
 var MkTemp = require("mktemp");
 var ShellJS = require("shelljs");
@@ -55,12 +56,36 @@ if (ShellJS.test("-d", appPath)) {
 
 // Determine packageId
 var packageId = null;
+var json = null;
+var manifestPath = Path.join(appPath, "manifest.json");
 if (argv.m || argv.manifest) {
-    // packageId from command-line?
-    packageId = CommandParser.validatePackageId(argv.m ? argv.m : argv.manifest, output);
-} else {
+    // packageId or manifest snippet from command-line?
+    var manifestInput = argv.m ? argv.m : argv.manifest;
+    if (manifestInput[0] === "{") {
+        if (ShellJS.test("-f", manifestPath)) {
+            output.error("Failed to process manifest json data");
+            output.error("Passing manifest data is only supported when manifest.json does not already exist");
+        } else {
+            try {
+                json = JSON.parse(manifestInput);
+                FS.writeFileSync(manifestPath, FormatJson.plain(json));
+                // Passing manifest data is just a shortcut for QA, so we
+                // frob the args to make it seem like it never happened, so
+                // later code expecting a package-id is not confused.
+                delete argv.m;
+                delete argv.manifest;
+            } catch (e) {
+                output.error(e);
+                output.error("Failed to parse manifest json data");
+            }
+        }
+    } else {
+        packageId = CommandParser.validatePackageId(manifestInput, output);
+    }
+}
+
+if (!packageId) {
     // packageId from existing web manifest?
-    var manifestPath = Path.join(appPath, "manifest.json");
     var buffer = null;
     if (ShellJS.test("-f", manifestPath)) {
         buffer = FS.readFileSync(manifestPath, {"encoding": "utf8"});
@@ -71,7 +96,7 @@ if (argv.m || argv.manifest) {
         output.info('{ "xwalk_package_id": "com.example.foo" }');
         process.exit(cat.EXIT_CODE_ERROR);
     }
-    var json = JSON.parse(buffer);
+    json = JSON.parse(buffer);
     if (!json) {
         output.error("Failed to parse manifest.json");
         process.exit(cat.EXIT_CODE_ERROR);
@@ -157,6 +182,9 @@ function check(app, appPath, extraArgs, output, callback) {
                         platforms = json.xwalk_target_platforms;
                     } else if (typeof json.xwalk_target_platforms === "string") {
                         platforms = [ json.xwalk_target_platforms ];
+                    } else {
+                        // No platforms given, no manifest default to android.
+                        platforms = [ "android" ];
                     }
                 }
             }
