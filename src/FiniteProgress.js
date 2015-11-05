@@ -25,6 +25,9 @@ function FiniteProgress(output, label) {
 Object.defineProperty(FiniteProgress.prototype, "isActive", {
                       get: function() {
                                 return this._active;
+                           },
+                      set: function(active) {
+                                this._active = active ? true : false;
                            }
                       });
 

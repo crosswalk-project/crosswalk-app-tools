@@ -48,8 +48,10 @@ function(message) {
         if (this._progress &&
             this._progress.isActive) {
             console.log("");
+            this._progress.isActive = false;
         }
-        console.error("*** ERROR: " + message);
+        // Output in red.
+        console.error('\x1B[31m'  + "*** ERROR: " + message + '\033[0m');
     }
 };
 
@@ -60,8 +62,10 @@ function(message) {
         if (this._progress &&
             this._progress.isActive) {
             console.log("");
+            this._progress.isActive = false;
         }
-        console.error(" ** WARNING: " + message);
+        // Output in dark grey so it stands out from the other text.
+        console.error('\x1B[90m'  + " ** WARNING: " + message + '\033[0m');
     }
 };
 
@@ -73,6 +77,7 @@ function(message, path) {
         if (this._progress &&
             this._progress.isActive) {
             console.log("");
+            this._progress.isActive = false;
         }
 
         var output;
@@ -103,6 +108,7 @@ function(message) {
         if (this._progress &&
             this._progress.isActive) {
             console.log("");
+            this._progress.isActive = false;
         }
         console.log('\033[1m  ' + message + '\033[0m');
     }

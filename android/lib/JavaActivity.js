@@ -84,8 +84,6 @@ function(zipEntry, packageId) {
     // 2 - if yes, create a ".new" file
     if (ShellJS.test("-f", this._path)) {
 
-        // HACK force newline because we're in the midst of a progress indication
-        output.write("\n");
         output.warning("File already exists: " + this._path);
 
         var activityDirPath = Path.dirname(this._path);
