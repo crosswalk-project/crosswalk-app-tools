@@ -87,6 +87,39 @@ exports.tests = {
         });
     },
 
+    canaryLatest: function(test) {
+
+        test.expect(1);
+
+        var application = Util.createTmpApplication("com.example.foo");
+        var deps = new Download01Org(application, "android", "canary");
+        deps.findCrosswalkVersion(null, "canary",
+                                  function(version, channel, errormsg) {
+
+            test.equal(typeof version, "string");
+
+            Util.deleteTmpApplication(application);
+            test.done();
+        });
+    },
+
+    canary64latest: function(test) {
+
+        test.expect(1);
+
+        var application = Util.createTmpApplication("com.example.foo");
+        var deps = new Download01Org(application, "android", "canary");
+        deps.androidWordSize = 64;
+        deps.findCrosswalkVersion(null, "canary",
+                                  function(version, channel, errormsg) {
+
+            test.equal(typeof version, "string");
+
+            Util.deleteTmpApplication(application);
+            test.done();
+        });
+    },
+
     lite: function(test) {
 
         test.expect(1);

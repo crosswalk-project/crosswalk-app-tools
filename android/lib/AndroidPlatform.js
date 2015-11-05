@@ -62,12 +62,16 @@ AndroidPlatform.getArgs =
 function() {
     return {
         create: {
-            "crosswalk": "\t\t\tChannel name (stable/beta/canary)\n" +
+            "crosswalk": "                 Channel name (stable/beta/canary)\n" +
                          "\t\t\t\t\t\tor version number (w.x.y.z)\n" +
                          "\t\t\t\t\t\tor crosswalk zip\n" +
                          "\t\t\t\t\t\tor xwalk_app_template dir",
             "lite": "                      Use crosswalk-lite, see Crosswalk Wiki for details",
-            "shared": "                    Depend on shared crosswalk installation"
+            "shared": "                    Depend on shared crosswalk installation",
+            "targets": "                   Target ABIs to create"
+        },
+        build: {
+            "targets": "                   Target ABIs to build"
         }
     };
 };
@@ -332,8 +336,6 @@ function(crosswalkPath) {
     entry = xwalk.getEntry(name);
     if (entry) {
         path = Path.join(this.platformPath, xwalkLibrary);
-        // Remove existing dir to prevent stale files when updating crosswalk
-        ShellJS.rm("-rf", path);
         ShellJS.mkdir(path);
         xwalk.extractEntryTo(entry, path);
     } else {
@@ -427,6 +429,19 @@ function(packageId, args, callback) {
         this._shared = true;
     }
 
+    // Check that only same-size ABIs are requested.
+    if (args.targets) {
+        var wordSize = 0;
+        args.targets.forEach(function (abi) {
+            if (wordSize &&
+                wordSize != util.Targets.ABI_WORDSIZE[abi]) {
+                callback("Projects can only be created for same-size ABIs (" + args.targets.join(",") + ")");
+                return;
+            }
+            wordSize = util.Targets.ABI_WORDSIZE[abi];
+        });
+    }
+
     this._sdk.queryTarget(AndroidPlatform.MIN_API_LEVEL,
                           function(apiTarget, errormsg) {
 
@@ -470,6 +485,12 @@ function(packageId, args, callback) {
             var deps = new util.Download01Org(this.application, "android", "stable" /* FIXME this is just a placeholder */);
             if (this._lite) {
                 deps.androidFlavor = "crosswalk-lite";
+            }
+            if (args.targets && args.targets.length > 0) {
+                // We only handle ABIs with same word size in one create() call
+                // so just check for the first one.
+                var wordSize = util.Targets.ABI_WORDSIZE[args.targets[0]];
+                deps.androidWordSize = wordSize;
             }
             deps.importCrosswalk(versionSpec,
                                  function(path) {
@@ -1286,30 +1307,48 @@ function(configId, args, callback) {
 
     // Embedded or shared build?
     var abis = [];
+    var libPath = Path.join(this.platformPath, "xwalk_core_library", "libs");
     if (ShellJS.test("-d", Path.join(this.platformPath, "xwalk_shared_library"))) {
         this._shared = true;
         abis = [ "shared" ];
-    } else {
-        // FIXME we need an option not to build all the ABIs.
-        var libPath = Path.join(this.platformPath, "xwalk_core_library", "libs");
+
+    } else if (!args.targets || args.targets.length === 0) {
+        // Build all available ABIs
         ShellJS.ls(libPath).forEach(function (lib) {
             if (ShellJS.test("-d", Path.join(libPath, lib))) {
                 abis.push(lib);
-                // Extract lzma libxwalkcore, because we are not supporting
-                // compressed runtime yet.
-                lzmaLibPath = Path.join(libPath, lib, "libxwalkcore.so.lzma");
-                if (ShellJS.test("-f", lzmaLibPath)) {
-                    if (!ShellJS.which("lzma")) {
-                        var message = "the lzma utility is needed for crosswalk-lite";
-                        output.error(message);
-                        throw new Error(message);
-                    }
-                    output.info("lzma -d ", lzmaLibPath);
-                    this.execSync("lzma -d " + lzmaLibPath);
-                }
             }
         }.bind(this));
+
+    } else if (args.targets.length > 0) {
+        // Build specified target ABIs.
+        args.targets.forEach(function (abi) {
+            if (ShellJS.test("-d", Path.join(libPath, abi))) {
+                abis.push(abi);
+            } else {
+                output.error("Failed to find libxwalkcore.so for " + abi + ", skipping");
+            }
+        });
+
+    } else {
+        callback("Failed to determine which ABIs to build");
+        return;
     }
+
+    // Extract lzma libxwalkcore, because we are not supporting
+    // compressed runtime yet.
+    abis.forEach(function (abi) {
+        lzmaLibPath = Path.join(libPath, abi, "libxwalkcore.so.lzma");
+        if (ShellJS.test("-f", lzmaLibPath)) {
+            if (!ShellJS.which("lzma")) {
+                var message = "the lzma utility is needed for crosswalk-lite";
+                output.error(message);
+                throw new Error(message);
+            }
+            output.info("lzma -d ", lzmaLibPath);
+            this.execSync("lzma -d " + lzmaLibPath);
+        }
+    });
 
     this.updateEngine();
     this.importExtensions();

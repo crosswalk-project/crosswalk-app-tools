@@ -142,11 +142,11 @@ function(path, packageId, apiTarget, callback) {
     var output = this._application.output;
     var errmsg = null;
 
-    // Fail if path exists.
+    // Warn if path exists, but this is a valid case when building
+    // 32- and 64-bit ABIs in one go.
     if (ShellJS.test("-e", path)) {
-        errmsg = "Error: project dir '" + path + "' already exists";
-        output.error(errmsg);
-        callback(null, null, errmsg);
+        output.warning("Project dir '" + path + "' already exists");
+        callback(path, null, null);
         return;
     }
 

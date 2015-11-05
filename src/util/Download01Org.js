@@ -55,6 +55,8 @@ function Download01Org(application, platform, channel) {
     this._channel = channel;
 
     this._flavor = "crosswalk";
+
+    this._androidWordSize = "32";
 }
 
 /**
@@ -123,6 +125,25 @@ Object.defineProperty(Download01Org.prototype, "androidFlavor", {
                       });
 
 /**
+ * Android 32bit or 64bit.
+ * @member {String[]} androidWordSize
+ * @memberOf Download01Org
+ */
+Object.defineProperty(Download01Org.prototype, "androidWordSize", {
+                      get: function() {
+                                return this._androidWordSize;
+                           },
+                      set: function(androidWordSize) {
+                                if (androidWordSize == 32 ||
+                                    androidWordSize == 64) {
+                                    this._androidWordSize = androidWordSize;
+                                } else {
+                                    this._application.output.error("Invalid word size (32/64) " + androidWordSize);
+                                }
+                           }
+                      });
+
+/**
  * Fetch available Crosswalk versions index.
  * @param {Download01Org~fetchVersionsFinishedCb} callback callback function
  */
@@ -172,6 +193,25 @@ function(callback) {
 };
 
 /**
+ * Build release filename, depending on 32 or 64bit release.
+ * @param {String} version Version string a.b.c.d
+ * @returns {String} Crosswalk zip filename.
+ */
+Download01Org.prototype.buildFilename =
+function(version) {
+
+    var filename;
+
+    if (this._androidWordSize == 64) {
+        filename = "crosswalk-" + version + "-64bit.zip";
+    } else {
+        filename = "crosswalk-" + version + ".zip";
+    }
+
+    return filename;
+};
+
+/**
  * Locate Crosswalk distribution zip.
  * @param {String} version Crosswalk version to look for
  * @returns {String} Relative path to zip file.
@@ -179,7 +219,7 @@ function(callback) {
 Download01Org.prototype.findLocally =
 function(version) {
 
-    var filename = "crosswalk-" + version + ".zip";
+    var filename = this.buildFilename(version);
     if (ShellJS.test("-f", filename))  {
         return filename;
     } else if (ShellJS.test("-f", "../" + filename)) {
@@ -206,7 +246,7 @@ function(version, defaultPath, callback) {
     var util = this._application.util;
 
     var output = this._application.output;
-    var filename = "crosswalk-" + version + ".zip";
+    var filename = this.buildFilename(version);
     var url = Download01Org.BASE_URL +
               this._flavor + "/" +
               this._platform + "/" +
@@ -276,6 +316,7 @@ function(version, channel, callback) {
     var deps = new Download01Org(this._application, this._platform, channel);
     if (this.androidFlavor === "crosswalk-lite")
         deps.androidFlavor = "crosswalk-lite";
+    deps.androidWordSize = this.androidWordSize;
     deps.fetchVersions(function(versions, errormsg) {
 
         if (errormsg) {
@@ -357,6 +398,7 @@ function(versionSpec, importCrosswalkFromDisk, callback) {
     var deps = new Download01Org(this._application, this._platform, channel);
     if (this.androidFlavor === "crosswalk-lite")
         deps.androidFlavor = "crosswalk-lite";
+    deps.androidWordSize = this.androidWordSize;
     deps.findCrosswalkVersion(version, channel,
                               function(version, channel, errormsg) {
 
@@ -371,6 +413,7 @@ function(versionSpec, importCrosswalkFromDisk, callback) {
         var deps = new Download01Org(this._application, this._platform, channel);
         if (this.androidFlavor === "crosswalk-lite")
             deps.androidFlavor = "crosswalk-lite";
+        deps.androidWordSize = this.androidWordSize;
         deps.download(version, ".",
                       function(filename, errormsg) {
 
