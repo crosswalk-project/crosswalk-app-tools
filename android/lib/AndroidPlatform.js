@@ -1348,7 +1348,7 @@ function(configId, args, callback) {
             output.info("lzma -d ", lzmaLibPath);
             this.execSync("lzma -d " + lzmaLibPath);
         }
-    });
+    }.bind(this));
 
     this.updateEngine();
     this.importExtensions();
