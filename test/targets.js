@@ -11,7 +11,7 @@ exports.tests = {
         test.expect(1);
 
         var match = Targets.match(null);
-        test.equal(match.length == 0, true);
+        test.equal(match.length === 0, true);
 
         test.done();
     },
@@ -21,7 +21,7 @@ exports.tests = {
         test.expect(1);
 
         var match = Targets.match(null);
-        test.equal(match.length == 0, true);
+        test.equal(match.length === 0, true);
 
         test.done();
     },

@@ -50,7 +50,6 @@ function(key) {
         return [ key ];
     }
 
-    match = [];
     for (var abi in Targets.ABI_WORDSIZE) {
 
         // Prefix match
