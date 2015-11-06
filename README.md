@@ -34,19 +34,45 @@ Two executables are provided, `crosswalk-app` implements low level helper comman
   Usage: crosswalk-pkg <options> <path>
 
   <options>
-    -c --crosswalk=<version-spec>: Runtime version
-    -h --help: Print usage information
-    -p --platforms=<android|windows>: Target platform
-    -r --release=true: Build release packages
-    -v --version: Print tool version
+    -a --android=<android-conf>      Extra configurations for Android
+    -c --crosswalk=<version-spec>    Specify Crosswalk version or path
+    -h --help                        Print usage information
+    -k --keep                        Keep build tree for debugging
+    -m --manifest=<package-id>       Fill manifest.json with default values
+    -p --platforms=<android|windows> Specify target platform
+    -r --release                     Build release packages
+    -t --targets=<target-archs>      Target CPU architectures
+    -v --version                     Print tool version
 
   <path>
     Path to directory that contains a web app
 
+  <android-conf>
+    Quoted string with extra config, e.g. "shared"
+    * "shared" Build APK that depends on crosswalk in the Google Play Store
+    * "lite"   Use crosswalk-lite, see Crosswalk Wiki
+
+  <package-id>
+    Canonical application name, e.g. com.example.foo, needs to
+    * Comprise of 3 or more period-separated parts
+    * Begin with lowecase letters
+
+  <target-archs>
+    List of CPU architectures for which to create packages.
+    Currently supported ABIs are: armeabi-v7a, arm64-v8a, x86, x86_64
+    * Prefixes will be matched, so "a","ar", or "arm" yield both ARM APKs
+    * Same for "x" and "x8", but "x86" is an exact match, only x86-32 conforms
+    * Short-hands "32" and "64" build ARM and x86 for the requested word size
+    * Default behavior is equivalent to "32", creation of 32-bit installers
+    Example: --targets="arm x86" builds both ARM plus 32-bit x86 packages
+
   <version-spec>
-    * Channel name, i.e. "stable". "beta", or "canary"
+    * Channel name, i.e. stable/beta/canary
     * Version number, e.g. 14.43.343.25
     * Path to release, e.g. $HOME/Downloads/crosswalk-14.43.343.25.zip
+    * Path to build, e.g. crosswalk/src/out/Release/xwalk_app_template
+    When passing a local file or directory, only the contained ABIs can be built.
+    See <target-archs> for details.
 
   Environment variables
     CROSSWALK_APP_TOOLS_CACHE_DIR=<path>: Keep downloaded files in this dir
