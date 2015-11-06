@@ -247,6 +247,32 @@ Object.defineProperty(AndroidManifest.prototype, "permissions", {
                       });
 
 /**
+ * activityClassName
+ * @member {String} activityClassName Name for main activity java class
+ * @instance
+ * @memberOf AndroidManifest
+ */
+Object.defineProperty(AndroidManifest.prototype, "activityClassName", {
+                      get: function() {
+                                var doc = this.read();
+                                var node = this.findApplicationNode(doc);
+                                if (node) {
+                                    var activityNode = this.findChildNode(node, "activity");
+                                    if (activityNode) {
+                                        var androidName = activityNode.getAttribute("android:name");
+                                        // Remove leading .
+                                        return androidName.split(".").pop();
+                                    } else {
+                                        this._output.warning("Did not find <activity> element in AndroidManifest.xml");
+                                    }
+                                } else {
+                                    this._output.warning("Did not find <application> element in AndroidManifest.xml");
+                                }
+                                return null;
+                           }
+                      });
+
+/**
  * Read AndroidManifest.xml
  * @returns {xmldom.Document} XML Document
  * @protected

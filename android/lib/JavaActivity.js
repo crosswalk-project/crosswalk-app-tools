@@ -43,10 +43,11 @@ JavaActivity.pathForPackage = JavaActivity.prototype.pathForPackage;
  * Import java activity file from crosswalk zip release.
  * @param {adm-zip.ZipEntry} zipEntry Entry holding the activity
  * @param {String} packageId Package identifier for the project
+ * @param {String} activityClassName Class ame for the Activity
  * @returns {Boolean} true on success, otherwise false.
  */
 JavaActivity.prototype.importFromZip =
-function(zipEntry, packageId) {
+function(zipEntry, packageId, activityClassName) {
 
     var output = this._output;
 
@@ -72,7 +73,7 @@ function(zipEntry, packageId) {
         output.error("Failed to find template class '" + templateClass + "' in " + zipEntry.name);
         return false;
     }
-    templateData = templateData.replace(templateClass, "MainActivity");
+    templateData = templateData.replace(templateClass, activityClassName);
 
     // Always load app from manifest instead of index.html
     templateData = templateData.replace('loadAppFromUrl("file:///android_asset/www/index.html")',

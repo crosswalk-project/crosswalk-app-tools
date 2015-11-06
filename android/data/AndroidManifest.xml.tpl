@@ -8,7 +8,7 @@
         android:hardwareAccelerated="true"
         android:label="{{ packageName }}"
         android:icon="@drawable/crosswalk">
-        <activity android:name=".MainActivity"
+        <activity android:name="{{ activityName }}"
                   android:theme="@style/AppTheme"
                   android:configChanges="orientation|keyboardHidden|keyboard|screenSize"
                   android:screenOrientation="unspecified"
