@@ -226,11 +226,11 @@ function(output, callback) {
 /**
  * Fill template files and put them into the project skeleton.
  * @param {String} apiTarget Android API target (greater android-14)
- * @param {String} platformPath Path to root dir of project
+ * @param {String} activityClassName Class ame for the Activity
  * @returns {Boolean} True on success.
  */
 AndroidPlatform.prototype.fillTemplates =
-function(apiTarget, platformPath) {
+function(apiTarget, activityClassName) {
 
     // Namespace util
     var util = this.application.util;
@@ -240,24 +240,25 @@ function(apiTarget, platformPath) {
     var data = {
         "packageId" : this.packageId,
         "packageName" : this.packageId,
+        "activityName": this.packageId + "." + activityClassName,
         "apiTarget" : apiTarget,
         "xwalkLibrary" : this._shared ? "xwalk_shared_library" : "xwalk_core_library"
     };
 
     // AndroidManifest.xml
     var tpl = new util.TemplateFile(Path.join(__dirname, "..", "data", "AndroidManifest.xml.tpl"));
-    tpl.render(data, platformPath + Path.sep + "AndroidManifest.xml");
+    tpl.render(data, this.platformPath + Path.sep + "AndroidManifest.xml");
 
     // build.xml
     tpl = new util.TemplateFile(Path.join(__dirname, "..", "data", "build.xml.tpl"));
-    tpl.render(data, platformPath + Path.sep + "build.xml");
+    tpl.render(data, this.platformPath + Path.sep + "build.xml");
 
     // project.properties
     tpl = new util.TemplateFile(Path.join(__dirname, "..", "data", "project.properties.tpl"));
-    tpl.render(data, platformPath + Path.sep + "project.properties");
+    tpl.render(data, this.platformPath + Path.sep + "project.properties");
 
     // Make html5 app dir and copy sample content
-    var wwwPath = Path.join(platformPath, "assets", "www");
+    var wwwPath = Path.join(this.platformPath, "assets", "www");
     ShellJS.mkdir("-p", wwwPath);
     ShellJS.cp("-rf", this.appPath + Path.sep + "*", wwwPath);
 
@@ -268,10 +269,11 @@ function(apiTarget, platformPath) {
 /**
  * Import Crosswalk libraries and auxiliary files into the project.
  * @param {String} crosswalkPath Location of Crosswalk zip or xwalk_app_template build dir
+ * @param {String} activityClassName Class ame for the Activity
  * @returns {String} Imported version on success, otherwise null.
  */
 AndroidPlatform.prototype.importCrosswalkFromDisk =
-function(crosswalkPath) {
+function(crosswalkPath, activityClassName) {
 
     // Namespace util
     var util = this.application.util;
@@ -379,8 +381,8 @@ function(crosswalkPath) {
         }
 
         var activity = new JavaActivity(output,
-                                        Path.join(activityDirPath, "MainActivity.java"));
-        if (!activity.importFromZip(entry, this.packageId))
+                                        Path.join(activityDirPath, activityClassName + ".java"));
+        if (!activity.importFromZip(entry, this.packageId, activityClassName))
             return null;
 
     } else {
@@ -477,7 +479,14 @@ function(packageId, args, callback) {
                 output.info("Defaulting to download channel " + versionSpec);
             }
 
-            if (!this.fillTemplates(apiTarget, path)) {
+            // Activity class name is the last part of the package-id
+            // starting in caps, plus "Activity".
+            // E.g. Package com.example.foo will get activity FooActivity.
+            var activityClassName = this.application.manifest.packageId.split(".").pop();
+            activityClassName = activityClassName[0].toUpperCase() + activityClassName.substring(1);
+            activityClassName += "Activity";
+
+            if (!this.fillTemplates(apiTarget, activityClassName)) {
                 callback("Failed to initialise project templates");
                 return;
             }
@@ -494,7 +503,7 @@ function(packageId, args, callback) {
             }
             deps.importCrosswalk(versionSpec,
                                  function(path) {
-                                     return this.importCrosswalkFromDisk(path);
+                                     return this.importCrosswalkFromDisk(path, activityClassName);
                                  }.bind(this),
                                  function(version, errormsg) {
 
@@ -954,6 +963,7 @@ function() {
 /**
  * Update android manifest.
  * @param {Function} callback Error callback
+ * @returns {AndroidManifest}
  */
 AndroidPlatform.prototype.updateManifest =
 function(callback) {
@@ -967,7 +977,7 @@ function(callback) {
     if (manifest.package !== this.application.manifest.packageId) {
         callback("Renaming of package not supported (" +
                  manifest.package + "/" + this.application.manifest.packageId + ")");
-        return;
+        return null;
     }
 
     manifest.versionName = this.application.manifest.appVersion;
@@ -1008,15 +1018,18 @@ function(callback) {
 
     // Update permissions
     manifest.permissions = this.application.manifest.androidPermissions;
+
+    return manifest;
 };
 
 /**
  * Update java activity file for build config.
  * @param {Boolean} release True if release build, false if debug
+ * @param {String} activityClassName Class ame for the Activity
  * @returns {Boolean} True if successful, otherwise false.
  */
 AndroidPlatform.prototype.updateJavaActivity =
-function(release) {
+function(release, activityClassName) {
 
     var output = this.application.output;
     var ret = true;
@@ -1026,7 +1039,7 @@ function(release) {
     output.info("Updating java activity for '" + config + "' configuration");
 
     var dir = JavaActivity.pathForPackage(this.platformPath, this.packageId);
-    var path = Path.join(dir, "MainActivity.java");
+    var path = Path.join(dir, activityClassName + ".java");
     var activity = new JavaActivity(output, path);
 
     // Enable remote debugging for debug builds.
@@ -1352,8 +1365,12 @@ function(configId, args, callback) {
 
     this.updateEngine();
     this.importExtensions();
-    this.updateManifest(callback);
-    this.updateJavaActivity(configId === "release");
+    var manifest = this.updateManifest(callback);
+    if (!manifest) {
+        // Callback already called from updateManifest
+        return;
+    }
+    this.updateJavaActivity(configId === "release", manifest.activityClassName);
     this.updateWebApp(this.application.manifest.androidWebp);
 
     var closure = {
