@@ -353,6 +353,13 @@ function clean(app, extraArgs, callback) {
 // Arguments
 var extraArgs = {};
 
+if (argv.a) {
+    extraArgs.android = argv.a;
+}
+if (argv.android) {
+    extraArgs.android = argv.android;
+}
+
 // Crosswalk, see help for <version-spec>
 if (argv.c) {
     // TODO implement way to pass through parameters w/o platform prefix
@@ -383,9 +390,6 @@ if (argv.p) {
 if (argv.platforms) {
     extraArgs.platforms = [ argv.platforms ];
 }
-
-// Extra android config
-extraArgs.android = argv.android;
 
 var buildConfig = null;
 if (argv.r || argv.release) {
