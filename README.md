@@ -9,8 +9,9 @@ Crosswalk-app-tools is our forthcoming packaging tool for creating Crosswalk app
 The tools are cross-platform by virtue of being based on Node.js. We are supporting Microsoft Windows, Apple OS X and Linux as host operating systems.
 
 The following components are required
-  1. Node.js and NPM
-  2. Android SDK with 5.0 (target-21) or later installed, plus Java JDK and Apache Ant for creating Android APK packages
+  * Node.js and NPM
+  * Android development (APK packages): Android SDK with 5.0 (target-21) or later installed, plus Java JDK and Apache Ant. Supported host systems are Apple OS X, Linux, and Windows.
+  * Windows development (MSI packages): [WiX Toolset](http://wixtoolset.org). MSI installers can only be created on Windows systems.
 
 In order to get the tools available from the command-line easily, global npm installation is recommended.
 
@@ -21,13 +22,18 @@ Apple OS X and Linux: `sudo npm install -g crosswalk-app-tools`
 The best way to check if a machine has all the required dependencies is to create and build a plain empty Android app 
 on the system. If this does not work, then building Crosswalk apps will not succeed either. App-tools provides a command for doing this:
 
+Check Android target setup:
 ```
 crosswalk-app check android
+```
+Check Windows target setup:
+```
+crosswalk-app check windows
 ```
 
 Two executables are provided, `crosswalk-app` implements low level helper commands, `crosswalk-pkg` is the main tool for creating packages.
 
-### Usage
+### Usage (crosswalk-pkg --help)
 
 ```
   Crosswalk Project Packaging Tool -- https://crosswalk-project.org
@@ -98,9 +104,13 @@ Then add an index.html in the same directory:
 </html>
 ```
 
-Finally, time to create the apk package:
+Finally, time to create the APK package:
 ```
 crosswalk-pkg <path>
+```
+Creation of an MSI package on Windows:
+```
+crosswalk-pkg -p windows <path>
 ```
 This sets up a skeleton project, downloads and imports Crosswalk, and creates a package using the files above.
 
@@ -111,7 +121,7 @@ This sets up a skeleton project, downloads and imports Crosswalk, and creates a 
 
 ### Additional target platforms
 There is forthcoming support for additional target platforms. For iOS packaging, see 
-https://github.com/crosswalk-project/crosswalk-app-tools-ios, Windows support is planned for the 0.8 release.
+https://github.com/crosswalk-project/crosswalk-app-tools-ios.
 
 ### Run development versions from git
 
