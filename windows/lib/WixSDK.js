@@ -5,6 +5,7 @@ var path = require('path');
 var child_process = require('child_process');
 
 var builder = require('xmlbuilder');
+var crypto = require('crypto');
 var uuid = require('node-uuid');
 var readDir = require('readdir');
 var ShellJS = require("shelljs");
@@ -148,9 +149,18 @@ function(app_path, xwalk_path, meta_data, callback) {
     var file_ids = [];
 
     function MakeIdFromPath(path) {
-        // Only ASCII, digits, '.', '_' are allowed.
-        return path.replace(new RegExp('[^A-Za-z0-9_.]', 'g'), '_');
+        var shasum = crypto.createHash('sha1');
+        existing_ids = {}
+
+        var id = '_' + shasum.update(path).digest('hex');
+        while (existing_ids.hasOwnProperty(id) && existing_ids[id] != path)
+            id = '_' + shasum.update(id).digest('hex');
+
+        existing_ids[id] = path;
+
+        return id;
     }
+
     // To be used for cmd line arguments.
     function InQuotes(arg) {
         return "\"" + arg + "\"";
@@ -167,9 +177,11 @@ function(app_path, xwalk_path, meta_data, callback) {
             component.att('Win64', 'yes');
             file.att('ProcessorArchitecture', 'x64');
         }
+
+        return file_id;
     }
 
-    AddFileComponent(app_root_folder, xwalk_path, 'xwalk.exe');
+    var xwalk_id = AddFileComponent(app_root_folder, xwalk_path, 'xwalk.exe');
     AddFileComponent(app_root_folder, xwalk_path, 'xwalk.pak');
     AddFileComponent(app_root_folder, xwalk_path, 'icudtl.dat');
     AddFileComponent(app_root_folder, xwalk_path, 'natives_blob.bin');
@@ -230,7 +242,7 @@ function(app_path, xwalk_path, meta_data, callback) {
         Id: 'ApplicationStartMenuShortcut',
         Name: meta_data.app_name,
        // Description: 'blah blah',
-        Target: '[#xwalk.exe]',
+        Target: '[#' + xwalk_id + ']',
         Arguments: cmd_line_args,
         WorkingDirectory: 'ApplicationRootFolder'
     });
