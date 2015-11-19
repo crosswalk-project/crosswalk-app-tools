@@ -27,9 +27,10 @@ function createTheme() {
 '\n' +
 '<resources>\n' +
 '    <!-- Application theme. -->\n' +
+'    <color name="white">#FFFFFFFF</color>\n' +
 '    <style name="AppTheme" parent="@android:style/Theme.Holo.Light.NoActionBar">\n' +
 '        <item name="android:windowFullscreen">false</item>\n' +
-'        <item name="android:windowBackground">@null</item>\n' +
+'        <item name="android:windowBackground">@color/white</item>\n' +
 '    </style>\n' +
 '</resources>\n';
 
@@ -39,6 +40,24 @@ function createTheme() {
 }
 
 exports.tests = {
+
+    background: function(test) {
+
+        test.expect(2);
+
+        var path = createTheme();
+        var theme = new XmlTheme(_output, path);
+        test.equal(theme.background, "@color/white");
+
+        // change and read back
+        theme.background = "@null";
+        theme = new XmlTheme(_output, path);
+        test.equal(theme.background, "@null");
+
+        ShellJS.rm("-f", path);
+
+        test.done();
+    },
 
     fullscreen: function(test) {
 

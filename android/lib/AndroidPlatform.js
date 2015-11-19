@@ -1062,6 +1062,12 @@ function(release, activityClassName) {
                              Path.join(this.platformPath, "res", "values-v14", "theme.xml"));
     theme.fullscreen = fullscreen;
 
+    // White is default, set colour if not white.
+    var bgColor = this.application.manifest.backgroundColor;
+    if (bgColor != "#ffffff") {
+        theme.setStartupBackgroundColor(bgColor);
+    }
+
     // "Keep screen on"
     ret = activity.enableKeepScreenOn(this.application.manifest.androidKeepScreenOn);
     if (!ret)

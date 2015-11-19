@@ -6,6 +6,7 @@ var FS = require("fs");
 var Path = require("path");
 
 var FormatJson = require("format-json");
+var ParseColor = require('parse-color');
 var ShellJS = require("shelljs");
 
 var CommandParser = require("./CommandParser");
@@ -56,6 +57,17 @@ function Manifest(output, path) {
     if (!this._appVersion) {
         output.error("Invalid app version '" + json.xwalk_app_version + "' in the manifest");
         throw new Error("Invalid app version '" + json.xwalk_app_version + "' in the manifest");
+    }
+
+    // Splash background colour
+    this._backgroundColor = "#ffffff";
+    if (json.background_color) {
+        var color = ParseColor(json.background_color);
+        if (color && color.hex) {
+            this._backgroundColor = color.hex;
+        } else {
+            output.warning("Failed to parse background_color " + json.background_color);
+        }
     }
 
     // Name
@@ -296,6 +308,7 @@ function(packageId) {
         // Standard fields
         "name": packageId,
         "short_name": packageId.split(".").pop(),
+        "background_color": "#ffffff",
         "display": "standalone",
         "orientation": "any",
         "start_url": "index.html",
@@ -459,6 +472,19 @@ Object.defineProperty(Manifest.prototype, "shortName", {
                                     this._output.error(errormsg);
                                     throw new IllegalAccessException(errormsg);
                                 }
+                           }
+                      });
+
+/**
+ * Background color at launch time
+ * @member {String} backgroundColor
+ * @instance
+ * @memberOf Manifest
+ * @see http://www.w3.org/TR/appmanifest/#background_color-member
+ */
+Object.defineProperty(Manifest.prototype, "backgroundColor", {
+                      get: function() {
+                                return this._backgroundColor;
                            }
                       });
 

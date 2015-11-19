@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE-APACHE-V2 file.
 
 var FS = require("fs");
+var Path = require("path");
 
 var xmldom = require("xmldom");
 
@@ -16,17 +17,40 @@ function XmlTheme(output, path) {
 
     this._output = output;
     this._path = path;
-
-    var doc = this.read();
-
-    this._fullscreen = false;
-    var node = this.findItem(doc, "android:windowFullscreen");
-    if (node) {
-        this._fullscreen = node.textContent === "true";
-    } else {
-        this._output.error("Failed to find 'fullscreen' setting in " + this._path);
-    }
 }
+
+/**
+ * Window background
+ * @member {String} background Drawable name
+ * @instance
+ * @memberOf XmlTheme
+ */
+Object.defineProperty(XmlTheme.prototype, "background", {
+                      get: function() {
+                                var doc = this.read();
+                                var node = this.findItem(doc, "android:windowBackground");
+                                var background = "";
+                                if (node) {
+                                    background = node.textContent;
+                                } else {
+                                    this._output.error("Failed to find 'android:windowBackground' setting in " + this._path);
+                                }
+                                return background;
+                           },
+                      set: function(background) {
+                                if (typeof background != "string") {
+                                    this._output.error("Background must be string value for " + this._path);
+                                }
+                                var doc = this.read();
+                                var node = this.findItem(doc, "android:windowBackground");
+                                if (node) {
+                                    node.textContent = background;
+                                    this.write(doc);
+                                } else {
+                                    this._output.error("Failed to find 'android:windowBackground' setting in " + this._path);
+                                }
+                           }
+                      });
 
 /**
  * Fullscreen mode
@@ -36,15 +60,22 @@ function XmlTheme(output, path) {
  */
 Object.defineProperty(XmlTheme.prototype, "fullscreen", {
                       get: function() {
-                                return this._fullscreen;
+                                var doc = this.read();
+                                var node = this.findItem(doc, "android:windowFullscreen");
+                                var fullscreen = false;
+                                if (node) {
+                                    fullscreen = node.textContent === "true";
+                                } else {
+                                    this._output.error("Failed to find 'fullscreen' setting in " + this._path);
+                                }
+                                return fullscreen;
                            },
                       set: function(fullscreen) {
-                                this._fullscreen = typeof fullscreen === "boolean" && fullscreen;
-
+                                fullscreen = typeof fullscreen === "boolean" && fullscreen;
                                 var doc = this.read();
                                 var node = this.findItem(doc, "android:windowFullscreen");
                                 if (node) {
-                                    node.textContent = this._fullscreen ? "true" : "false";
+                                    node.textContent = fullscreen ? "true" : "false";
                                     this.write(doc);
                                 } else {
                                     this._output.error("Failed to find 'fullscreen' setting in " + this._path);
@@ -53,39 +84,75 @@ Object.defineProperty(XmlTheme.prototype, "fullscreen", {
                       });
 
 /**
+ * Set background colour while starting the app.
+ * @param {String} colour Color in #rrggbb format
+ * @returns {Boolean} true on success or false.
+ */
+XmlTheme.prototype.setStartupBackgroundColor =
+function(color) {
+
+    // Set colour in launchscreen fragment
+    var bgPath = Path.dirname(this._path);
+    bgPath = Path.resolve(bgPath, Path.join("..", "drawable", "launchscreen_bg.xml"));
+
+    var doc = this.read(bgPath);
+    var solids = doc.getElementsByTagName("solid");
+    if (!solids || solids.length === 0) {
+        this._output.error("Background not found in " + bgPath);
+        return false;
+    }
+
+    var node = solids[0];
+    node.setAttribute("android:color", color);
+    this.write(doc, bgPath);
+
+    // Use launchscreen fragment#
+    this.background = "@drawable/launchscreen_bg";
+
+    // TODO better error handling
+    return true;
+};
+
+/**
  * Read theme.xml
+ * @param {String} [path] Path to XML file
  * @returns {xmldom.Document} XML Document
  * @private
  * @see {@link https://github.com/jindw/xmldom}
  */
 XmlTheme.prototype.read =
-function() {
+function(path) {
 
     // TODO Error handling
 
+    path = path ? path : this._path;
+
     var parser = new xmldom.DOMParser();
-    var buf = FS.readFileSync(this._path, {"encoding": "utf8"});
+    var buf = FS.readFileSync(path, {"encoding": "utf8"});
     return parser.parseFromString(buf);
 };
 
 /**
  * Write theme.xml
  * @param {xmldom.Document} doc XML Document
+ * @param {String} [path] Path to XML file
  * @private
  * @see {@link https://github.com/jindw/xmldom}
  */
 XmlTheme.prototype.write =
-function(doc) {
+function(doc, path) {
 
     // TODO Error handling
 
+    path = path ? path : this._path;
+
     var serializer = new xmldom.XMLSerializer();
     var buf = serializer.serializeToString(doc);
-    FS.writeFileSync(this._path, buf);
+    FS.writeFileSync(path, buf);
 };
 
 /**
- * Find fullscreen node
+ * Find first node by name
  * @param {xmldom.Document} document
  * @returns {xmldom.Node} Node if found or null
  * @private
