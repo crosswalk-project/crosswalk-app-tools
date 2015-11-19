@@ -159,6 +159,33 @@ exports.tests = {
         test.done();
     },
 
+    backgroundColor: function(test) {
+
+        test.expect(8);
+
+        // Default to "standalone"
+        var path = produceManifest();
+        var manifest = consumeManifest(path);
+        test.equal(manifest.backgroundColor, "#ffffff");
+
+        // Test reading various values
+        var values =  ["#9", "#99", "#999", "#9999", "#99999", "#999999"];
+        values.forEach(function (value) {
+            path = produceManifest({"background_color": value});
+            manifest = consumeManifest(path);
+            // When value is different from default, we assume it has been
+            // parsed correctly.
+            test.equal(manifest.backgroundColor != "#ffffff", true);
+        });
+
+        // Test reading bogus value "foo", default to "standalone"
+        path = produceManifest({"background_color": "foo"});
+        manifest = consumeManifest(path);
+        test.equal(manifest.backgroundColor, "#ffffff");
+
+        test.done();
+    },
+
     display: function(test) {
 
         test.expect(6);
