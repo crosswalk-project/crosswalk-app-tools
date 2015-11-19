@@ -88,8 +88,8 @@ Object.defineProperty(XmlTheme.prototype, "fullscreen", {
  * @param {String} colour Color in #rrggbb format
  * @returns {Boolean} true on success or false.
  */
-XmlTheme.prototype.setStartupBackgroundColor =
-function(color) {
+XmlTheme.prototype.setSplash =
+function(color, icon, text) {
 
     // Set colour in launchscreen fragment
     var bgPath = Path.dirname(this._path);
@@ -104,10 +104,20 @@ function(color) {
 
     var node = solids[0];
     node.setAttribute("android:color", color);
-    this.write(doc, bgPath);
 
-    // Use launchscreen fragment#
+    // Set icon
+    var item = doc.createElement("item");
+    doc.documentElement.appendChild(item);
+
+    var bitmap = doc.createElement("bitmap");
+    bitmap.setAttribute("android:src", icon);
+    bitmap.setAttribute("android:gravity", "center");
+    item.appendChild(bitmap);
+
+    // Use launchscreen fragment
     this.background = "@drawable/launchscreen_bg";
+
+    this.write(doc, bgPath);
 
     // TODO better error handling
     return true;
