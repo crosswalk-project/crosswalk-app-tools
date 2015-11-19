@@ -1057,16 +1057,6 @@ function(release, activityClassName) {
     ret = activity.enableFullscreen(fullscreen);
     if (!ret)
         return false;
-    output.info("Updating theme.xml for display mode (fullscreen: " + (fullscreen ? "yes" : "no") + ")");
-    var theme = new XmlTheme(output,
-                             Path.join(this.platformPath, "res", "values-v14", "theme.xml"));
-    theme.fullscreen = fullscreen;
-
-    // White is default, set colour if not white.
-    var bgColor = this.application.manifest.backgroundColor;
-    if (bgColor != "#ffffff") {
-        theme.setStartupBackgroundColor(bgColor);
-    }
 
     // "Keep screen on"
     ret = activity.enableKeepScreenOn(this.application.manifest.androidKeepScreenOn);
@@ -1314,6 +1304,28 @@ function() {
 };
 
 /**
+ * Update app theme.
+ * @param {AndroidManifest} androidManifest
+ * @returns {Boolean} true on success.
+ */
+AndroidPlatform.prototype.updateXmlTheme =
+function(androidManifest) {
+
+    var output = this.application.output;
+
+    var fullscreen = this.application.manifest.display === "fullscreen";
+    output.info("Updating theme.xml for display mode (fullscreen: " + (fullscreen ? "yes" : "no") + ")");
+
+    var theme = new XmlTheme(output,
+                             Path.join(this.platformPath, "res", "values-v14", "theme.xml"));
+    theme.fullscreen = fullscreen;
+
+    // White is default, set colour if not white.
+    var bgColor = this.application.manifest.backgroundColor;
+    return theme.setSplash(bgColor, androidManifest.applicationIcon);
+};
+
+/**
  * Implements {@link PlatformBase.build}
  */
 AndroidPlatform.prototype.build =
@@ -1371,13 +1383,14 @@ function(configId, args, callback) {
 
     this.updateEngine();
     this.importExtensions();
-    var manifest = this.updateManifest(callback);
-    if (!manifest) {
+    var androidManifest = this.updateManifest(callback);
+    if (!androidManifest) {
         // Callback already called from updateManifest
         return;
     }
-    this.updateJavaActivity(configId === "release", manifest.activityClassName);
+    this.updateJavaActivity(configId === "release", androidManifest.activityClassName);
     this.updateWebApp(this.application.manifest.androidWebp);
+    this.updateXmlTheme(androidManifest);
 
     var closure = {
         abis: abis,
