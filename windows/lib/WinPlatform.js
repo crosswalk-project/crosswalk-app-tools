@@ -217,7 +217,7 @@ function(configId, args, callback) {
     var nComponents = manifest.appVersion.split(".").length;
     var versionPadding = new Array(4 - nComponents + 1).join(".0");
 
-    var sdk = new WixSDK(this.output);
+    var sdk = new WixSDK(manifest, this.output);
     var indicator = output.createInfiniteProgress("Building package");
     sdk.onData = function(data) {
         this.logOutput.write(data);

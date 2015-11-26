@@ -10,8 +10,15 @@ var uuid = require('node-uuid');
 var readDir = require('readdir');
 var ShellJS = require("shelljs");
 
-function WixSDK(output) {
+/**
+ * Creates WixSDK object.
+ * @param {Manifest} manifest Web manifest
+ * @param {OutputIface} output Output
+ * @constructor
+ */
+function WixSDK(manifest, output) {
 
+    this._manifest = manifest;
     this._output = output;
 }
 
@@ -236,6 +243,16 @@ function(app_path, xwalk_path, meta_data, callback) {
     var program_menu_folder_ref = product.ele('DirectoryRef', { Id: 'ApplicationProgramsFolder' });
     var component = program_menu_folder_ref.ele('Component', { Id: 'ApplicationShortcut', Guid: uuid.v1() });
     var cmd_line_args = InQuotes(path.join(meta_data.app_name, 'manifest.json'));
+    if (this._manifest.commandLine) {
+        var manifest_args = this._manifest.commandLine.split(" ").reduce(function (acc, val) {
+            // Multiple adjacent whitespaces split to empty elements.
+            if (val)
+                return acc + ' "' + val + '"';
+            else
+                return acc;
+        }, "");
+        cmd_line_args += manifest_args;
+    }
     if (HasExtensions())
         cmd_line_args += ' --external-extensions-path=extensions';
     var shortcut = component.ele('Shortcut', {
