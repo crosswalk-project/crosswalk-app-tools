@@ -338,7 +338,6 @@ function(crosswalkPath, activityClassName) {
     entry = xwalk.getEntry(name);
     if (entry) {
         path = Path.join(this.platformPath, xwalkLibrary);
-        ShellJS.mkdir(path);
         xwalk.extractEntryTo(entry, path);
     } else {
         output.error("Failed to find entry " + name);

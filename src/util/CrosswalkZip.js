@@ -73,6 +73,13 @@ function(path) {
 CrosswalkZip.prototype.extractEntryTo =
 function(entry, path) {
 
+    // If dir and path does not exist, create it,
+    // because adm-zip doesn't.
+    if (path[path.length - 1] === "/" &&
+        !ShellJS.test("-d", path)) {
+        ShellJS.mkdir(path);
+    }
+
     return this._adm.extractEntryTo(entry, path, false, true);
 };
 

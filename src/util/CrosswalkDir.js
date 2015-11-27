@@ -121,7 +121,12 @@ function(path) {
 CrosswalkDir.prototype.extractEntryTo =
 function(entry, path) {
 
-    ShellJS.cp("-rf", entry.path, path);
+    var entryPath = entry.path;
+    if (ShellJS.test("-d", entry.path)) {
+        entryPath = Path.join(entry.path, "*");
+    }
+
+    ShellJS.cp("-rf", entryPath, path);
     return true;
 };
 
