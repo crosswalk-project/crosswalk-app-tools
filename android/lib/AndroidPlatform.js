@@ -1253,28 +1253,32 @@ function() {
             return;
         }
 
-        var jsPath = Path.join(extPath, extName + ".js");
-        if (!ShellJS.test("-f", jsPath)) {
-            output.warning("Skipping extension, file not found " + jsPath);
-            return;
-        }
-
         var jsonPath = Path.join(extPath, extName + ".json");
         if (!ShellJS.test("-f", jsonPath)) {
             output.warning("Skipping extension, file not found " + jsonPath);
             return;
         }
 
-        // Copy
-        ShellJS.cp("-f", jarPath, Path.join(this.platformPath, "libs"));
-        var jsDstPath = Path.join(this.platformPath, "assets", "xwalk-extensions");
-        ShellJS.mkdir(jsDstPath);
-        ShellJS.cp("-f", jsPath, jsDstPath);
-
-        // Accumulate config
         var jsonBuf = FS.readFileSync(jsonPath, {"encoding": "utf8"});
         var configJson = JSON.parse(jsonBuf);
-        configJson.jsapi = [ "xwalk-extensions", configJson.jsapi ].join("/");
+        // jsapi is optional
+        if (configJson.jsapi) {
+            // Copy js
+            var jsPath = Path.join(extPath, extName + ".js");
+            if (!ShellJS.test("-f", jsPath)) {
+                output.warning("Skipping extension, file not found " + jsPath);
+                return;
+            }
+            var jsDstPath = Path.join(this.platformPath, "assets", "xwalk-extensions");
+            ShellJS.mkdir(jsDstPath);
+            ShellJS.cp("-f", jsPath, jsDstPath);
+            configJson.jsapi = [ "xwalk-extensions", configJson.jsapi ].join("/");
+        }
+
+        // Copy jar
+        ShellJS.cp("-f", jarPath, Path.join(this.platformPath, "libs"));
+
+        // Accumulate config
         extensionsConfig.push(configJson);
 
         // Accumulate permissions
