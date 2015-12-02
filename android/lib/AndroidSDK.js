@@ -205,7 +205,7 @@ function(release, callback) {
     }
 
     var exitStatus = { "code" : 0 };
-    ant += release ? " release" : " debug";
+    ant = "ant " + (release ? "release" : "debug");
     var child = ChildProcess.exec(ant);
 
     child.stdout.on("data", function(data) {
