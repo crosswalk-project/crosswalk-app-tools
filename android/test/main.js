@@ -22,7 +22,7 @@ exports.tests = {
 
         var app = require("../../src/Main");
         Application.call(app, tmpdir, _packageId);
-        app.create(_packageId, {}, function(errno) {
+        app.create(_packageId, { 'android-crosswalk': 'canary' }, function(errno) {
 
             test.equal(errno, 0);
 
@@ -43,7 +43,7 @@ exports.tests = {
 
         var app = require("../../src/Main");
         Application.call(app, tmpdir, _packageId);
-        app.create(_packageId, {}, function(errno) {
+        app.create(_packageId, { 'android-crosswalk': 'canary' }, function(errno) {
 
             if (!errno) {
 
