@@ -4,8 +4,8 @@
   "description": "An APK packager for the Crosswalk Project -- http://crosswalk-project.org",
   "author": "Robert Staudinger <robert.staudinger@intel.com>",
   "license": "Apache-2.0",
-  "engines" : {
-    "node" : ">=0.12"
+  "engines": {
+    "node": ">=0.12"
   },
   "bin": {
     "crosswalk-app": "./src/crosswalk-app",
@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "grunt": "~0.4.5",
+    "grunt-cli": "^0.1.13",
     "grunt-contrib-jshint": "~0.10.0",
     "grunt-contrib-nodeunit": "~0.4.1",
     "grunt-jsdoc": "~0.6.7",
