@@ -58,18 +58,19 @@ function workingDirectoryIsProject() {
 
 /**
  * Instantiate platform backend
+ * @param {String} platformId Unique platform name
  * @returns {PlatformBase} Platform implementation instance or null on error.
  * @private
  * @static
  */
 Main.prototype.instantiatePlatform =
-function() {
+function(platformId) {
 
     var output = this.output;
     var errorDetail = null;
 
     var mgr = new PlatformsManager(output);
-    var platformInfo = mgr.load(this.manifest.targetPlatforms,
+    var platformInfo = mgr.load(platformId,
                                 function(errormsg) {
                                     errorDetail = errormsg;
                                 });
@@ -182,28 +183,26 @@ function(path, extraArgs, output, callback) {
         packageId = "com.example.foo";
     }
 
+    // Can only have one, platform (crosswalk-app) or platforms (crosswalk-pkg)
+    if (extraArgs.platform && extraArgs.platforms) {
+        throw new Error("Passing both 'platform' and 'platforms' not supported");
+    }
+
     Manifest.addDefaults(output, path, packageId);
-    var manifest = new Manifest(output, path);
-    if (extraArgs.platforms) {
-        // FIXME, only single-platform at the moment
-        var platform = null;
-        if (extraArgs.platforms instanceof Array &&
-            extraArgs.platforms.length > 0) {
-            platform = extraArgs.platforms[0];
-        } else if (typeof extraArgs.platforms === "string") {
-            platform = extraArgs.platforms;
-        }
-        // Check
-        if (platform) {
-            try {
-                manifest.targetPlatforms = platform;
-            } catch (e) {
-                output.error("Invalid target platform '" + platform + "'");
-                callback(Main.EXIT_CODE_ERROR);
-                return;
-            }
+
+    if (extraArgs.platform || (extraArgs.platforms && extraArgs.platforms.length > 0)) {
+        var manifest = new Manifest(output, path);
+        try {
+            manifest.targetPlatforms = extraArgs.platform ?
+                                            [ extraArgs.platform ] :
+                                            extraArgs.platforms;
+        } catch (e) {
+            output.error("Failed to set target platforms");
+            callback(Main.EXIT_CODE_ERROR);
+            return;
         }
     }
+
     output.info("Initialized", path);
     callback(Main.EXIT_CODE_OK);
 };
@@ -242,23 +241,23 @@ function(packageId, extraArgs, callback) {
 
     var output = this.output;
 
-    // Handle "platform" arg to set default platform
-    // for new project.
-    var platform = null;
-    if (typeof extraArgs.platforms === "string") {
-        platform = extraArgs.platforms;
-    } else if (extraArgs.platforms instanceof Array &&
-               extraArgs.platforms.length > 0) {
-        platform = extraArgs.platforms[0];
+    // Can only have one, platform (crosswalk-app) or platforms (crosswalk-pkg)
+    if (extraArgs.platform && extraArgs.platforms) {
+        throw new Error("Passing both 'platform' and 'platforms' not supported");
     }
-    if (platform) {
+
+    if (extraArgs.platform || (extraArgs.platforms && extraArgs.platforms.length > 0)) {
         try {
-            this.manifest.targetPlatforms = platform;
+            this.manifest.targetPlatforms = extraArgs.platform ?
+                                                [ extraArgs.platform ] :
+                                                extraArgs.platforms;
         } catch (e) {
-            output.error("Invalid target platform '" + platform + "'");
+            output.error("Failed to set target platforms");
             callback(Main.EXIT_CODE_ERROR);
             return;
         }
+    } else {
+        extraArgs.platform = "android";
     }
 
     // Copy sample web app content
@@ -271,7 +270,7 @@ function(packageId, extraArgs, callback) {
     output.info("Copying app template from", templatePath);
     ShellJS.cp("-r", Path.join(templatePath, "*"), this.appPath);
 
-    var project = this.instantiatePlatform();
+    var project = this.instantiatePlatform(extraArgs.platform ? extraArgs.platform : extraArgs.platforms[0]);
     if (!project) {
         callback(Main.EXIT_CODE_ERROR);
         return;
@@ -311,16 +310,14 @@ function(configId, extraArgs, callback) {
 
     var output = this.output;
 
-    // Check we're inside a project
-    /* TODO move this inside the AndroidProject
-    if (!workingDirectoryIsProject()) {
-        output.error("This does not appear to be a Crosswalk project.");
-        callback(false);
-        return;
+    var platformId = "android";
+    if (extraArgs.platform) {
+        platformId = extraArgs.platform;
+    } else if (this.manifest && this.manifest.targetPlatforms.length > 0) {
+        platformId = this.manifest.targetPlatforms[0];
     }
-    */
 
-    var project = this.instantiatePlatform();
+    var project = this.instantiatePlatform(platformId);
     if (!project) {
         callback(Main.EXIT_CODE_ERROR);
         return;
