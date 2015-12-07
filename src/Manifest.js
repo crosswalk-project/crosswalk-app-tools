@@ -175,14 +175,14 @@ function Manifest(output, path) {
 
     // Target platforms
     if (json.xwalk_target_platforms &&
-        typeof json.xwalk_target_platforms === "string") {
+        json.xwalk_target_platforms instanceof Array) {
         this._targetPlatforms = json.xwalk_target_platforms;
     }
 
     if (!this._targetPlatforms) {
         output.error("Missing or invalid target platforms in the manifest");
         output.error("Try adding");
-        output.error('    "xwalk_target_platforms": "android"');
+        output.error('    "xwalk_target_platforms": [ "android" ]');
         output.error("or similar for platform of choice.");
     }
 
@@ -316,7 +316,7 @@ function(packageId) {
         "xwalk_app_version": "0.1",
         "xwalk_command_line": "",
         "xwalk_package_id": packageId,
-        "xwalk_target_platforms": platformInfo.platformId,
+        "xwalk_target_platforms": [ platformInfo.platformId ],
         // Android fields
         "xwalk_android_animatable_view": false,
         "xwalk_android_keep_screen_on": false,
@@ -626,7 +626,7 @@ Object.defineProperty(Manifest.prototype, "extensions", {
 
 /**
  * Build target platforms for the apps
- * @member {String} targetPlatforms
+ * @member {String[]} targetPlatforms
  * @throws {IllegalAccessException} If unknown target platforms are set.
  * @instance
  * @memberOf Manifest
@@ -638,13 +638,13 @@ Object.defineProperty(Manifest.prototype, "targetPlatforms", {
                       set: function(targetPlatforms) {
                                 var PlatformsManager = require("./PlatformsManager");
                                 var mgr = new PlatformsManager(this._output);
-                                if (typeof targetPlatforms === "string" &&
-                                    mgr.load(targetPlatforms)) {
+                                var ret = targetPlatforms.every(function (platform) {
+                                    return mgr.load(platform);
+                                });
+                                if (ret) {
                                     this._targetPlatforms = targetPlatforms;
                                     this.update({"xwalk_target_platforms": this._targetPlatforms});
                                 } else {
-                                    var errormsg = "Target platform '" + targetPlatforms + "' not available";
-                                    this._output.error(errormsg);
                                     throw new IllegalAccessException(errormsg);
                                 }
                            }

@@ -317,7 +317,7 @@ function copy(app, appPath, extraArgs, callback) {
 
     // Propagate target platform cause we just nuked the manifest
     if (extraArgs.platforms.length > 0) {
-        app.manifest.targetPlatforms = extraArgs.platforms[0];
+        app.manifest.targetPlatforms = extraArgs.platforms;
     }
 
     callback(cat.EXIT_CODE_OK);

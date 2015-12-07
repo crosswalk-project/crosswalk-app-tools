@@ -329,18 +329,18 @@ exports.tests = {
 
         test.expect(2);
 
-        var path = produceManifest({"xwalk_target_platforms": "android"});
+        var path = produceManifest({"xwalk_target_platforms": [ "android" ] });
 
         // read
         var manifest = new Manifest(_output, path);
-        test.equal(manifest.targetPlatforms, "android");
+        test.equal(manifest.targetPlatforms[0], "android");
 
         // write
-        manifest.targetPlatforms = "windows";
+        manifest.targetPlatforms = [ "windows" ];
 
         // read back
         manifest = consumeManifest(path);
-        test.equal(manifest.targetPlatforms, "windows");
+        test.equal(manifest.targetPlatforms[0], "windows");
 
         test.done();
     },

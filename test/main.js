@@ -110,7 +110,7 @@ exports.tests = {
 
                 // Build
                 ShellJS.pushd(_packageId);
-                app.build("debug", null, function(errno) {
+                app.build("debug", {}, function(errno) {
 
                     test.equal(errno, 0);
                     test.done();
