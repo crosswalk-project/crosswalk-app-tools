@@ -14,6 +14,7 @@ function FiniteProgress(output, label) {
     this._label = label;
     this._active = false;
     this._prefix = this._output.prefix;
+    this._progress = -1;
 }
 
 /**
@@ -38,12 +39,20 @@ Object.defineProperty(FiniteProgress.prototype, "isActive", {
 FiniteProgress.prototype.update =
 function(progress) {
 
-    this._active = true;
-
     // Clamp
     progress = progress < 0 ? 0 :
                progress > 1 ? 1 :
                progress;
+
+    // Suppress output for small changes, unless
+    // we're almost done, so we get the full progress bar.
+    if (progress < 1 &&
+        Math.abs(progress - this._progress) < 0.1) {
+        return;
+    }
+
+    this._progress = progress;
+    this._active = true;
 
     // Go to column 0
     this._output.write('\033[0G');
