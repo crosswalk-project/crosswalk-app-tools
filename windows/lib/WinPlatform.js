@@ -212,6 +212,10 @@ function(configId, args, callback) {
     var output = this.output;
     var manifest = this.application.manifest;
 
+    if (!configId) {
+        configId = "debug";
+    }
+
     // WiX wants 4 component version numbers, so append as many ".0" as needed.
     // Manifest versions are restricted to 4 parts max.
     var nComponents = manifest.appVersion.split(".").length;
@@ -243,6 +247,7 @@ function(configId, args, callback) {
     }.bind(this);
 
     var metaData = {
+        configId: configId,
         app_name: manifest.name,
         upgrade_id: manifest.windowsUpdateId,
         manufacturer: this.getVendor(),
