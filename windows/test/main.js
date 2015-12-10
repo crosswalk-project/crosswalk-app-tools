@@ -1,4 +1,4 @@
-// Copyright © 2014 Intel Corporation. All rights reserved.
+﻿// Copyright © 2014 Intel Corporation. All rights reserved.
 // Use  of this  source  code is  governed by  an Apache v2
 // license that can be found in the LICENSE-APACHE-V2 file.
 
@@ -38,7 +38,7 @@ exports.tests = {
 
         var app = require("../../src/Main");
         Application.call(app, tmpdir, _packageId);
-        app.create(_packageId, {platforms: "windows"}, function(errno) {
+        app.create(_packageId, {platform: "windows"}, function(errno) {
 
             test.equal(errno, 0);
 
