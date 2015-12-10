@@ -248,11 +248,8 @@ function init(app, packageId, callback) {
 // This is separate from the 64bit because they are in separate downloads.
 function create32(app, packageId, extraArgs, callback) {
 
-    // By default we're building 32bit packages only. But if we have 64bit
-    // specified, and not 32, that means the default is overruled, and we only
-    // build what's requested.
-    if (extraArgs.targets["32"].length == 0 &&
-        extraArgs.targets["64"].length > 0) {
+    // Skip if no 32bit ABIs requested.
+    if (extraArgs.targets["32"].length === 0) {
         callback(cat.EXIT_CODE_OK);
         return;
     }
@@ -398,11 +395,14 @@ if (argv.r || argv.release) {
 
 // Targets
 // By default, build both 32bit targets.
-var targets = { "32": [],
-                "64": []
-              };
+extraArgs.targets = { "32": [ "armeabi-v7a", "x86" ],
+                      "64": []
+                    };
 if (argv.t || argv.targets) {
 
+    extraArgs.targets = { "32": [],
+                          "64": []
+                        };
     // Parse and match
     var targetsParam = "" + (argv.t ? argv.t : argv.targets);
     var targetsKeys = targetsParam.split(" ");
@@ -411,14 +411,13 @@ if (argv.t || argv.targets) {
             var abis = Targets.match(key);
             abis.forEach(function (abi) {
                 var size = Targets.ABI_WORDSIZE[abi];
-                if (targets[size].indexOf(abi) < 0) {
-                    targets[size].push(abi);
+                if (extraArgs.targets[size].indexOf(abi) < 0) {
+                    extraArgs.targets[size].push(abi);
                 }
             });
         }
     });
 }
-extraArgs.targets = targets;
 
 // Build steps
 var tasks = [

@@ -183,19 +183,11 @@ function(path, extraArgs, output, callback) {
         packageId = "com.example.foo";
     }
 
-    // Can only have one, platform (crosswalk-app) or platforms (crosswalk-pkg)
-    if (extraArgs.platform && extraArgs.platforms) {
-        throw new Error("Passing both 'platform' and 'platforms' not supported");
-    }
-
     Manifest.addDefaults(output, path, packageId);
-
-    if (extraArgs.platform || (extraArgs.platforms && extraArgs.platforms.length > 0)) {
+    if (extraArgs.platforms && extraArgs.platforms.length > 0) {
         var manifest = new Manifest(output, path);
         try {
-            manifest.targetPlatforms = extraArgs.platform ?
-                                            [ extraArgs.platform ] :
-                                            extraArgs.platforms;
+            manifest.targetPlatforms = extraArgs.platforms;
         } catch (e) {
             output.error("Failed to set target platforms");
             callback(Main.EXIT_CODE_ERROR);
@@ -241,23 +233,8 @@ function(packageId, extraArgs, callback) {
 
     var output = this.output;
 
-    // Can only have one, platform (crosswalk-app) or platforms (crosswalk-pkg)
-    if (extraArgs.platform && extraArgs.platforms) {
-        throw new Error("Passing both 'platform' and 'platforms' not supported");
-    }
-
-    if (extraArgs.platform || (extraArgs.platforms && extraArgs.platforms.length > 0)) {
-        try {
-            this.manifest.targetPlatforms = extraArgs.platform ?
-                                                [ extraArgs.platform ] :
-                                                extraArgs.platforms;
-        } catch (e) {
-            output.error("Failed to set target platforms");
-            callback(Main.EXIT_CODE_ERROR);
-            return;
-        }
-    } else {
-        extraArgs.platform = "android";
+    if (!extraArgs.platform) {
+        extraArgs.platform = this.manifest.targetPlatforms[0];
     }
 
     // Copy sample web app content
@@ -270,7 +247,7 @@ function(packageId, extraArgs, callback) {
     output.info("Copying app template from", templatePath);
     ShellJS.cp("-r", Path.join(templatePath, "*"), this.appPath);
 
-    var project = this.instantiatePlatform(extraArgs.platform ? extraArgs.platform : extraArgs.platforms[0]);
+    var project = this.instantiatePlatform(extraArgs.platform);
     if (!project) {
         callback(Main.EXIT_CODE_ERROR);
         return;
@@ -310,14 +287,11 @@ function(configId, extraArgs, callback) {
 
     var output = this.output;
 
-    var platformId = "android";
-    if (extraArgs.platform) {
-        platformId = extraArgs.platform;
-    } else if (this.manifest && this.manifest.targetPlatforms.length > 0) {
-        platformId = this.manifest.targetPlatforms[0];
+    if (!extraArgs.platform) {
+        extraArgs.platform = this.manifest.targetPlatforms[0];
     }
 
-    var project = this.instantiatePlatform(platformId);
+    var project = this.instantiatePlatform(extraArgs.platform);
     if (!project) {
         callback(Main.EXIT_CODE_ERROR);
         return;
@@ -457,6 +431,11 @@ function(callback) {
 
     case "manifest":
         var path = parser.manifestGetPath();
+        // This is a bit of a hack, but initManifest takes array of platforms.
+        if (extraArgs.platform) {
+            extraArgs.platforms = [ extraArgs.platform ];
+            delete extraArgs.platform;
+        }
         app.initManifest(path, extraArgs, output, callback);
         break;
 
