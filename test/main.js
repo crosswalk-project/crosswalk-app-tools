@@ -73,58 +73,6 @@ exports.tests = {
         });
     },
 
-    create: function(test) {
-
-        test.expect(1);
-
-        // Good test.
-        var tmpdir = Util.createTmpDir();
-        ShellJS.pushd(tmpdir);
-
-        var app = require("../src/Main");
-        Application.call(app, tmpdir, _packageId);
-        app.create(_packageId, {}, function(errno) {
-
-            test.equal(errno, 0);
-
-            ShellJS.popd();
-            ShellJS.rm("-rf", tmpdir);
-
-            test.done();
-        });
-    },
-
-    build: function(test) {
-
-        test.expect(1);
-
-        // Create
-        var tmpdir = Util.createTmpDir();
-        ShellJS.pushd(tmpdir);
-
-        var app = require("../src/Main");
-        Application.call(app, tmpdir, _packageId);
-        app.create(_packageId, {}, function(errno) {
-
-            if (!errno) {
-
-                // Build
-                ShellJS.pushd(_packageId);
-                app.build("debug", {}, function(errno) {
-
-                    test.equal(errno, 0);
-                    test.done();
-
-                    ShellJS.popd();
-                    ShellJS.popd();
-                    ShellJS.rm("-rf", tmpdir);
-                });
-            } else {
-                test.done();
-            }
-        });
-    },
-
     listPlatforms: function(test) {
 
         // Prints to stdout, so just run the code to see if it breaks.
