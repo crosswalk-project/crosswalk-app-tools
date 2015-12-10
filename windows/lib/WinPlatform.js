@@ -262,7 +262,8 @@ function(configId, args, callback) {
 
         if (success) {
             indicator.done();
-            output.highlight("Package: " + metaData.msi);
+            this.exportPackage(metaData.msi);
+            output.highlight("Package: " + Path.basename(metaData.msi));
             callback(null);
         } else {
             indicator.update("error");

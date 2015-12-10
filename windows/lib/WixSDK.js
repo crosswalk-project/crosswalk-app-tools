@@ -294,7 +294,7 @@ function(app_path, xwalk_path, meta_data, callback) {
     this.runWix(InQuotes(basename), function(success) {
         if (success) {
             // Pass back built package
-            meta_data.msi = basename + ".msi";
+            meta_data.msi = path.resolve(basename + ".msi");
             // Only delete on success, for debugging reasons.
             ShellJS.rm("-f", basename + ".wxs");
             ShellJS.rm("-f", basename + ".wixobj");
