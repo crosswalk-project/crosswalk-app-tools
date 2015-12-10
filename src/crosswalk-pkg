@@ -137,7 +137,7 @@ function help() {
         "    -h --help                        Print usage information\n" +
         "    -k --keep                        Keep build tree for debugging\n" +
         "    -m --manifest=<package-id>       Fill manifest.json with default values\n" +
-        "    -p --platforms=<android|windows> Specify target platform\n" +
+        "    -p --platforms=<target-systems>  Specify target platform\n" +
         "    -r --release                     Build release packages\n" +
         "    -t --targets=<target-archs>      Target CPU architectures\n" +
         "    -v --version                     Print tool version\n" +
@@ -164,6 +164,12 @@ function help() {
         "    * Default behavior is equivalent to \"32\", creation of 32-bit installers\n" +
         "    Example: --targets=\"arm x86\" builds both ARM plus 32-bit x86 packages\n" +
         "\n" +
+        "  <target-systems>\n" +
+        "    List of operating systems for which to create packages.\n" +
+        "    Default is android-only, which is supported on Apple OSX, Linux and Windows\n" +
+        "    Creating Windows MSIs is supported on Microsoft Windows only.\n" +
+        "    Example: --platforms=\"android windows\"\n" +
+        "\n" +
         "  <version-spec>\n" +
         "    * Channel name, i.e. stable/beta/canary\n" +
         "    * Version number, e.g. 14.43.343.25\n" +
@@ -182,33 +188,8 @@ function help() {
 // Check platform
 function check(app, appPath, extraArgs, output, callback) {
 
-    var platforms = extraArgs.platforms;
-    if (platforms.length === 0) {
-        // Try to load platforms from manifest, so we only check what's needed.
-        var manifestPath = Path.join(appPath, "manifest.json");
-        if (ShellJS.test("-f", manifestPath)) {
-            var buffer = FS.readFileSync(manifestPath, {"encoding": "utf8"});
-            if (buffer) {
-                var json = JSON.parse(buffer);
-                if (json) {
-                    if (json.xwalk_target_platforms instanceof Array) {
-                        platforms = json.xwalk_target_platforms;
-                    } else if (typeof json.xwalk_target_platforms === "string") {
-                        platforms = [ json.xwalk_target_platforms ];
-                    } else {
-                        // No platforms given, no manifest default to android.
-                        platforms = [ "android" ];
-                    }
-                }
-            }
-        } else {
-            // No platforms given, no manifest default to android.
-            platforms = [ "android" ];
-        }
-    }
-
     output.highlight("Checking host setup");
-    app.check(platforms, output, callback);
+    app.check(extraArgs.platforms, output, callback);
 }
 
 // Initialize app tools
@@ -246,32 +227,37 @@ function init(app, packageId, callback) {
 
 // Create skeleton for 32bit ABIs.
 // This is separate from the 64bit because they are in separate downloads.
-function create32(app, packageId, extraArgs, callback) {
+function create(app, packageId, extraArgs, platform, callback) {
 
-    // Skip if no 32bit ABIs requested.
-    if (extraArgs.targets["32"].length === 0) {
-        callback(cat.EXIT_CODE_OK);
-        return;
+    // FIXME android-specific code here is not ideal
+    if (platform === "android") {
+
+        // Skip if no 32bit ABIs requested.
+        if (extraArgs.targets["32"].length === 0) {
+            callback(cat.EXIT_CODE_OK);
+            return;
+        }
+
+        var androidArgs = [];
+        if (extraArgs.android) {
+            androidArgs = extraArgs.android.split(" ");
+        }
+
+        // TODO implement way to pass through parameters w/o platform prefix
+        if (androidArgs.indexOf("lite") > -1) {
+            extraArgs["android-lite"] = true;
+        }
+        if (androidArgs.indexOf("shared") > -1) {
+            extraArgs["android-shared"] = true;
+        }
+
+        delete extraArgs["android-targets"];
+        if (extraArgs.targets["32"].length > 0) {
+            extraArgs["android-targets"] = extraArgs.targets["32"];
+        }
     }
 
-    var androidArgs = [];
-    if (extraArgs.android) {
-        androidArgs = extraArgs.android.split(" ");
-    }
-
-    // TODO implement way to pass through parameters w/o platform prefix
-    if (androidArgs.indexOf("lite") > -1) {
-        extraArgs["android-lite"] = true;
-    }
-    if (androidArgs.indexOf("shared") > -1) {
-        extraArgs["android-shared"] = true;
-    }
-
-    delete extraArgs["android-targets"];
-    if (extraArgs.targets["32"].length > 0) {
-        extraArgs["android-targets"] = extraArgs.targets["32"];
-    }
-
+    extraArgs.platform = platform;
     app.create(packageId, extraArgs, callback);
 }
 
@@ -321,7 +307,7 @@ function copy(app, appPath, extraArgs, callback) {
 }
 
 // Build
-function build(app, configId, extraArgs, callback) {
+function build(app, configId, extraArgs, platform, callback) {
 
     var targets = extraArgs.targets["32"].concat(extraArgs.targets["64"]);
     delete extraArgs["android-targets"];
@@ -329,6 +315,7 @@ function build(app, configId, extraArgs, callback) {
         extraArgs["android-targets"] = targets;
     }
 
+    extraArgs.platform = platform;
     app.output.highlight("Building packages " + targets.join(","));
     app.build(configId, extraArgs, callback);
 }
@@ -380,12 +367,13 @@ if (argv.manifest) {
     extraArgs.manifest = argv.manifest;
 }
 
-extraArgs.platforms = [];
-if (argv.p) {
-    extraArgs.platforms = [ argv.p ];
-}
-if (argv.platforms) {
-    extraArgs.platforms = [ argv.platforms ];
+extraArgs.platforms = [ "android" ];
+if (argv.p || argv.platforms) {
+    var platforms = argv.p ? argv.p : argv.platforms;
+    extraArgs.platforms = platforms.split(" ").filter(function (value) {
+        // Filter empty entries caused by extra whitespace.
+        return value;
+    });
 }
 
 var buildConfig = null;
@@ -424,12 +412,37 @@ var tasks = [
     { func: check,    args: [ cat, appPath, extraArgs, output ] },
     { func: manifest, args: [ cat, appPath, extraArgs, output ] },
     { func: init,     args: [ cat, packageId                  ] },
-    { func: create32, args: [ cat, packageId, extraArgs       ] },
+    { func: create,   args: [ cat, packageId, extraArgs       ], loop: extraArgs.platforms },
     { func: create64, args: [ cat, packageId, extraArgs       ] },
     { func: copy,     args: [ cat, appPath, extraArgs         ] },
-    { func: build,    args: [ cat, buildConfig, extraArgs     ] },
+    { func: build,    args: [ cat, buildConfig, extraArgs     ], loop: extraArgs.platforms },
     { func: clean,    args: [ cat, extraArgs                  ] }
 ];
+
+function loop(func, args, platforms, nextTask) {
+
+    util.iterate(
+        platforms,
+        function(platform, nextPlatform) {
+
+            // Callback function for the call into app-tools.
+            function callback(errno) {
+                if (errno) {
+                    throw new Error("Packaging failed");
+                } else {
+                    nextPlatform();
+                }
+            }
+
+            // Add platform and callback to args array.
+            var taskArgs = args.concat([platform, callback]);
+            // Run async task.
+            func.apply(null, taskArgs)
+        },
+        function () {
+            nextTask();
+        });
+}
 
 util.iterate(
     tasks,
@@ -444,9 +457,13 @@ util.iterate(
             }
         }
 
-        // Add callback to args array.
-        task.args.push(callback);
-
-        // Run async task.
-        task.func.apply(null, task.args)
+        if (task.loop) {
+            // Run for all platforms
+            loop(task.func, task.args, task.loop, next);
+        } else {
+            // Add callback to args array.
+            task.args.push(callback);
+            // Run async task.
+            task.func.apply(null, task.args)
+        }
     });
