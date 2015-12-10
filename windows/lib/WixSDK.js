@@ -138,17 +138,14 @@ function(app_path, xwalk_path, meta_data, callback) {
     var target_dir = product.ele('Directory', { 'Id': 'TARGETDIR', 'Name': 'SourceDir' });
 
     var program_files_folder = Is64Bit() ? target_dir.ele('Directory', { Id: 'ProgramFiles64Folder' })
-                                         : target_dir.ele('Directory', { Id: 'ProgramFilesFolder' })
+                                         : target_dir.ele('Directory', { Id: 'ProgramFilesFolder' });
     var app_root_folder = program_files_folder.ele('Directory',
                                                    { Id: 'ApplicationRootFolder', 'Name': meta_data.app_name });
     // We're putting web app files to a separate subfolder to avoid name clashes.
     var app_files_folder = app_root_folder.ele('Directory',
                                               { Id: 'ApplicationFilesFolder', 'Name': meta_data.app_name });
-    if (HasExtensions()) {
-        var app_extensions_folder = app_root_folder.ele('Directory',
+    var app_extensions_folder = app_root_folder.ele('Directory',
                                                        { Id: 'ApplicationExtensionsFolder', 'Name': 'extensions' });
-    }
-
     var program_menu_folder = target_dir.ele('Directory', { Id: 'ProgramMenuFolder' });
     var app_menu_folder = program_menu_folder.ele('Directory',
                                                   { Id: 'ApplicationProgramsFolder', 'Name': meta_data.app_name });
@@ -157,7 +154,7 @@ function(app_path, xwalk_path, meta_data, callback) {
 
     function MakeIdFromPath(path) {
         var shasum = crypto.createHash('sha1');
-        existing_ids = {}
+        existing_ids = {};
 
         var id = '_' + shasum.update(path).digest('hex');
         while (existing_ids.hasOwnProperty(id) && existing_ids[id] != path)
@@ -177,7 +174,7 @@ function(app_path, xwalk_path, meta_data, callback) {
         var file_id = MakeIdFromPath(relative_path);
         file_ids.push(file_id);
         var component = node.ele('Component', { Id: file_id, Guid: uuid.v1() });
-        var source_path = (base_path.length == 0) ? relative_path
+        var source_path = (base_path.length === 0) ? relative_path
                                                   : path.join(base_path, relative_path);
         var file = component.ele('File', { Id: file_id, Source: source_path, KeyPath: 'yes' });
         if (Is64Bit()) {
@@ -285,7 +282,7 @@ function(app_path, xwalk_path, meta_data, callback) {
     });
 
     var feature = product.ele('Feature', { Id: 'MainApplication', Level: '1' });
-    file_ids.forEach(function (file_id) { feature.ele('ComponentRef', { Id: file_id }); })
+    file_ids.forEach(function (file_id) { feature.ele('ComponentRef', { Id: file_id }); });
     feature.ele('ComponentRef', { Id: "ApplicationShortcut" });
 
     var xml_str = root.end({ pretty: true });
