@@ -408,6 +408,23 @@ function(crosswalkPath, activityClassName) {
 };
 
 /**
+ * Split target APIs string
+ * TODO this is no more needed after crosswalk-app deprecation
+ */
+AndroidPlatform.prototype.parseTargets =
+function(targetsSpec) {
+
+    if (typeof targetsSpec === "string") {
+        return targetsSpec.split(" ").filter(function (value) {
+            // Filter empty entries caused by extra whitespace.
+            return value;
+        });
+    }
+
+    return undefined;
+};
+
+/**
  * Implements {@link PlatformBase.create}
  */
 AndroidPlatform.prototype.create =
@@ -429,6 +446,9 @@ function(packageId, args, callback) {
     if (args.shared) {
         this._shared = true;
     }
+
+    // TODO this is no more needed after crosswalk-app deprecation
+    args.targets = this.parseTargets(args.targets);
 
     // Check that only same-size ABIs are requested.
     if (args.targets) {
@@ -494,6 +514,7 @@ function(packageId, args, callback) {
             if (this._lite) {
                 deps.androidFlavor = "crosswalk-lite";
             }
+
             if (args.targets && args.targets.length > 0) {
                 // We only handle ABIs with same word size in one create() call
                 // so just check for the first one.
@@ -1338,6 +1359,9 @@ function(configId, args, callback) {
 
     // TODO should we cd back afterwards?
     process.chdir(this.platformPath);
+
+    // TODO this is no more needed after crosswalk-app deprecation
+    args.targets = this.parseTargets(args.targets);
 
     // Embedded or shared build?
     var abis = [];
