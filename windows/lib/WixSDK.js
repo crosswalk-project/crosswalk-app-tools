@@ -48,7 +48,6 @@ function(path) {
  *                              'product_name' - product name, application name is used by default
  *                              'version' - product version, '0.0.0.0' by default
  *                              'is_64_bit' {Bool} - 64 bit arch. flag, 'false' by default
- *                              'extensions' - path to the Crosswalk C++ extensions to be used by the app
  */
 WixSDK.prototype.generateMSI =
 function(app_path, xwalk_path, meta_data, callback) {
@@ -108,7 +107,6 @@ function(app_path, xwalk_path, meta_data, callback) {
 
     function HasProductIcon() { return meta_data.hasOwnProperty('icon'); }
     function Is64Bit() { return ('is_64_bit' in meta_data) ? meta_data.is_64_bit : false; }
-    function HasExtensions() { return meta_data.hasOwnProperty('extensions'); }
 
     var root = builder.create('Wix').att('xmlns', 'http://schemas.microsoft.com/wix/2006/wi');
 
@@ -144,8 +142,10 @@ function(app_path, xwalk_path, meta_data, callback) {
     // We're putting web app files to a separate subfolder to avoid name clashes.
     var app_files_folder = app_root_folder.ele('Directory',
                                               { Id: 'ApplicationFilesFolder', 'Name': meta_data.app_name });
+    // Try to align with the in-folder extensions' directory name of Android.
+    var app_relative_extensions_dir = 'xwalk-extensions';
     var app_extensions_folder = app_root_folder.ele('Directory',
-                                                       { Id: 'ApplicationExtensionsFolder', 'Name': 'extensions' });
+                                                       { Id: 'ApplicationExtensionsFolder', 'Name': app_relative_extensions_dir });
     var program_menu_folder = target_dir.ele('Directory', { Id: 'ProgramMenuFolder' });
     var app_menu_folder = program_menu_folder.ele('Directory',
                                                   { Id: 'ApplicationProgramsFolder', 'Name': meta_data.app_name });
@@ -224,18 +224,36 @@ function(app_path, xwalk_path, meta_data, callback) {
         // TODO maybe error or warning
     }
 
-    function installFiles(source_dir_path, dest_folder_object) {
+    function installFiles(source_dir_path, dest_folder_object, skip_array) {
         var app_files = readDir.readSync(source_dir_path);
         app_files.forEach(function (name) {
             var directory = path.dirname(name);
+	    if (skip_array && skip_array.indexOf(directory) >= 0) return;
+
             var node = (directory == '.') ? dest_folder_object : GetFolderNode(directory, dest_folder_object);
             AddFileComponent(node, source_dir_path, name);
         });
     }
 
-    installFiles(app_path, app_files_folder);
-    if (HasExtensions())
-        installFiles(meta_data.extensions, app_extensions_folder);
+    // Extensions are supposed to be in the source application root dir: app_path.
+    // Then we copy them to the sub-directory of the installer folder:
+    //     app_files_folder/xwalk-extensions
+    // So, if we still fully copy the source application root directory, all the
+    // extensions will be duplicated.
+    // This array is used to keep all the in-folder extensions in the source
+    // application directory, so that we can skip them when copy the web staff
+    // to the installer folder.
+    var extensions_relative_dir = [];
+    // Extensions can be divided by categories in seperate directories.
+    this._manifest.extensions.forEach(function(extDir) {
+        installFiles(extDir, app_extensions_folder);
+	if (path.normalize(path.dirname(extDir)) == path.normalize(app_path)) {
+            extensions_relative_dir.push(path.relative(app_path, extDir));
+	}
+    });
+
+    // Skip in-folder extensions copying to avoid duplication.
+    installFiles(app_path, app_files_folder, extensions_relative_dir);
 
     var program_menu_folder_ref = product.ele('DirectoryRef', { Id: 'ApplicationProgramsFolder' });
     var component = program_menu_folder_ref.ele('Component', { Id: 'ApplicationShortcut', Guid: uuid.v1() });
@@ -251,8 +269,9 @@ function(app_path, xwalk_path, meta_data, callback) {
         }, "");
         cmd_line_args += manifest_args;
     }
-    if (HasExtensions())
-        cmd_line_args += ' --external-extensions-path=extensions';
+    if (this._manifest.extensions.length > 0) {
+        cmd_line_args += ' --external-extensions-path=' + app_relative_extensions_dir;
+    }
     if (meta_data.configId === "debug") {
         cmd_line_args += " --enable-inspector";
     }
