@@ -1,11 +1,62 @@
-language: android
+sudo: required
 
-android:
-  components:
-    - build-tools-22.0.1
+matrix:
+  include:
+    - language: objective-c
+      os: osx
+      osx_image: xcode7.1
+      script:
+        - grunt nodeunit:common
+    - language: objective-c
+      os: osx
+      osx_image: xcode7.1
+      script:
+        - python lint.py -p ios
+    - language: android      
+      android:
+        components:
+          - build-tools-22.0.1
+      script:
+        - npm test
+    - language: android      
+      android:
+        components:
+          - build-tools-22.0.1
+      install:
+        - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a
+        - emulator -avd test -no-skin -no-audio -no-window &
+        - android-wait-for-emulator
+        - adb devices
+      script:
+        - python lint.py -p android -a 32bit
+    - language: android      
+      android:
+        components:
+          - build-tools-22.0.1
+      script:
+        - python lint.py -p android -a 64bit
 
 before_script:
-  - npm install
-
-script:
-  - npm test
+  - if [ $TRAVIS_OS_NAME == "linux" ]; then
+      npm install;
+      npm install exec-sync;
+      sudo pip install BeautifulSoup4;
+    fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+      npm cache clean -f;
+      npm install -g n;
+      n 4.2.1;
+      npm uninstall -g grunt;
+      npm install -g grunt-cli;
+      npm install;
+      cd node_modules;
+      git clone https://github.com/crosswalk-project/crosswalk-app-tools-ios.git crosswalk-app-tools-backend-ios;
+      cd crosswalk-app-tools-backend-ios;
+      npm install;
+      cd ../../;
+      wget http://www.crummy.com/software/BeautifulSoup/bs4/download/4.4/beautifulsoup4-4.4.1.tar.gz;
+      tar -xvf beautifulsoup4-4.4.1.tar.gz;
+      cd beautifulsoup4-4.4.1;
+      sudo python setup.py install;
+      cd ../;
+    fi
