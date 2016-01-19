@@ -255,7 +255,6 @@ function(configId, args, callback) {
         is_64_bit: true,
         icon: this.selectIcon(),
         product: manifest.packageId
-        //extensions: 'tests/extension/echo_extension'
     };
     sdk.generateMSI(this.appPath, this.platformPath, metaData,
                     function (success) {
