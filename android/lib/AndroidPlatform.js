@@ -421,7 +421,7 @@ function(targetsSpec) {
         });
     }
 
-    return undefined;
+    return targetsSpec;
 };
 
 /**
