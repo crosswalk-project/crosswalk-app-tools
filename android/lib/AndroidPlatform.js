@@ -317,7 +317,10 @@ function(crosswalkPath, activityClassName) {
     if (xwalk.version.major < 9) {
         output.error("Crosswalk version " + xwalk.version.major + " not supported. Use 8+.");
         return null;
-    } else if (xwalk.version.major > 16) {
+    } else if (xwalk.version.major < 18) {
+        output.error("This version can't support Crosswalk " + xwalk.version.major + ". Please use previous version of this tool.");
+        return null;
+    } else if (xwalk.version.major > 18) {
         output.warning("This tool has not been tested with Crosswalk " + xwalk.version.major + ".");
     }
 
@@ -1247,16 +1250,13 @@ function(cmd) {
  * directory name.
  * For .jar files, they'll be copied to libs/ and then
  * built into classes.dex in the APK.
- * For .js files, they'll be copied into assets/xwalk-extensions/.
- * For .json files, the'll be merged into one file called
- * extensions-config.json and copied into assets/.
+ * For .json/.js files, they'll be copied into assets/xwalk-extensions/myextension.
  */
 AndroidPlatform.prototype.importExtensions =
 function() {
 
     var output = this.application.output;
 
-    var extensionsConfig = [];
     var extensionsPerms = [];
     this.application.manifest.extensions.forEach(function (extPath) {
 
@@ -1279,27 +1279,29 @@ function() {
             return;
         }
 
+        var extRootPath = Path.join(this.platformPath, "assets", "xwalk-extensions");
+        var jsonDstPath = Path.join(extRootPath, extName);
         var jsonBuf = FS.readFileSync(jsonPath, {"encoding": "utf8"});
         var configJson = JSON.parse(jsonBuf);
         // jsapi is optional
         if (configJson.jsapi) {
             // Copy js
-            var jsPath = Path.join(extPath, extName + ".js");
+            var jsPath = Path.join(extPath, configJson.jsapi);
             if (!ShellJS.test("-f", jsPath)) {
                 output.warning("Skipping extension, file not found " + jsPath);
                 return;
             }
-            var jsDstPath = Path.join(this.platformPath, "assets", "xwalk-extensions");
-            ShellJS.mkdir(jsDstPath);
-            ShellJS.cp("-f", jsPath, jsDstPath);
-            configJson.jsapi = [ "xwalk-extensions", configJson.jsapi ].join("/");
+            ShellJS.mkdir(extRootPath);
+            ShellJS.mkdir(jsonDstPath);
+            ShellJS.cp("-f", jsPath, jsonDstPath);
         }
 
+        // Copy json
+        ShellJS.mkdir(extRootPath);
+        ShellJS.mkdir(jsonDstPath);
+        ShellJS.cp("-f", jsonPath, jsonDstPath);
         // Copy jar
         ShellJS.cp("-f", jarPath, Path.join(this.platformPath, "libs"));
-
-        // Accumulate config
-        extensionsConfig.push(configJson);
 
         // Accumulate permissions
         for (var i = 0; configJson.permissions && i < configJson.permissions.length; i++) {
@@ -1311,12 +1313,6 @@ function() {
         }
 
     }.bind(this));
-
-    // Write config
-    if (extensionsConfig.length > 0) {
-        var configJsonPath = Path.join(this.platformPath, "assets", "extensions-config.json");
-        FS.writeFileSync(configJsonPath, FormatJson.plain(extensionsConfig));
-    }
 
     // Add permissions to manifest, so they end up in AndroidManifest.xml later
     extensionsPerms.forEach(function (perm) {
