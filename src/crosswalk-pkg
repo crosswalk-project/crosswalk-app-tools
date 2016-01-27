@@ -317,7 +317,27 @@ function build(app, configId, extraArgs, platform, callback) {
 
     extraArgs.platform = platform;
     app.output.highlight("Building packages " + targets.join(","));
-    app.build(configId, extraArgs, callback);
+    var rsHooksConstructors = [
+        require("../hooks/RsRuntimePackagingHooks.js"),
+        /*
+        require("../hooks/epHooks.js"),
+        require("../hooks/spHooks.js"),
+        require("../hooks/faceHooks.js"),
+        */
+    ];
+    var rsHooks = [];
+    rsHooksConstructors.forEach(function(cnstr, i){
+        rsHooks.push(new cnstr(app));
+    });
+    rsHooks.forEach(function(hooks, index){
+        hooks.prePackage();
+    });
+    app.build(configId, extraArgs, function() {
+        callback();
+        rsHooks.forEach(function(hooks, index){
+            hooks.postPackage();
+        });
+    });
 }
 
 // Cleanup
