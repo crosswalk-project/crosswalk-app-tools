@@ -25,6 +25,15 @@ var util = {
     /** {@link Version} */
     Version: require("./Version"),
 
+    /** expose some dependencies for hooks */
+    AdmZip: require("adm-zip"),
+    FormatJson: require("format-json"),
+    NodeUuid: require("node-uuid"),
+    ParseColor: require("parse-color"),
+    XmlBuilder: require("xmlbuilder"),
+    XmlDom: require("xmldom"),
+    ShellJS: require("shelljs"),
+
     /**
      * Iterate an array with provisions for asynchronous processing of each item.
      * @param {Array} a Array to iterate over
