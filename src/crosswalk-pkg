@@ -330,6 +330,8 @@ function preHook(app, configId, extraArgs, platform, nextPlatform) {
                 var Ctor = require(path);
                 var hooks = new Ctor(app, configId, extraArgs, _hooksSharedState);
                 hooks.prePackage(platform, callback);
+            } else {
+                nextExtension();
             }
         },
         function () {
@@ -373,6 +375,8 @@ function postHook(app, configId, extraArgs, platform, nextPlatform) {
                 var Ctor = require(path);
                 var hooks = new Ctor(app, configId, extraArgs, _hooksSharedState);
                 hooks.postPackage(platform, callback);
+            } else {
+                nextExtension();
             }
         },
         function () {
