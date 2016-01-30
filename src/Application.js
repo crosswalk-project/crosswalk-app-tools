@@ -102,6 +102,7 @@ function Application(cwd, packageId) {
     this._output = new OutputTee(this._logfileOutput, TerminalOutput.getInstance());
 
     this.loadManifest(Path.join(this._appPath, "manifest.json"));
+    this._generatedPackage = null;
 }
 
 /**
@@ -210,6 +211,22 @@ Object.defineProperty(Application.prototype, "rootPath", {
                       get: function() {
                                 return this._rootPath;
                             }
+                      });
+
+/**
+ * Absolute path to the generated package.
+ * Ruturn null without successfully build.
+ * @member {String} generatedPackage
+ * @instance
+ * @memberOf Application
+ */
+Object.defineProperty(Application.prototype, "generatedPackage", {
+                      get: function() {
+                                return this._generatedPackage;
+                           },
+                      set: function(packagePath) {
+                                this._generatedPackage = packagePath;
+                           }
                       });
 
 /**

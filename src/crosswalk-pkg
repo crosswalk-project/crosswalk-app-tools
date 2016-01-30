@@ -312,24 +312,25 @@ var _hooksSharedState = {};
 function preHook(app, configId, extraArgs, platform, nextPlatform) {
 
     util.iterate(
-        app.manifest.extensions,
-        function(extension, nextExtension) {
+        app.manifest.extensionHooks,
+        function(path, nextHook) {
 
             // Callback function for the call into the extension hook.
             function callback(errno) {
                 if (errno) {
                     throw new Error("Packaging failed");
                 } else {
-                    nextExtension();
+                    nextHook();
                 }
             }
 
             // Execute extension "pre" hook if found
-            var path = Path.join(extension, "XWalkExtensionHooks.js");
             if (ShellJS.test("-f", path)) {
                 var Ctor = require(path);
                 var hooks = new Ctor(app, configId, extraArgs, _hooksSharedState);
                 hooks.prePackage(platform, callback);
+            } else {
+                nextHook();
             }
         },
         function () {
@@ -355,24 +356,25 @@ function build(app, configId, extraArgs, platform, callback) {
 function postHook(app, configId, extraArgs, platform, nextPlatform) {
 
     util.iterate(
-        app.manifest.extensions,
-        function(extension, nextExtension) {
+        app.manifest.extensionHooks,
+        function(path, nextHook) {
 
             // Callback function for the call into the extension hook.
             function callback(errno) {
                 if (errno) {
                     throw new Error("Packaging failed");
                 } else {
-                    nextExtension();
+                    nextHook();
                 }
             }
 
-            // Execute extension "pre" hook if found
-            var path = Path.join(extension, "XWalkExtensionHooks.js");
+            // Execute extension "post" hook if found
             if (ShellJS.test("-f", path)) {
                 var Ctor = require(path);
                 var hooks = new Ctor(app, configId, extraArgs, _hooksSharedState);
                 hooks.postPackage(platform, callback);
+            } else {
+                nextHook();
             }
         },
         function () {
