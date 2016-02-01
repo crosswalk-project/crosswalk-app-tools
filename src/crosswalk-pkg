@@ -306,6 +306,38 @@ function copy(app, appPath, extraArgs, callback) {
     callback(cat.EXIT_CODE_OK);
 }
 
+var _hooksSharedState = {};
+
+// preHook
+function preHook(app, configId, extraArgs, platform, nextPlatform) {
+
+    util.iterate(
+        app.manifest.extensionHooks,
+        function(path, nextHook) {
+
+            // Callback function for the call into the extension hook.
+            function callback(errno) {
+                if (errno) {
+                    throw new Error("Packaging failed");
+                } else {
+                    nextHook();
+                }
+            }
+
+            // Execute extension "pre" hook if found
+            if (ShellJS.test("-f", path)) {
+                var Ctor = require(path);
+                var hooks = new Ctor(app, configId, extraArgs, _hooksSharedState);
+                hooks.prePackage(platform, callback);
+            } else {
+                nextHook();
+            }
+        },
+        function () {
+            nextPlatform();
+        });
+}
+
 // Build
 function build(app, configId, extraArgs, platform, callback) {
 
@@ -318,6 +350,36 @@ function build(app, configId, extraArgs, platform, callback) {
     extraArgs.platform = platform;
     app.output.highlight("Building packages " + targets.join(","));
     app.build(configId, extraArgs, callback);
+}
+
+// postHook
+function postHook(app, configId, extraArgs, platform, nextPlatform) {
+
+    util.iterate(
+        app.manifest.extensionHooks,
+        function(path, nextHook) {
+
+            // Callback function for the call into the extension hook.
+            function callback(errno) {
+                if (errno) {
+                    throw new Error("Packaging failed");
+                } else {
+                    nextHook();
+                }
+            }
+
+            // Execute extension "post" hook if found
+            if (ShellJS.test("-f", path)) {
+                var Ctor = require(path);
+                var hooks = new Ctor(app, configId, extraArgs, _hooksSharedState);
+                hooks.postPackage(platform, callback);
+            } else {
+                nextHook();
+            }
+        },
+        function () {
+            nextPlatform();
+        });
 }
 
 // Cleanup
@@ -415,7 +477,9 @@ var tasks = [
     { func: create,   args: [ cat, packageId, extraArgs       ], loop: extraArgs.platforms },
     { func: create64, args: [ cat, packageId, extraArgs       ] },
     { func: copy,     args: [ cat, appPath, extraArgs         ] },
+    { func: preHook,  args: [ cat, buildConfig, extraArgs     ], loop: extraArgs.platforms },
     { func: build,    args: [ cat, buildConfig, extraArgs     ], loop: extraArgs.platforms },
+    { func: postHook, args: [ cat, buildConfig, extraArgs     ], loop: extraArgs.platforms },
     { func: clean,    args: [ cat, extraArgs                  ] }
 ];
 

@@ -172,6 +172,15 @@ function Manifest(output, path) {
             output.warning("Invalid extensions " + json.xwalk_extensions);
         }
     }
+    // Absolute path of Extension Hooks.
+    // This info is needed to skip them when generating MSI.
+    this._extensionHooks = [];
+    this._extensions.forEach(function(extension, i){
+      var path = Path.join(extension, "XWalkExtensionHooks.js");
+      if (ShellJS.test("-f", path)) {
+        this._extensionHooks.push(path);
+      }
+    }.bind(this));
 
     // Target platforms
     if (json.xwalk_target_platforms &&
@@ -624,6 +633,17 @@ Object.defineProperty(Manifest.prototype, "extensions", {
                            }
                       });
 
+/**
+ * Extension hooks.
+ * @member {String} extensionHooks
+ * @instance
+ * @memberOf Manifest
+ */
+Object.defineProperty(Manifest.prototype, "extensionHooks", {
+                      get: function() {
+                                return this._extensionHooks;
+                           }
+                      });
 /**
  * Build target platforms for the apps
  * @member {String[]} targetPlatforms

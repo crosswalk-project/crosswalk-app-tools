@@ -197,6 +197,7 @@ function(packagePath) {
         ShellJS.cp(packagePath, this.pkgPath);
         ShellJS.rm("-f", packagePath);
     }
+    this._application.generatedPackage = packagePath;
 };
 
 /**

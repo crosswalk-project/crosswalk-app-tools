@@ -224,11 +224,16 @@ function(app_path, xwalk_path, meta_data, callback) {
         // TODO maybe error or warning
     }
 
+    // @skip_array contains absolute path of those need to be skipped, items can be
+    // directory or files.
     function installFiles(source_dir_path, dest_folder_object, skip_array) {
         var app_files = readDir.readSync(source_dir_path);
         app_files.forEach(function (name) {
             var directory = path.dirname(name);
-	    if (skip_array && skip_array.indexOf(directory) >= 0) return;
+            var absPath = path.join(source_dir_path, name);
+            if (skip_array.indexOf(absPath) >= 0 ||
+                skip_array.indexOf(path.dirname(absPath)) >= 0)
+                return;
 
             var node = (directory == '.') ? dest_folder_object : GetFolderNode(directory, dest_folder_object);
             AddFileComponent(node, source_dir_path, name);
@@ -240,20 +245,16 @@ function(app_path, xwalk_path, meta_data, callback) {
     //     app_files_folder/xwalk-extensions
     // So, if we still fully copy the source application root directory, all the
     // extensions will be duplicated.
-    // This array is used to keep all the in-folder extensions in the source
-    // application directory, so that we can skip them when copy the web staff
-    // to the installer folder.
-    var extensions_relative_dir = [];
     // Extensions can be divided by categories in seperate directories.
     this._manifest.extensions.forEach(function(extDir) {
-        installFiles(extDir, app_extensions_folder);
-	if (path.normalize(path.dirname(extDir)) == path.normalize(app_path)) {
+        installFiles(extDir, app_extensions_folder, this._manifest.extensionHooks);
+        if (path.normalize(path.dirname(extDir)) == path.normalize(app_path)) {
             extensions_relative_dir.push(path.relative(app_path, extDir));
-	}
-    });
+        }
+    }.bind(this));
 
     // Skip in-folder extensions copying to avoid duplication.
-    installFiles(app_path, app_files_folder, extensions_relative_dir);
+    installFiles(app_path, app_files_folder, this._manifest.extensions);
 
     var program_menu_folder_ref = product.ele('DirectoryRef', { Id: 'ApplicationProgramsFolder' });
     var component = program_menu_folder_ref.ele('Component', { Id: 'ApplicationShortcut', Guid: uuid.v1() });
