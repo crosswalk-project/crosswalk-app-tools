@@ -454,9 +454,9 @@ extraArgs.targets = { "32": [ "armeabi-v7a", "x86" ],
                     };
 if (argv.t || argv.targets) {
 
-    extraArgs.targets = { "32": [],
-                          "64": []
-                        };
+    var targets = { "32": [],
+                    "64": []
+                  };
     // Parse and match
     var targetsParam = "" + (argv.t ? argv.t : argv.targets);
     var targetsKeys = targetsParam.split(" ");
@@ -465,12 +465,19 @@ if (argv.t || argv.targets) {
             var abis = Targets.match(key);
             abis.forEach(function (abi) {
                 var size = Targets.ABI_WORDSIZE[abi];
-                if (extraArgs.targets[size].indexOf(abi) < 0) {
-                    extraArgs.targets[size].push(abi);
+                if (targets[size].indexOf(abi) < 0) {
+                    targets[size].push(abi);
                 }
             });
         }
     });
+
+    // Use targets if they are valid
+    if (targets["32"].length || targets["64"].length) {
+        extraArgs.targets = targets;
+    } else {
+        output.warning("Ignoring unknown -t / --targets, building default");
+    }
 }
 
 // Build steps
