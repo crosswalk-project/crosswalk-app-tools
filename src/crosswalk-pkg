@@ -391,6 +391,18 @@ if (argv.a) {
 if (argv.android) {
     extraArgs.android = argv.android;
 }
+if (extraArgs.android) {
+
+    var androidArgs = extraArgs.android.split(" ");
+    if (androidArgs.indexOf("shared") > -1 &&
+        (argv.t || argv.targets)) {
+
+        output.warning("Ignoring -t / --targets for shared android build");
+        delete argv.t;
+        delete argv.targets;
+    }
+
+}
 
 // Crosswalk, see help for <version-spec>
 if (argv.c) {
