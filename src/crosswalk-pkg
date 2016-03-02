@@ -87,21 +87,7 @@ if (argv.m || argv.manifest) {
 
 if (!packageId) {
     // packageId from existing web manifest?
-    var buffer = null;
-    if (ShellJS.test("-f", manifestPath)) {
-        buffer = FS.readFileSync(manifestPath, {"encoding": "utf8"});
-    }
-    if (!buffer) {
-        output.error("Failed to read manifest.json in " + appPath);
-        output.info("Please create a minimal manifest.json by pasting the following content");
-        output.info('{ "xwalk_package_id": "com.example.foo" }');
-        process.exit(cat.EXIT_CODE_ERROR);
-    }
-    json = JSON.parse(buffer);
-    if (!json) {
-        output.error("Failed to parse manifest.json");
-        process.exit(cat.EXIT_CODE_ERROR);
-    }
+    json = _readManifest(manifestPath, output);
     if (!json.xwalk_package_id) {
         output.error("Missing field 'xwalk_package_id' in the form of 'com.example.foo' in manifest.json");
         process.exit(cat.EXIT_CODE_ERROR);
@@ -429,13 +415,19 @@ if (argv.manifest) {
     extraArgs.manifest = argv.manifest;
 }
 
-extraArgs.platforms = [ "android" ];
 if (argv.p || argv.platforms) {
     var platforms = argv.p ? argv.p : argv.platforms;
     extraArgs.platforms = platforms.split(" ").filter(function (value) {
         // Filter empty entries caused by extra whitespace.
         return value;
     });
+} else {
+    json = _readManifest(manifestPath, output);
+    if (json.xwalk_target_platforms) {
+        extraArgs.platforms = json.xwalk_target_platforms;
+    } else {
+        extraArgs.platforms = [ "android" ];
+    }
 }
 
 var buildConfig = null;
@@ -531,3 +523,22 @@ util.iterate(
             task.func.apply(null, task.args)
         }
     });
+
+function _readManifest(path, output) {
+    var buffer = null;
+    if (ShellJS.test("-f", path)) {
+        buffer = FS.readFileSync(path, {"encoding": "utf8"});
+    }
+    if (!buffer) {
+        output.error("Failed to read manifest.json in " + appPath);
+        output.info("Please create a minimal manifest.json by pasting the following content");
+        output.info('{ "xwalk_package_id": "com.example.foo" }');
+        process.exit(cat.EXIT_CODE_ERROR);
+    }
+    var json = JSON.parse(buffer);
+    if (!json) {
+        output.error("Failed to parse manifest.json");
+        process.exit(cat.EXIT_CODE_ERROR);
+    }
+    return json;
+}
