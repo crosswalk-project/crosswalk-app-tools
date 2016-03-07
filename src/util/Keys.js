@@ -36,9 +36,9 @@ function(name) {
         name = Path.basename(name);
     } else {
         if (OS.homedir) {
-            path = Path.join(OS.homedir(), ".crosswalk-app-tools-keys");
+            path = Path.join(OS.homedir(), ".crosswalk-app-tools-keys.json");
         } else {
-            path = Path.join(process.env.HOME, ".crosswalk-app-tools-keys");
+            path = Path.join(process.env.HOME, ".crosswalk-app-tools-keys.json");
         }
     }
 
@@ -69,6 +69,6 @@ function(name) {
     }
 
     return googleKeys;
-}
+};
 
 module.exports = Keys;
