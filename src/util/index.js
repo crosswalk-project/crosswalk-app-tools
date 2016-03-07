@@ -18,6 +18,8 @@ var util = {
     DownloadHandler: require("./DownloadHandler"),
     /** {@link IndexParser} */
     IndexParser: require("./IndexParser"),
+    /** {@link Keys} */
+    Keys: require("./Keys"),
     /** {@link Targets} */
     Targets: require("./Targets"),
     /** {@link TemplateFile} */
