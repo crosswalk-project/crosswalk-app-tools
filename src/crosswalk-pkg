@@ -127,6 +127,7 @@ function help() {
         "    -r --release                     Build release packages\n" +
         "    -t --targets=<target-archs>      Target CPU architectures\n" +
         "    -v --version                     Print tool version\n" +
+        '    -w --windows=<windows-conf>      Extra configurations for Windows\n' +
         "\n" +
         "  <path>\n" +
         "    Path to directory that contains a web app\n" +
@@ -163,6 +164,10 @@ function help() {
         "    * Path to build, e.g. crosswalk/src/out/Release/xwalk_app_template\n" +
         "    When passing a local file or directory, only the contained ABIs can be built.\n" +
         "    See <target-archs> for details.\n" +
+        "\n" +
+        "  <windows-conf>\n" +
+        "    Quoted string with extra config, e.g. \"google-api-key:<name>\"\n" +
+        "    where <name> is the keyset in ~/.crosswalk-app-tools-keys.json\n" +
         "\n" +
         "  Environment variables\n" +
         "    CROSSWALK_APP_TOOLS_CACHE_DIR=<path>: Keep downloaded files in this dir\n" +
@@ -477,6 +482,14 @@ if (argv.t || argv.targets) {
         extraArgs.targets = targets;
     } else {
         output.warning("Ignoring unknown -t / --targets, building default");
+    }
+}
+
+var windowsArgs = argv.w ? argv.w : argv.windows;
+if (windowsArgs) {
+    var a = windowsArgs.split(":");
+    if (a[0] === "google-api-key" && a.length > 1) {
+        extraArgs["windows-googleApiKeyName"] = a[1];
     }
 }
 

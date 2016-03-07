@@ -41,6 +41,9 @@ WinPlatform.getArgs = function() {
     return {
         create: { // Extra options for command "create"
             crosswalk: "\t\t\tPath to crosswalk zip"
+        },
+        build: { // Extra options for command "build"
+            googleApiKeyName: "\t\ŧGoogle API key name in ~/.crosswalk-app-tools-keys.json"
         }
     };
 };
@@ -209,11 +212,26 @@ function() {
 WinPlatform.prototype.build =
 function(configId, args, callback) {
 
+    // Namespace util
+    var util = this.application.util;
+
     var output = this.output;
     var manifest = this.application.manifest;
 
     if (!configId) {
         configId = "debug";
+    }
+
+    var googleKeys = null;
+    if (args.googleApiKeyName) {
+        try {
+            googleKeys = util.Keys.getGoogleApiKeys(args.googleApiKeyName);
+            output.info("Using Google API Key '" + args.googleApiKeyName + "'");
+        } catch (e) {
+            output.error("Failed loading Google API Key '" + args.googleApiKeyName + "'");
+            output.error(e.message);
+            output.error("Google APIs will not be functional");
+        }
     }
 
     // WiX wants 4 component version numbers, so append as many ".0" as needed.
@@ -254,7 +272,8 @@ function(configId, args, callback) {
         version: manifest.appVersion + versionPadding,
         is_64_bit: true,
         icon: this.selectIcon(),
-        product: manifest.packageId
+        product: manifest.packageId,
+        googleApiKeys: googleKeys
     };
     sdk.generateMSI(this.appPath, this.platformPath, metaData,
                     function (success) {
