@@ -317,10 +317,10 @@ function(crosswalkPath, activityClassName) {
     if (xwalk.version.major < 9) {
         output.error("Crosswalk version " + xwalk.version.major + " not supported. Use 8+.");
         return null;
-    } else if (xwalk.version.major < 18) {
+    } else if (xwalk.version.major < 17) {
         output.error("This version can't support Crosswalk " + xwalk.version.major + ". Please use previous version of this tool.");
         return null;
-    } else if (xwalk.version.major > 18) {
+    } else if (xwalk.version.major > 19) {
         output.warning("This tool has not been tested with Crosswalk " + xwalk.version.major + ".");
     }
 
