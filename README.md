@@ -45,10 +45,11 @@ Two executables are provided, `crosswalk-app` implements low level helper comman
     -h --help                        Print usage information
     -k --keep                        Keep build tree for debugging
     -m --manifest=<package-id>       Fill manifest.json with default values
-    -p --platforms=<android|windows> Specify target platform
+    -p --platforms=<target-systems>  Specify target platform
     -r --release                     Build release packages
     -t --targets=<target-archs>      Target CPU architectures
     -v --version                     Print tool version
+    -w --windows=<windows-conf>      Extra configurations for Windows
 
   <path>
     Path to directory that contains a web app
@@ -72,6 +73,12 @@ Two executables are provided, `crosswalk-app` implements low level helper comman
     * Default behavior is equivalent to "32", creation of 32-bit installers
     Example: --targets="arm x86" builds both ARM plus 32-bit x86 packages
 
+  <target-systems>
+    List of operating systems for which to create packages.
+    Default is android-only, which is supported on Apple OSX, Linux and Windows
+    Creating Windows MSIs is supported on Microsoft Windows only.
+    Example: --platforms="android windows"
+
   <version-spec>
     * Channel name, i.e. stable/beta/canary
     * Version number, e.g. 14.43.343.25
@@ -79,6 +86,10 @@ Two executables are provided, `crosswalk-app` implements low level helper comman
     * Path to build, e.g. crosswalk/src/out/Release/xwalk_app_template
     When passing a local file or directory, only the contained ABIs can be built.
     See <target-archs> for details.
+
+  <windows-conf>
+    Quoted string with extra config, e.g. "google-api-key:<name>"
+    where <name> is the keyset in ~/.crosswalk-app-tools-keys.json
 
   Environment variables
     CROSSWALK_APP_TOOLS_CACHE_DIR=<path>: Keep downloaded files in this dir
