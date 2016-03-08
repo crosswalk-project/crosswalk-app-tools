@@ -149,7 +149,8 @@ function help() {
         "    * Same for \"x\" and \"x8\", but \"x86\" is an exact match, only x86-32 conforms\n" +
         "    * Short-hands \"32\" and \"64\" build ARM and x86 for the requested word size\n" +
         "    * Default behavior is equivalent to \"32\", creation of 32-bit installers\n" +
-        "    Example: --targets=\"arm x86\" builds both ARM plus 32-bit x86 packages\n" +
+        "    Example: --targets=\"arm x86\" builds both 32-bit and 64-bit ARM packages\n" +
+        "             plus the 32-bit x86 package.\n" +
         "\n" +
         "  <target-systems>\n" +
         "    List of operating systems for which to create packages.\n" +
