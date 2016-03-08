@@ -238,7 +238,12 @@ Object.defineProperty(AndroidManifest.prototype, "permissions", {
                                 this._output.info("Adding permissions " + permissions.join(","));
                                 permissions.forEach(function (permission) {
                                     child = doc.createElement("uses-permission");
-                                    child.setAttribute("android:name", "android.permission." + permission);
+                                    if (permission.indexOf(".") < 0) {
+                                        // If permission is not namespaced, use Android namespace
+                                        child.setAttribute("android:name", "android.permission." + permission);
+                                    } else {
+                                        child.setAttribute("android:name", permission);
+                                    }
                                     doc.documentElement.appendChild(child);
                                 });
 
