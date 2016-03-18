@@ -496,6 +496,8 @@ function(packageId, args, callback) {
             if (args.crosswalk) {
                 // TODO verify version/channel
                 versionSpec = args.crosswalk;
+            } else if (this._lite) {
+                versionSpec = "canary"; //Lite only has canary release.
             } else {
                 versionSpec = "stable";
                 output.info("Defaulting to download channel " + versionSpec);
@@ -1388,21 +1390,6 @@ function(configId, args, callback) {
         callback("Failed to determine which ABIs to build");
         return;
     }
-
-    // Extract lzma libxwalkcore, because we are not supporting
-    // compressed runtime yet.
-    abis.forEach(function (abi) {
-        lzmaLibPath = Path.join(libPath, abi, "libxwalkcore.so.lzma");
-        if (ShellJS.test("-f", lzmaLibPath)) {
-            if (!ShellJS.which("lzma")) {
-                var message = "the lzma utility is needed for crosswalk-lite";
-                output.error(message);
-                throw new Error(message);
-            }
-            output.info("lzma -d ", lzmaLibPath);
-            this.execSync("lzma -d " + lzmaLibPath);
-        }
-    }.bind(this));
 
     this.updateEngine();
     this.importExtensions();
