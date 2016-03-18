@@ -202,7 +202,9 @@ function(version) {
 
     var filename;
 
-    if (this._androidWordSize == 64) {
+    if (this._platform === "windows") {
+        filename = "crosswalk64-" + version + ".zip";
+    } else if (this._androidWordSize == 64) {
         filename = "crosswalk-" + version + "-64bit.zip";
     } else {
         filename = "crosswalk-" + version + ".zip";
