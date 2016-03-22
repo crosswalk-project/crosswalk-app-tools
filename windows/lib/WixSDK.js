@@ -190,10 +190,16 @@ function(app_path, xwalk_path, meta_data, callback) {
     AddFileComponent(app_root_folder, xwalk_path, 'icudtl.dat');
     AddFileComponent(app_root_folder, xwalk_path, 'natives_blob.bin');
     AddFileComponent(app_root_folder, xwalk_path, 'snapshot_blob.bin');
-    AddFileComponent(app_root_folder, xwalk_path, 'libEGL.dll');
-    AddFileComponent(app_root_folder, xwalk_path, 'libGLESv2.dll');
-    AddFileComponent(app_root_folder, xwalk_path, 'osmesa.dll');
+    AddFileComponent(app_root_folder, xwalk_path, 'VERSION');
 
+    // Add all dll files
+    readDir.readSync(xwalk_path).forEach(function (name) {
+        var suffix = name.substring(name.length - ".dll".length);
+        if (suffix && suffix.toLowerCase() === ".dll") {
+            AddFileComponent(app_root_folder, xwalk_path, name);
+        }
+    });
+    
     var subfolder_map = {};
 
     function GetFolderNode(subfolder, root) {
