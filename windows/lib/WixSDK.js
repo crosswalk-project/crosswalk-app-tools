@@ -12,12 +12,14 @@ var ShellJS = require("shelljs");
 
 /**
  * Creates WixSDK object.
+ * @param {String} rootPath Root path for project
  * @param {Manifest} manifest Web manifest
  * @param {OutputIface} output Output
  * @constructor
  */
-function WixSDK(manifest, output) {
+function WixSDK(rootPath, manifest, output) {
 
+    this._rootPath = rootPath;
     this._manifest = manifest;
     this._output = output;
 }
@@ -357,13 +359,13 @@ function(app_path, xwalk_path, meta_data, callback) {
 
     var xml_str = root.end({ pretty: true });
     var basename = meta_data.product + "-" + meta_data.version;
-    fs.writeFileSync(basename + '.wxs', xml_str);
-    this.runWix(InQuotes(basename), function(success) {
+    var wxsPath = path.join(this._rootPath, basename + '.wxs');
+    fs.writeFileSync(wxsPath, xml_str);
+    this.runWix(InQuotes(basename), wxsPath, function(success) {
         if (success) {
             // Pass back built package
             meta_data.msi = path.resolve(basename + ".msi");
             // Only delete on success, for debugging reasons.
-            ShellJS.rm("-f", basename + ".wxs");
             ShellJS.rm("-f", basename + ".wixobj");
             ShellJS.rm("-f", basename + ".wixpdb");
         }
@@ -372,9 +374,9 @@ function(app_path, xwalk_path, meta_data, callback) {
 };
 
 WixSDK.prototype.runWix =
-function(basename, callback) {
+function(basename, wxsPath, callback) {
 
-    var candle = "candle -v " + basename + ".wxs";
+    var candle = "candle -v " + wxsPath;
     this._output.info("Running '" + candle + "'");
     var child = child_process.exec(candle);
 
