@@ -568,33 +568,27 @@ function(abi) {
         return false;
     }
 
-    ShellJS.pushd(libsDir);
-
     var abiMatched = false;
-    var list = ShellJS.ls(".");
-    for (var i = 0; i < list.length; i++) {
+    FS.readdirSync(libsDir).forEach(function (entry) {
 
-        var entry = list[i];
-        if (ShellJS.test("-d", entry)) {
-            // This is a dir inside "libs", enable/disable depending
-            // on which ABI we want.
-            if (!abi) {
-                // No ABI passed, enable all of them, this is default
-                // status of the project.
-                ShellJS.chmod("+rx", entry);
-                abiMatched = true;
-            } else if (abi === entry) {
-                // enable
-                ShellJS.chmod("+rx", entry);
-                abiMatched = true;
-            } else {
-                // disable
-                ShellJS.chmod("-rx", entry);
-            }
+        // This is a dir inside "libs", enable/disable depending
+        // on which ABI we want.
+        var libxwalkcore = Path.join(libsDir, entry, "libxwalkcore.so");
+        if (!abi) {
+            // No ABI passed, enable all of them, this is default
+            // status of the project.
+            ShellJS.mv(libxwalkcore + ".foo", libxwalkcore);
+            abiMatched = true;
+        } else if (abi === entry) {
+            // enable
+            ShellJS.mv(libxwalkcore + ".foo", libxwalkcore);
+            abiMatched = true;
+        } else {
+            // disable
+            ShellJS.mv(libxwalkcore, libxwalkcore + ".foo");
         }
-    }
+    });
 
-    ShellJS.popd();
     return abiMatched;
 };
 
