@@ -309,6 +309,12 @@ function(app_path, xwalk_path, meta_data, callback) {
         Arguments: cmd_line_args,
         WorkingDirectory: 'ApplicationRootFolder'
     });
+    
+    shortcut.ele('ShortcutProperty', {
+        Key: 'System.AppUserModel.ID',
+        Value: meta_data.product,
+    });
+
     if (HasProductIcon())
         shortcut.att('Icon', 'ProductIcon');
 
