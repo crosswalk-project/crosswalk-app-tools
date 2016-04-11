@@ -22,7 +22,7 @@ install:
   - 7z x lzma1514.7z
   - cd ..\
   - set PATH=%ANDROID_HOME%\tools;%PATH%;%ANT_HOME%\bin;%WIX_HOME%\bin;C:\lzma\bin;
-  - appveyor DownloadFile http://www.crummy.com/software/BeautifulSoup/bs4/download/4.4/beautifulsoup4-4.4.1.tar.gz
+  - appveyor DownloadFile https://www.crummy.com/software/BeautifulSoup/bs4/download/4.4/beautifulsoup4-4.4.1.tar.gz
   - 7z x beautifulsoup4-4.4.1.tar.gz
   - 7z x dist/beautifulsoup4-4.4.1.tar > nul
   - cd beautifulsoup4-4.4.1
