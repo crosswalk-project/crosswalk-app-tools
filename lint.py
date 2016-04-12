@@ -9,6 +9,7 @@ import re
 from bs4 import BeautifulSoup
 import platform
 
+os.system("node -v")
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 crosswalk_test_suite = os.path.join(SCRIPT_PATH, "crosswalk-test-suite")
 tmp = os.path.join(SCRIPT_PATH, "tmp")
@@ -89,19 +90,17 @@ def main():
             vp_64.write(android_crosswalk_version + " 64")
             vp_64.close()
             os.chdir(os.path.join(apptools_android_tests, "tools"))
-            if platform.system() != "Linux":
-                os.system("appveyor DownloadFile https://download.01.org/crosswalk/releases/crosswalk/" + BUILD_PARAMETERS.platform + "/stable/" + android_crosswalk_version + "/crosswalk-" + android_crosswalk_version + "-64bit.zip")
-            else:
-                os.system("wget https://download.01.org/crosswalk/releases/crosswalk/" + BUILD_PARAMETERS.platform + "/stable/" + android_crosswalk_version + "/crosswalk-" + android_crosswalk_version + "-64bit.zip")
+            data = urllib2.urlopen("https://download.01.org/crosswalk/releases/crosswalk/" + BUILD_PARAMETERS.platform + "/stable/" + android_crosswalk_version + "/crosswalk-" + android_crosswalk_version + "-64bit.zip").read()
+            with open("crosswalk-" + android_crosswalk_version + "-64bit.zip", 'wb') as f:
+                f.write(data)
         else:
             vp_32 = open(apptools_android_tests + "/version.txt", 'w+')
             vp_32.write(android_crosswalk_version + " 32")
             vp_32.close()
             os.chdir(os.path.join(apptools_android_tests, "tools"))
-            if platform.system() != "Linux":
-                os.system("appveyor DownloadFile https://download.01.org/crosswalk/releases/crosswalk/" + BUILD_PARAMETERS.platform + "/stable/" + android_crosswalk_version + "/crosswalk-" + android_crosswalk_version + ".zip")
-            else:
-                os.system("wget https://download.01.org/crosswalk/releases/crosswalk/" + BUILD_PARAMETERS.platform + "/stable/" + android_crosswalk_version + "/crosswalk-" + android_crosswalk_version + ".zip")
+            data = urllib2.urlopen("https://download.01.org/crosswalk/releases/crosswalk/" + BUILD_PARAMETERS.platform + "/stable/" + android_crosswalk_version + "/crosswalk-" + android_crosswalk_version + ".zip").read()
+            with open("crosswalk-" + android_crosswalk_version + ".zip", 'wb') as f:
+                f.write(data)
         os.chdir(os.path.join(os.path.join(apptools_android_tests, "apptools"), "CI"))
         if platform.system() != "Linux":
             os.system("python -m unittest discover --pattern=crosswalk_pkg_basic.py > null")
@@ -112,7 +111,14 @@ def main():
         shutil.copytree(os.path.join(apptools, "apptools-windows-tests"), apptools_windows_tests)
         os.chdir(os.path.join(apptools_windows_tests, "tools"))
         windows_crosswalk_version = crosswalk_version("canary", BUILD_PARAMETERS.platform)
-        os.system("appveyor DownloadFile https://download.01.org/crosswalk/releases/crosswalk/" + BUILD_PARAMETERS.platform + "/canary/" + windows_crosswalk_version + "/crosswalk-" + windows_crosswalk_version + ".zip")
+        try:
+            data = urllib2.urlopen("https://download.01.org/crosswalk/releases/crosswalk/" + BUILD_PARAMETERS.platform + "/canary/" + windows_crosswalk_version + "/crosswalk-" + windows_crosswalk_version + ".zip").read()
+            with open("crosswalk-" + windows_crosswalk_version + ".zip", 'wb') as f:
+                f.write(data)
+        except Exception as e:
+            data = urllib2.urlopen("https://download.01.org/crosswalk/releases/crosswalk/" + BUILD_PARAMETERS.platform + "/canary/" + windows_crosswalk_version + "/crosswalk64-" + windows_crosswalk_version + ".zip").read()
+            with open("crosswalk64-" + windows_crosswalk_version + ".zip", 'wb') as f:
+                f.write(data)
         os.chdir(os.path.join(os.path.join(apptools_windows_tests, "apptools"), "CI"))
         os.system("python -m unittest discover --pattern=*.py > null")
     elif BUILD_PARAMETERS.platform == "ios":
