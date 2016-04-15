@@ -439,13 +439,14 @@ if (argv.p || argv.platforms) {
         // Filter empty entries caused by extra whitespace.
         return value;
     });
-} else {
+} else if (ShellJS.test("-f", manifestPath)) {
     json = _readManifest(manifestPath, output);
     if (json.xwalk_target_platforms) {
         extraArgs.platforms = json.xwalk_target_platforms;
-    } else {
-        extraArgs.platforms = [ "android" ];
     }
+}
+if (!extraArgs.platforms) {
+    extraArgs.platforms = [ "android" ];
 }
 
 var buildConfig = null;
