@@ -1,29 +1,29 @@
 cache:
-- C:\apache-ant-1.9.6-bin.zip
+- C:\apache-ant-1.9.7-bin.zip
 
 environment:
   matrix:
     - ANDROID_HOME: C:\Program Files (x86)\Android\android-sdk
-      ANT_HOME: C:\apache-ant-1.9.6
+      ANT_HOME: C:\apache-ant-1.9.7
       TEST_SCRIPT: "nodeunit_test"
     - WIX_HOME: C:\Program Files (x86)\WiX Toolset v3.10
       TEST_SCRIPT: "windows_test"
     - ANDROID_HOME: C:\Program Files (x86)\Android\android-sdk
-      ANT_HOME: C:\apache-ant-1.9.6
+      ANT_HOME: C:\apache-ant-1.9.7
       TEST_SCRIPT: "android_test"
 
 install:
   - cd \
   - ps: "[Net.ServicePointManager]::SecurityProtocol = 'Tls12'"
-  - ps: Start-FileDownload http://www.eu.apache.org/dist//ant/binaries/apache-ant-1.9.6-bin.zip
-  - 7z x apache-ant-1.9.6-bin.zip > nul
+  - ps: Start-FileDownload 'http://www.eu.apache.org/dist//ant/binaries/apache-ant-1.9.7-bin.zip'
+  - 7z x apache-ant-1.9.7-bin.zip > nul
   - md lzma
   - cd lzma
-  - ps: Start-FileDownload http://www.7-zip.org/a/lzma1514.7z
+  - ps: Start-FileDownload 'http://www.7-zip.org/a/lzma1514.7z'
   - 7z x lzma1514.7z
   - cd ..\
   - set PATH=%ANDROID_HOME%\tools;%PATH%;%ANT_HOME%\bin;%WIX_HOME%\bin;C:\lzma\bin;
-  - ps: Start-FileDownload http://www.crummy.com/software/BeautifulSoup/bs4/download/4.4/beautifulsoup4-4.4.1.tar.gz
+  - ps: Start-FileDownload 'http://www.crummy.com/software/BeautifulSoup/bs4/download/4.4/beautifulsoup4-4.4.1.tar.gz'
   - 7z x beautifulsoup4-4.4.1.tar.gz
   - 7z x dist/beautifulsoup4-4.4.1.tar > nul
   - cd beautifulsoup4-4.4.1
