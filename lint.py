@@ -103,9 +103,9 @@ def main():
                 f.write(data)
         os.chdir(os.path.join(os.path.join(apptools_android_tests, "apptools"), "CI"))
         if platform.system() != "Linux":
-            os.system("python -m unittest discover --pattern=crosswalk_pkg_basic.py > null")
+            retval = os.system("python -m unittest discover --pattern=crosswalk_pkg_basic.py > null")
         else:
-            os.system("python -m unittest discover --pattern=*.py > null")
+            retval = os.system("python -m unittest discover --pattern=*.py")
     elif BUILD_PARAMETERS.platform == "windows":
         os.environ['CROSSWALK_APP_TOOLS_CACHE_DIR'] = os.path.join(apptools_windows_tests, "tools")
         shutil.copytree(os.path.join(apptools, "apptools-windows-tests"), apptools_windows_tests)
@@ -120,11 +120,12 @@ def main():
             with open("crosswalk64-" + windows_crosswalk_version + ".zip", 'wb') as f:
                 f.write(data)
         os.chdir(os.path.join(os.path.join(apptools_windows_tests, "apptools"), "CI"))
-        os.system("python -m unittest discover --pattern=*.py > null")
+        retval = os.system("python -m unittest discover --pattern=*.py > null")
     elif BUILD_PARAMETERS.platform == "ios":
         shutil.copytree(os.path.join(apptools, "apptools-ios-tests"), apptools_ios_tests)
         os.chdir(os.path.join(os.path.join(apptools_ios_tests, "apptools"), "CI"))
-        os.system("python -m unittest discover --pattern=*.py > null")
+        retval = os.system("python -m unittest discover --pattern=*.py > null")
+    return retval
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
