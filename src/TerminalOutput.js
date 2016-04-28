@@ -81,8 +81,9 @@ function(message, path) {
         }
 
         var output;
-        if (message.length > 75 && path) {
-            // Overflow, no point in abbreviating
+        if (!process.stdout.isTTY ||
+            (message.length > 75 && path)) {
+            // Non-interactive or overflow, no point in abbreviating
             output = this.prefix + message + " " + path;
         }
         else if (path) {
