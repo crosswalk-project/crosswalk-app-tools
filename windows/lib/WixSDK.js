@@ -188,11 +188,18 @@ function(app_path, xwalk_path, meta_data, callback) {
     }
 
     var xwalk_id = AddFileComponent(app_root_folder, xwalk_path, 'xwalk.exe');
-    AddFileComponent(app_root_folder, xwalk_path, 'xwalk.pak');
     AddFileComponent(app_root_folder, xwalk_path, 'icudtl.dat');
     AddFileComponent(app_root_folder, xwalk_path, 'natives_blob.bin');
     AddFileComponent(app_root_folder, xwalk_path, 'snapshot_blob.bin');
     AddFileComponent(app_root_folder, xwalk_path, 'VERSION');
+
+    // Add all pak files
+    readDir.readSync(xwalk_path).forEach(function (name) {
+        var suffix = name.substring(name.length - ".pak".length);
+        if (suffix && suffix.toLowerCase() === ".pak") {
+            AddFileComponent(app_root_folder, xwalk_path, name);
+        }
+    });
 
     // Add all dll files
     readDir.readSync(xwalk_path).forEach(function (name) {
