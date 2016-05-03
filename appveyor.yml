@@ -10,7 +10,10 @@ environment:
       TEST_SCRIPT: "windows_test"
     - ANDROID_HOME: C:\Program Files (x86)\Android\android-sdk
       ANT_HOME: C:\apache-ant-1.9.7
-      TEST_SCRIPT: "android_test"
+      TEST_SCRIPT: "android_test_32bit"
+    - ANDROID_HOME: C:\Program Files (x86)\Android\android-sdk
+      ANT_HOME: C:\apache-ant-1.9.7
+      TEST_SCRIPT: "android_test_64bit"
 
 install:
   - cd \
@@ -38,10 +41,10 @@ test_script:
   - if "%TEST_SCRIPT%" == "windows_test" (
       python lint.py -p windows
     )
-  - if "%TEST_SCRIPT%" == "android_test" (
+  - if "%TEST_SCRIPT%" == "android_test_32bit" (
       python lint.py -p android -a 32bit
     )
-  - if "%TEST_SCRIPT%" == "android_test" (
+  - if "%TEST_SCRIPT%" == "android_test_64bit" (
       python lint.py -p android -a 64bit
     )
 
