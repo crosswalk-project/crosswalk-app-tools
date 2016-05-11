@@ -102,7 +102,7 @@ function(crosswalkPath) {
     var version = null;
     if (ShellJS.test("-d", crosswalkPath)) {
         ShellJS.mkdir(this.platformPath);
-        ShellJS.cp(Path.join(crosswalkPath, "*"), this.platformPath);
+        ShellJS.cp("-r", Path.join(crosswalkPath, "*"), this.platformPath);
         version = util.Version.createFromFile(Path.join(crosswalkPath, "VERSION"));
     } else {
         var xwalk = new util.CrosswalkZip(crosswalkPath);
