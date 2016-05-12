@@ -397,6 +397,9 @@ if (argv.a) {
 if (argv.android) {
     extraArgs.android = argv.android;
 }
+delete argv.a;
+delete argv.android;
+
 if (extraArgs.android) {
 
     var androidArgs = extraArgs.android.split(" ");
@@ -421,10 +424,14 @@ if (argv.crosswalk) {
     extraArgs["android-crosswalk"] = argv.crosswalk;
     extraArgs["windows-crosswalk"] = argv.crosswalk;
 }
+delete argv.c;
+delete argv.crosswalk;
 
 if (argv.k || argv.keep) {
     extraArgs.keep = true;
 }
+delete argv.k;
+delete argv.keep;
 
 if (argv.m) {
     extraArgs.manifest = argv.m;
@@ -432,6 +439,8 @@ if (argv.m) {
 if (argv.manifest) {
     extraArgs.manifest = argv.manifest;
 }
+delete argv.m;
+delete argv.manifest;
 
 if (argv.p || argv.platforms) {
     var platforms = argv.p ? argv.p : argv.platforms;
@@ -445,6 +454,9 @@ if (argv.p || argv.platforms) {
         extraArgs.platforms = json.xwalk_target_platforms;
     }
 }
+delete argv.p;
+delete argv.platforms;
+
 if (!extraArgs.platforms) {
     extraArgs.platforms = [ "android" ];
 }
@@ -453,6 +465,8 @@ var buildConfig = null;
 if (argv.r || argv.release) {
     buildConfig = "release";
 }
+delete argv.r;
+delete argv.release;
 
 // Targets
 // By default, build both 32bit targets.
@@ -486,12 +500,25 @@ if (argv.t || argv.targets) {
         output.warning("Ignoring unknown -t / --targets, building default");
     }
 }
+delete argv.t;
+delete argv.targets;
 
 var windowsArgs = argv.w ? argv.w : argv.windows;
 if (windowsArgs) {
     var a = windowsArgs.split(":");
     if (a[0] === "google-api-key" && a.length > 1) {
         extraArgs["windows-googleApiKeyName"] = a[1];
+    }
+}
+delete argv.w;
+delete argv.windows;
+
+// Check for unhandled leftover args,
+// there should not be any at this point.
+for (var arg in argv) {
+    if (argv.hasOwnProperty(arg) &&
+        arg != "_") {
+        output.error("Ignoring unknown argument " + arg);
     }
 }
 
