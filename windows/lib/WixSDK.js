@@ -236,7 +236,8 @@ function(app_path, xwalk_path, meta_data, callback) {
             AddFileComponent(GetFolderNode('locales', app_root_folder), locales_path, locale);
         });
     } else {
-        // TODO maybe error or warning
+        output.error("Folder 'locales' not found in " + xwalk_path);
+        output.error("Missing i18n support");
     }
 
     // @skip_array contains absolute path of those need to be skipped, items can be
