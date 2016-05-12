@@ -47,7 +47,6 @@ function(path) {
  *                              'manufacturer' - product manufacturer
  *                           Optional fields:
  *                              'icon' - path to the icon to be used for shortcut and in the installed program list
- *                              'product_name' - product name, application name is used by default
  *                              'version' - product version, '0.0.0.0' by default
  *                              'is_64_bit' {Bool} - 64 bit arch. flag, 'false' by default
  */
@@ -97,8 +96,7 @@ function(app_path, xwalk_path, meta_data, callback) {
         return;
     }
 
-    if (!meta_data.hasOwnProperty('product_name'))
-        meta_data.product_name = meta_data.app_name;
+    meta_data.product_name = meta_data.manufacturer + " " + meta_data.app_name;
 
     if (!meta_data.hasOwnProperty('version'))
         meta_data.version = '0.0.0.0';
