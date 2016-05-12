@@ -513,7 +513,8 @@ if (windowsArgs) {
 delete argv.w;
 delete argv.windows;
 
-// Check for unhandled leftover args
+// Check for unhandled leftover args,
+// there should not be any at this point.
 for (var arg in argv) {
     if (argv.hasOwnProperty(arg) &&
         arg != "_") {
