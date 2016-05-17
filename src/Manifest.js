@@ -4,6 +4,7 @@
 
 var FS = require("fs");
 var Path = require("path");
+var Url = require("url");
 
 var FormatJson = require("format-json");
 var ParseColor = require('parse-color');
@@ -391,6 +392,51 @@ function(output, path, packageId) {
     // Write back
     buffer = FormatJson.plain(json);
     FS.writeFileSync(path, buffer);
+};
+
+/**
+ * Convert relative start_url links to absolute ones using the app:// protocol.
+ * @param {String} path Path to manifest.json
+ * @param {String} packageId Unique package identifier com.example.foo
+ * @memberOf Manifest
+ * @static
+ */
+Manifest.ensureAppProtocol =
+function(output, path, packageId) {
+
+    var buffer;
+    var json = null;
+    if (ShellJS.test("-f", path)) {
+        buffer = FS.readFileSync(path, {"encoding": "utf8"});
+        json = JSON.parse(buffer);
+    } else {
+        output.error("File does not exist " + path);
+        output.error("Failed to check app:// protocol for start_url");
+        return false;
+    }
+
+    if (!json) {
+        output.error("File does not exist " + path);
+        return false;
+    }
+
+    var url = Url.parse(json.start_url);
+    if (!url.protocol) {
+        var manifestDir = Path.dirname(path);
+        var indexPath = Path.join(manifestDir, json.start_url);
+        if (!ShellJS.test("-f", indexPath)) {
+            output.error("File start_url does not exist " + indexPath);
+            output.error("Check manifest.json field start_url for correct value");
+            return false;
+        }
+        json.start_url = "app://" + Path.join(json.xwalk_package_id, json.start_url);
+        output.info("Rewriting manifest start_url to", json.start_url);
+    }
+
+    // Write back
+    buffer = FormatJson.plain(json);
+    FS.writeFileSync(path, buffer);
+    return true;
 };
 
 /**

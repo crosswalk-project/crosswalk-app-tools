@@ -288,6 +288,11 @@ function copy(app, appPath, extraArgs, callback) {
     // Init and load manifest
     var manifestPath = Path.join(app.appPath, "manifest.json");
     Manifest.addDefaults(output, manifestPath, app.packageId);
+    var ret = Manifest.ensureAppProtocol(output, manifestPath, app.packageId);
+    if (!ret) {
+        callback(cat.EXIT_CODE_ERROR);
+        return;
+    }
     app.loadManifest(manifestPath);
 
     // Propagate target platform cause we just nuked the manifest
