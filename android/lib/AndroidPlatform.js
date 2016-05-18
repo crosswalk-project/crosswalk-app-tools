@@ -574,21 +574,25 @@ function(abi) {
         // This is a dir inside "libs", enable/disable depending
         // on which ABI we want.
         var libxwalkcore = Path.join(libsDir, entry, "libxwalkcore.so");
+        var libxwalkcoreCompressed = Path.join(libsDir, entry, "libxwalkcoreCompressed.so");
         var libxwalkdummy = Path.join(libsDir, entry, "libxwalkdummy.so");
         if (!abi) {
             // No ABI passed, enable all of them, this is default
             // status of the project.
             ShellJS.mv(libxwalkcore + ".foo", libxwalkcore);
+            ShellJS.mv(libxwalkcoreCompressed + ".foo", libxwalkcoreCompressed);
             ShellJS.mv(libxwalkdummy + ".foo", libxwalkdummy);
             abiMatched = true;
         } else if (abi === entry) {
             // enable
             ShellJS.mv(libxwalkcore + ".foo", libxwalkcore);
+            ShellJS.mv(libxwalkcoreCompressed + ".foo", libxwalkcoreCompressed);
             ShellJS.mv(libxwalkdummy + ".foo", libxwalkdummy);
             abiMatched = true;
         } else {
             // disable
             ShellJS.mv(libxwalkcore, libxwalkcore + ".foo");
+            ShellJS.mv(libxwalkcoreCompressed, libxwalkcoreCompressed + ".foo");
             ShellJS.mv(libxwalkdummy, libxwalkdummy + ".foo");
         }
     });
