@@ -125,6 +125,7 @@ function help() {
         "    -m --manifest=<package-id>       Fill manifest.json with default values\n" +
         "    -p --platforms=<target-systems>  Specify target platform\n" +
         "    -r --release                     Build release packages\n" +
+        "    -s --skip-check                  Skip host setup check before building\n" +
         "    -t --targets=<target-archs>      Target CPU architectures\n" +
         "    -v --version                     Print tool version\n" +
         '    -w --windows=<windows-conf>      Extra configurations for Windows\n' +
@@ -180,8 +181,18 @@ function help() {
 // Check platform
 function check(app, appPath, extraArgs, output, callback) {
 
-    output.highlight("Checking host setup");
-    app.check(extraArgs.platforms, output, callback);
+    // Per default check only on non-interactive termial (logfile ...)
+    if (!extraArgs.hasOwnProperty("skipCheck")) {
+        extraArgs.skipCheck = !process.stdout.isTTY;
+    }
+
+    if (extraArgs.skipCheck) {
+        output.highlight("Skipping host setup check");
+        callback(cat.EXIT_CODE_OK);
+    } else {
+        output.highlight("Checking host setup");
+        app.check(extraArgs.platforms, output, callback);
+    }
 }
 
 // Initialize app tools
@@ -467,6 +478,19 @@ if (argv.r || argv.release) {
 }
 delete argv.r;
 delete argv.release;
+
+// extraArgs.skipCheck is tri-state:
+// unset: default (check if running in interactive terminal)
+// true: skip check
+// false: force check
+if (argv["s"] === "no" ||
+    argv["skip-check"] === "no") {
+    extraArgs.skipCheck = false;
+} else if (argv["s"] || argv["skip-check"]) {
+    extraArgs.skipCheck = true;
+}
+delete argv["s"];
+delete argv["skip-check"];
 
 // Targets
 // By default, build both 32bit targets.

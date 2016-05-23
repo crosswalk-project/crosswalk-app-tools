@@ -47,6 +47,7 @@ Two executables are provided, `crosswalk-app` implements low level helper comman
     -m --manifest=<package-id>       Fill manifest.json with default values
     -p --platforms=<target-systems>  Specify target platform
     -r --release                     Build release packages
+    -s --skip-check                  Skip host setup check before building
     -t --targets=<target-archs>      Target CPU architectures
     -v --version                     Print tool version
     -w --windows=<windows-conf>      Extra configurations for Windows

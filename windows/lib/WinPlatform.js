@@ -43,7 +43,7 @@ WinPlatform.getArgs = function() {
             crosswalk: "\t\t\tPath to crosswalk zip"
         },
         build: { // Extra options for command "build"
-            googleApiKeyName: "\t\ŧGoogle API key name in ~/.crosswalk-app-tools-keys.json"
+            googleApiKeyName: "\t\tGoogle API key name in ~/.crosswalk-app-tools-keys.json"
         }
     };
 };
