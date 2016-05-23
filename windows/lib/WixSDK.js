@@ -192,19 +192,13 @@ function(app_path, xwalk_path, meta_data, callback) {
     AddFileComponent(app_root_folder, xwalk_path, 'VERSION');
 
     // Add all pak files
-    readDir.readSync(xwalk_path).forEach(function (name) {
-        var suffix = name.substring(name.length - ".pak".length);
-        if (suffix && suffix.toLowerCase() === ".pak") {
-            AddFileComponent(app_root_folder, xwalk_path, name);
-        }
+    ShellJS.ls(path.join(xwalk_path, "*.pak")).forEach(function (entry) {
+        AddFileComponent(app_root_folder, xwalk_path, path.basename(entry));
     });
 
     // Add all dll files
-    readDir.readSync(xwalk_path).forEach(function (name) {
-        var suffix = name.substring(name.length - ".dll".length);
-        if (suffix && suffix.toLowerCase() === ".dll") {
-            AddFileComponent(app_root_folder, xwalk_path, name);
-        }
+    ShellJS.ls(path.join(xwalk_path, "*.dll")).forEach(function (entry) {
+        AddFileComponent(app_root_folder, xwalk_path, path.basename(entry));
     });
     
     var subfolder_map = {};
