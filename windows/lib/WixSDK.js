@@ -200,7 +200,7 @@ function(app_path, xwalk_path, meta_data, callback) {
     ShellJS.ls(path.join(xwalk_path, "*.dll")).forEach(function (entry) {
         AddFileComponent(app_root_folder, xwalk_path, path.basename(entry));
     });
-    
+
     var subfolder_map = {};
 
     function GetFolderNode(subfolder, root) {
