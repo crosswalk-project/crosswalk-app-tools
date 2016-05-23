@@ -22,6 +22,8 @@ function WixSDK(rootPath, manifest, output) {
     this._rootPath = rootPath;
     this._manifest = manifest;
     this._output = output;
+
+    this._existing_ids = {};
 }
 
 /**
@@ -152,18 +154,20 @@ function(app_path, xwalk_path, meta_data, callback) {
 
     var file_ids = [];
 
-    function MakeIdFromPath(path) {
+    var MakeIdFromPath = function(path) {
+
+        if (this._existing_ids[path]) {
+            return this._existing_ids[path];
+        }
+
         var shasum = crypto.createHash('sha1');
-        existing_ids = {};
-
         var id = '_' + shasum.update(path).digest('hex');
-        while (existing_ids.hasOwnProperty(id) && existing_ids[id] != path)
-            id = '_' + shasum.update(id).digest('hex');
 
-        existing_ids[id] = path;
+        this._existing_ids[path] = id;
 
         return id;
-    }
+
+    }.bind(this);
 
     // To be used for cmd line arguments.
     function InQuotes(arg) {
@@ -171,7 +175,7 @@ function(app_path, xwalk_path, meta_data, callback) {
     }
 
     function AddFileComponent(node, base_path, relative_path) {
-        var file_id = MakeIdFromPath(relative_path);
+        var file_id = MakeIdFromPath(path.join(base_path, relative_path));
         file_ids.push(file_id);
         var component = node.ele('Component', { Id: file_id, Guid: uuid.v1() });
         var source_path = (base_path.length === 0) ? relative_path
