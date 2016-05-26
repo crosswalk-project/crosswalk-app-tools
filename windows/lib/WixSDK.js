@@ -263,20 +263,15 @@ function(app_path, xwalk_path, meta_data, callback) {
         });
     }
 
-    // Extensions are supposed to be in the source application root dir: app_path.
-    // Then we copy them to the sub-directory of the installer folder:
-    //     app_files_folder/xwalk-extensions
-    // So, if we still fully copy the source application root directory, all the
-    // extensions will be duplicated.
-    // Extensions can be divided by categories in seperate directories.
+    // Only .dll files in extension folders will be picked up into
+    // app_files_folder/xwalk-extensions.
     this._manifest.extensions.forEach(function(extDir) {
         installExtensionDlls(extDir, app_extensions_folder);
-        if (path.normalize(path.dirname(extDir)) == path.normalize(app_path)) {
-            extensions_relative_dir.push(path.relative(app_path, extDir));
-        }
     }.bind(this));
 
-    // Skip in-folder extensions copying to avoid duplication.
+    // Pass all extensions as the skip_array argument, so that in-folder
+    // extensions copying to avoid duplication. Because the needed extension
+    // files(*.dll) have already be installed by previous step.
     installFiles(app_path, app_files_folder, this._manifest.extensions);
 
     var program_menu_folder_ref = product.ele('DirectoryRef', { Id: 'ApplicationProgramsFolder' });
