@@ -413,6 +413,28 @@ exports.tests = {
         test.done();
     },
 
+    windowsCodepageDefault: function(test) {
+
+        test.expect(1);
+
+        var path1 = produceManifest();
+        var m1 = consumeManifest(path1);
+
+        test.equal(m1.windowsCodepage, Manifest.WINDOWS_DEFAULT_CODEPAGE);
+        test.done();
+    },
+
+    windowsCodepageCustom: function(test) {
+
+        test.expect(1);
+
+        var path1 = produceManifest({xwalk_windows_codepage: "936"});
+        var m1 = consumeManifest(path1);
+
+        test.equal(m1.windowsCodepage, "936");
+        test.done();
+    },
+
     windowsUpdateId: function(test) {
 
         test.expect(1);
