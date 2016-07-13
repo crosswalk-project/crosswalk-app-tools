@@ -56,6 +56,7 @@ WixSDK.prototype.generateMSI =
 function(app_path, xwalk_path, meta_data, callback) {
 
     var output = this._output;
+    var app_root_path = "approot";
 
     if (app_path) {
         app_path = this.convertPath(app_path);
@@ -143,7 +144,7 @@ function(app_path, xwalk_path, meta_data, callback) {
                                                    { Id: 'ApplicationRootFolder', 'Name': meta_data.app_name });
     // We're putting web app files to a separate subfolder to avoid name clashes.
     var app_files_folder = app_root_folder.ele('Directory',
-                                              { Id: 'ApplicationFilesFolder', 'Name': meta_data.app_name });
+                                              { Id: 'ApplicationFilesFolder', 'Name': app_root_path });
     // Try to align with the in-folder extensions' directory name of Android.
     var app_relative_extensions_dir = 'xwalk-extensions';
     var app_extensions_folder = app_root_folder.ele('Directory',
@@ -287,7 +288,7 @@ function(app_path, xwalk_path, meta_data, callback) {
         registry_entries_component = registry_entries_ref.ele('Component', { Id: 'RegistryEntries', Guid: uuid.v1() });
     }
 
-    var cmd_line_args = InQuotes(path.join(meta_data.app_name, 'manifest.json'));
+    var cmd_line_args = InQuotes(path.join(app_root_path, 'manifest.json'));
     if (this._manifest.commandLine) {
         var manifest_args = this._manifest.commandLine.split(" ").reduce(function (acc, val) {
             // Multiple adjacent whitespaces split to empty elements.
