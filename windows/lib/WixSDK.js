@@ -226,7 +226,9 @@ function(app_path, xwalk_path, meta_data, callback) {
         return node;
     }
 
-    var locales_path = path.join(xwalk_path, 'locales');
+    var locales_path = path.join(xwalk_path, 'locales', 'xwalk');
+    if (!fs.existsSync(locales_path))
+	locales_path = path.join(xwalk_path, 'locales');
     if (fs.existsSync(locales_path)) {
         var locales = fs.readdirSync(locales_path);
         locales.forEach(function (locale) {
