@@ -62,37 +62,7 @@ function testFile(url, callback) {
     });
 }
 
-
 exports.tests = {
-
-    httpFile: function(test) {
-
-        test.expect(1);
-
-        testFile("http://www.linuxfoundation.org", function(size) {
-
-            test.equal(size > 0, true);
-            test.done();
-        });
-    },
-
-    httpStream: function(test) {
-
-        test.expect(1);
-
-        var stream = new MemoryStream();
-
-        var buffer = "";
-        stream.on("data", function(chunk) {
-            buffer += chunk.toString();
-        });
-
-        testStream("http://www.linuxfoundation.org", stream, function() {
-
-            test.equal(buffer.length > 0, true);
-            test.done();
-        });
-    },
 
     httpsFile: function(test) {
 

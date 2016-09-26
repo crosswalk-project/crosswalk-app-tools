@@ -35,7 +35,7 @@ exports.tests = {
         ShellJS.rm(tmpPath);
 
         // Download
-        var url = "http://www.linuxfoundation.org";
+        var url = "https://www.linuxfoundation.org";
         var label = "Fetching " + url;
         var indicator = _output.createFiniteProgress(label);
         var stream = handler.createStream();
