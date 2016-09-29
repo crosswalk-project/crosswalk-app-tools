@@ -18,11 +18,11 @@ environment:
 install:
   - cd \
   - ps: "[Net.ServicePointManager]::SecurityProtocol = 'Tls12'"
-  - ps: Start-FileDownload 'http://www.eu.apache.org/dist//ant/binaries/apache-ant-1.9.7-bin.zip'
+  - appveyor DownloadFile http://www.eu.apache.org/dist/ant/binaries/apache-ant-1.9.7-bin.zip
   - 7z x apache-ant-1.9.7-bin.zip > nul
   - md lzma
   - cd lzma
-  - ps: Start-FileDownload 'http://www.7-zip.org/a/lzma1514.7z'
+  - appveyor DownloadFile http://www.7-zip.org/a/lzma1514.7z
   - 7z x lzma1514.7z
   - cd ..\
   - set PATH=%ANDROID_HOME%\tools;%PATH%;%ANT_HOME%\bin;%WIX_HOME%\bin;C:\lzma\bin;
