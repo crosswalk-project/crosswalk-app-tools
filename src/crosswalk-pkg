@@ -118,17 +118,26 @@ function help() {
         "  Usage: crosswalk-pkg <options> <path>\n" +
         "\n" +
         "  <options>\n" +
-        '    -a --android=<android-conf>      Extra configurations for Android\n' +
-        "    -c --crosswalk=<version-spec>    Specify Crosswalk version or path\n" +
-        "    -h --help                        Print usage information\n" +
-        "    -k --keep                        Keep build tree for debugging\n" +
-        "    -m --manifest=<package-id>       Fill manifest.json with default values\n" +
-        "    -p --platforms=<target-systems>  Specify target platform\n" +
-        "    -r --release                     Build release packages\n" +
-        "    -s --skip-check                  Skip host setup check before building\n" +
-        "    -t --targets=<target-archs>      Target CPU architectures\n" +
-        "    -v --version                     Print tool version\n" +
-        '    -w --windows=<windows-conf>      Extra configurations for Windows\n' +
+        "    -a <android-conf>\n" +
+        "    --android=<android-conf>      Extra configurations for Android\n" +
+        "    -c <version-spec>\n" +
+        "    --crosswalk=<version-spec>    Specify Crosswalk version or path\n" +
+        "    -h, --help                    Print usage information\n" +
+        "    -k, --keep                    Keep build tree for debugging\n" +
+        "    -m <package-id>\n" +
+        "    --manifest=<package-id>       Fill manifest.json with default values\n" +
+        "    -p <target-systems>\n" +
+        "    --platforms=<target-systems>  Specify target platform\n" +
+        "    -r, --release                 Build release packages\n" +
+        "    -s, --skip-check              Skip host setup check before building\n" +
+        "    -t <target-archs>\n" +
+        "    --targets=<target-archs>      Target CPU architectures\n" +
+        "    -v, --version                 Print tool version\n" +
+        "    -w <windows-conf>\n" +
+        "    --windows=<windows-conf>      Extra configurations for Windows\n" +
+        "\n" +
+        "  Note that single character options should not be followed by '=',\n" +
+        "  i.e. -c=canary doesn't work.\n" +
         "\n" +
         "  <path>\n" +
         "    Path to directory that contains a web app\n" +
