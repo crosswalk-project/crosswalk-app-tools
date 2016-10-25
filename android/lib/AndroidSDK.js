@@ -69,13 +69,9 @@ function(buffer) {
     var prefixes = [
         "Picked up _JAVA_OPTIONS",
         "Picked up JAVA_TOOL_OPTIONS" ];
-		
-    if("string" !== typeof buffer) {
-        buffer = buffer.toString();
-    }		
-
+	
     var filtered = "";
-    var lines = buffer.split("\n");
+    var lines = buffer.toString().split("\n");
     for (var i = 0; i < lines.length; i++) {
 
         var line = lines[i].trim();

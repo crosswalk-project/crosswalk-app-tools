@@ -241,10 +241,8 @@ function(configId, args, callback) {
 
     var sdk = new WixSDK(this.application.rootPath, manifest, this.output);
     var indicator = output.createInfiniteProgress("Building package");
-    sdk.onData = function(data) {
-        if("string" !== typeof data) {
-            data = data.toString();
-	}
+    sdk.onData = function(data) {        
+        data = data.toString();
 	
         this.logOutput.write(data);
         var keys = [
