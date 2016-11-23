@@ -30,7 +30,7 @@ var util = {
     /** expose some dependencies for hooks */
     AdmZip: require("adm-zip"),
     FormatJson: require("format-json"),
-    NodeUuid: require("node-uuid"),
+    NodeUuid: require("uuid"),
     ParseColor: require("parse-color"),
     XmlBuilder: require("xmlbuilder"),
     XmlDom: require("xmldom"),
