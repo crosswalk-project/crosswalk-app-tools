@@ -6,7 +6,7 @@ var child_process = require('child_process');
 
 var builder = require('xmlbuilder');
 var crypto = require('crypto');
-var uuid = require('node-uuid');
+var uuid = require('uuid');
 var readDir = require('readdir');
 var ShellJS = require("shelljs");
 
