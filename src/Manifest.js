@@ -244,6 +244,15 @@ function Manifest(output, path) {
         }
     }
 
+    // Windows codepage
+    // Optional field, only check if present.
+    this._windowsCodepage = "";
+    if (json.xwalk_windows_codepage) {
+        this._windowsCodepage = json.xwalk_windows_codepage;
+    } else {
+        this._windowsCodepage = Manifest.WINDOWS_DEFAULT_CODEPAGE;
+    }
+
     // Windows update ID
     // Optional field, only check if present.
     this._windowsUpdateId = null;
@@ -281,6 +290,13 @@ function Manifest(output, path) {
  * Default permissions needed on android.
  */
 Manifest.ANDROID_DEFAULT_PERMISSIONS = [ "ACCESS_NETWORK_STATE", "ACCESS_WIFI_STATE", "INTERNET" ];
+
+/**
+ * Default codepage to use is "western european".
+ * When using ISO 8859-1 unsupported characters in the manifest,
+ * the codepage needs to be adjusted accordingly.
+ */
+Manifest.WINDOWS_DEFAULT_CODEPAGE = "1252";
 
 /**
  * Create default manifest data.
@@ -332,6 +348,7 @@ function(packageId) {
         // Set external storage by default, needed for shared mode/fallback.
         "xwalk_android_permissions": Manifest.ANDROID_DEFAULT_PERMISSIONS,
         // Windows fields
+        "xwalk_windows_codepage": Manifest.WINDOWS_DEFAULT_CODEPAGE,
         "xwalk_windows_update_id": windowsUpdateId
     };
 };
@@ -667,6 +684,18 @@ Object.defineProperty(Manifest.prototype, "targetPlatforms", {
                                 } else {
                                     throw new IllegalAccessException(errormsg);
                                 }
+                           }
+                      });
+
+/**
+ * Windows codepage
+ * @member {String} windowsCodepage
+ * @instance
+ * @memberOf Manifest
+ */
+Object.defineProperty(Manifest.prototype, "windowsCodepage", {
+                      get: function() {
+                                return this._windowsCodepage;
                            }
                       });
 

@@ -119,7 +119,8 @@ function(app_path, xwalk_path, meta_data, callback) {
         'UpgradeCode': meta_data.upgrade_id,
         'Version': meta_data.version,
         'Manufacturer': meta_data.manufacturer,
-        'Language': '1033'
+        'Language': '1033',
+        'Codepage': this._manifest.windowsCodepage
     });
 
     var package = product.ele('Package', { InstallerVersion: '300', 'Compressed': 'yes' });
