@@ -305,9 +305,14 @@ function copy(app, appPath, extraArgs, callback) {
     ShellJS.rm("-rf", Path.join(app.appPath, "*"));
     ShellJS.cp("-r", Path.join(appPath, "*"), app.appPath);
 
-    // Init and load manifest
+    // Initialise and load manifest
     var manifestPath = Path.join(app.appPath, "manifest.json");
     Manifest.addDefaults(output, manifestPath, app.packageId);
+    var ret = Manifest.ensureAppProtocol(output, manifestPath, app.packageId);
+    if (!ret) {
+        callback(cat.EXIT_CODE_ERROR);
+        return;
+    }
     app.loadManifest(manifestPath);
 
     // Propagate target platform cause we just nuked the manifest
