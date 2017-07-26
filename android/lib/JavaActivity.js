@@ -153,7 +153,7 @@ function(enable) {
 JavaActivity.prototype.enableKeepScreenOn =
 function(enable) {
 
-    return this.editOnCreate(enable, "        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);");
+    return this.editOnCreate(enable, "        getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);");
 };
 
 /**

@@ -1,25 +1,25 @@
 cache:
-- C:\apache-ant-1.9.7-bin.zip
+- C:\apache-ant-1.9.9-bin.zip
 
 environment:
   matrix:
     - ANDROID_HOME: C:\Program Files (x86)\Android\android-sdk
-      ANT_HOME: C:\apache-ant-1.9.7
+      ANT_HOME: C:\apache-ant-1.9.9
       TEST_SCRIPT: "nodeunit_test"
     - WIX_HOME: C:\Program Files (x86)\WiX Toolset v3.10
       TEST_SCRIPT: "windows_test"
     - ANDROID_HOME: C:\Program Files (x86)\Android\android-sdk
-      ANT_HOME: C:\apache-ant-1.9.7
+      ANT_HOME: C:\apache-ant-1.9.9
       TEST_SCRIPT: "android_test_32bit"
     - ANDROID_HOME: C:\Program Files (x86)\Android\android-sdk
-      ANT_HOME: C:\apache-ant-1.9.7
+      ANT_HOME: C:\apache-ant-1.9.9
       TEST_SCRIPT: "android_test_64bit"
 
 install:
   - cd \
   - ps: "[Net.ServicePointManager]::SecurityProtocol = 'Tls12'"
-  - appveyor DownloadFile http://www.eu.apache.org/dist/ant/binaries/apache-ant-1.9.7-bin.zip
-  - 7z x apache-ant-1.9.7-bin.zip > nul
+  - appveyor DownloadFile http://www.eu.apache.org/dist/ant/binaries/apache-ant-1.9.9-bin.zip
+  - 7z x apache-ant-1.9.9-bin.zip > nul
   - md lzma
   - cd lzma
   - appveyor DownloadFile http://www.7-zip.org/a/lzma1514.7z
