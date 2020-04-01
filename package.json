@@ -21,7 +21,7 @@
   "dependencies": {
     "adm-zip": "~0.4.4",
     "format-json": "~1.0.3",
-    "https-proxy-agent": "~0.3.5",
+    "https-proxy-agent": "~5.0.0",
     "memorystream": "~0.3.0",
     "minimist": "~1.1.0",
     "mktemp": "~0.3.5",
