@@ -25,7 +25,7 @@
     "memorystream": "~0.3.0",
     "minimist": "~1.1.0",
     "mktemp": "~0.3.5",
-    "mustache": "~0.8.2",
+    "mustache": "~4.0.1",
     "parse-color": "~1.0.0",
     "readdir": "~0.0.13",
     "shelljs": "~0.3.0",
