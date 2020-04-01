@@ -23,7 +23,7 @@
     "format-json": "~1.0.3",
     "https-proxy-agent": "~0.3.5",
     "memorystream": "~0.3.0",
-    "minimist": "~1.1.0",
+    "minimist": "~1.2.5",
     "mktemp": "~0.3.5",
     "mustache": "~0.8.2",
     "parse-color": "~1.0.0",
